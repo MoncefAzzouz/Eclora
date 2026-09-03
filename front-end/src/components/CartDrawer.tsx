@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Product } from '@/data/products';
 
@@ -155,13 +156,14 @@ export default function CartDrawer({
                 <span className="text-base">{Math.round(subtotal)} DA</span>
               </div>
               <p className="text-[11px] text-gray-500">Taxes incluses et frais de port calculés au paiement.</p>
-              <button
-                onClick={() => alert('Redirection vers la caisse sécurisée Eclora...')}
-                className="w-full bg-black text-white py-3.5 rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+              <Link
+                href="/panier"
+                onClick={onClose}
+                className="w-full bg-black text-white py-3.5 rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 block text-center"
               >
-                <span>Commander</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                <span>Voir mon panier</span>
+                <ArrowRight className="w-4 h-4 inline" />
+              </Link>
             </div>
           )}
         </div>
