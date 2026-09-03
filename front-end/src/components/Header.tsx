@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, MapPin, User, Heart, ShoppingBag, X } from 'lucide-react';
+import { Search, MapPin, User, Heart, ShoppingBag, X, Menu, ChevronRight } from 'lucide-react';
 import { BEST_SELLERS, NEW_LAUNCHES, Product } from '@/data/products';
 
 interface HeaderProps {
@@ -15,6 +15,7 @@ interface HeaderProps {
 export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQuickView }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const allProducts = [...BEST_SELLERS, ...NEW_LAUNCHES];
   const filteredProducts = searchQuery.trim()
@@ -25,15 +26,38 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
       )
     : [];
 
+  const CATEGORIES = [
+    { name: 'Maquillage', slug: 'maquillage' },
+    { name: 'Parfum', slug: 'parfum' },
+    { name: 'Soin Visage', slug: 'soin-visage' },
+    { name: 'Corps & Bain', slug: 'corps-bain' },
+    { name: 'Cheveux', slug: 'cheveux' },
+    { name: 'Nouveautés & Tendances', slug: 'nouveautes' },
+    { name: 'Marques', slug: 'marques' },
+    { name: 'Eclora Collection', slug: 'eclora-collection', highlight: 'pink' },
+    { name: 'Bons plans & Cadeaux', slug: 'bons-plans' },
+    { name: 'Dernière chance -40%', slug: 'derniere-chance', highlight: 'red' },
+  ];
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-        {/* Eclora Logo */}
-        <Link href="/" className="flex-shrink-0 cursor-pointer block">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-[0.22em] text-black font-sans uppercase hover:opacity-80 transition-opacity">
-            ECLORA
-          </h1>
-        </Link>
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+        {/* Mobile Hamburger + Eclora Logo */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={() => setIsMobileNavOpen(true)}
+            className="p-1 text-black hover:opacity-75 transition-opacity sm:hidden"
+            aria-label="Menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
+          <Link href="/" className="flex-shrink-0 cursor-pointer block">
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-[0.2em] text-black font-sans uppercase hover:opacity-80 transition-opacity">
+              ECLORA
+            </h1>
+          </Link>
+        </div>
 
         {/* Search Bar Container */}
         <div className="relative flex-1 max-w-2xl mx-2 sm:mx-6">
@@ -141,6 +165,69 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
           </Link>
         </div>
       </div>
+
+      {/* Mobile Slide-Over Navigation Drawer */}
+      {isMobileNavOpen && (
+        <div className="fixed inset-0 z-50 flex sm:hidden animate-fade-in">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            onClick={() => setIsMobileNavOpen(false)}
+          />
+          <div className="relative bg-white w-4/5 max-w-sm h-full shadow-2xl flex flex-col justify-between z-10">
+            <div>
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <span className="text-xl font-extrabold tracking-[0.2em] text-black uppercase font-sans">
+                  ECLORA
+                </span>
+                <button
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="p-1 text-black"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-4 divide-y divide-gray-100 overflow-y-auto max-h-[calc(100vh-140px)]">
+                <div className="py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Catégories
+                </div>
+                {CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/shop/${cat.slug}`}
+                    onClick={() => setIsMobileNavOpen(false)}
+                    className="flex items-center justify-between py-3 text-xs font-bold transition-colors hover:text-[#d80075]"
+                  >
+                    <span
+                      className={
+                        cat.highlight === 'pink'
+                          ? 'text-[#d80075]'
+                          : cat.highlight === 'red'
+                          ? 'text-red-600'
+                          : 'text-black'
+                      }
+                    >
+                      {cat.name}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-200 bg-gray-50 text-xs font-semibold text-gray-600 space-y-2">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-black" />
+                <span>Magasins & Services</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-black" />
+                <span>Mon compte</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
