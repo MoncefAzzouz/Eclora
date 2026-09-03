@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Star, Heart, Search, ChevronDown, ChevronUp, ChevronRight, X, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Star, Heart, Search, ChevronDown, ChevronUp, ChevronRight, X, Check } from 'lucide-react';
 import { Product, SHOP_PRODUCTS, SHOP_BRANDS } from '@/data/products';
 
 interface ShopPageProps {
@@ -20,10 +20,11 @@ export default function ShopPage({
 }: ShopPageProps) {
   const [brandSearch, setBrandSearch] = useState('');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [activeCategoryPill, setActiveCategoryPill] = useState<string>(categoryName || 'Maquillage');
+  const [activeCategoryPill, setActiveCategoryPill] = useState<string>(categoryName || 'Parfum');
   const [sortBy, setSortBy] = useState('Nouveautés');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [activeMobileFilterSection, setActiveMobileFilterSection] = useState<string | null>(null);
+  const [addedProductId, setAddedProductId] = useState<string | null>(null);
 
   // Desktop accordions
   const [openAccordion, setOpenAccordion] = useState<Record<string, boolean>>({
@@ -50,10 +51,15 @@ export default function ShopPage({
     b.name.toLowerCase().includes(brandSearch.toLowerCase())
   );
 
-  // Filter products by selected brands
   const displayedProducts = selectedBrands.length > 0
     ? SHOP_PRODUCTS.filter((p) => selectedBrands.includes(p.brand))
     : SHOP_PRODUCTS;
+
+  const handleAddClick = (product: Product) => {
+    onAddToCart(product);
+    setAddedProductId(product.id);
+    setTimeout(() => setAddedProductId(null), 1800);
+  };
 
   const CATEGORY_PILLS = [
     'Maquillage',
@@ -61,7 +67,6 @@ export default function ShopPage({
     'Soin Visage',
     'Corps & Bain',
     'Cheveux',
-    'Bons plans & Cadeaux',
     'Marques',
   ];
 
@@ -75,22 +80,22 @@ export default function ShopPage({
 
   return (
     <div className="bg-white min-h-screen pb-24 text-black font-sans">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4">
         {/* Breadcrumbs */}
-        <nav className="text-xs text-gray-500 mb-3 sm:mb-6 flex items-center space-x-1.5 sm:space-x-2">
+        <nav className="text-[11px] sm:text-xs text-gray-500 mb-2 sm:mb-4 flex items-center space-x-1.5 font-medium">
           <Link href="/" className="hover:text-black transition-colors text-gray-400">
             ...
           </Link>
           <span>/</span>
-          <span className="text-black font-bold tracking-wide capitalize">
-            {categoryName || 'Nouveautés par catégorie'}
+          <span className="text-black font-bold tracking-tight">
+            Nouveautés Par Catégorie
           </span>
         </nav>
 
         {/* Category Description Banner Header */}
-        <div className="bg-[#fce5dd] rounded-2xl sm:rounded-3xl p-5 sm:p-8 mb-4 sm:mb-8 border border-[#f7d6cc]">
-          <h1 className="text-2xl sm:text-4xl font-black text-black mb-1 sm:mb-3 tracking-tight">
-            {categoryName || 'Nouveautés par catégorie'}
+        <div className="bg-gradient-to-r from-[#faede5] to-[#fce2d6] rounded-2xl sm:rounded-3xl p-5 sm:p-8 mb-4 sm:mb-6 border border-[#f5ded4]">
+          <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight mb-1 sm:mb-2">
+            Nouveautés par catégorie
           </h1>
           <p className="text-xs sm:text-sm text-gray-800 leading-relaxed font-normal max-w-4xl hidden sm:block">
             Essentiel beauté incontournable, le maquillage et les parfums sont nos meilleurs alliés ! Teint frais, lèvres gourmandes et smoky eyes, le makeup parfait est à portée de main chez Eclora.
@@ -98,17 +103,17 @@ export default function ShopPage({
         </div>
 
         {/* Subcategory Horizontal Pills Carousel */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-4 mb-3 sm:mb-8 text-xs font-bold whitespace-nowrap">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 sm:mb-6 text-xs sm:text-sm font-bold whitespace-nowrap">
           {CATEGORY_PILLS.map((pill) => {
             const isSelected = activeCategoryPill.toLowerCase() === pill.toLowerCase();
             return (
               <button
                 key={pill}
                 onClick={() => setActiveCategoryPill(pill)}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl border transition-all ${
+                className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl transition-all ${
                   isSelected
-                    ? 'bg-black text-white border-black shadow-xs'
-                    : 'bg-[#faede5] border-[#f5ded4] text-black hover:bg-[#f6dfd3]'
+                    ? 'bg-black text-white shadow-xs'
+                    : 'bg-[#faede5] text-black hover:bg-[#f5ded4]'
                 }`}
               >
                 {pill}
@@ -117,7 +122,7 @@ export default function ShopPage({
           })}
         </div>
 
-        {/* Mobile Filter & Sort Split Bar (Hidden on Desktop, Visible on Mobile) */}
+        {/* Mobile Filter & Sort Split Bar */}
         <div className="grid grid-cols-2 border-t border-b border-gray-200 py-3 mb-4 sm:hidden text-xs font-bold text-black text-center">
           <button
             onClick={() => setIsMobileFilterOpen(true)}
@@ -146,13 +151,13 @@ export default function ShopPage({
         </div>
 
         {/* Product Count Header on Mobile */}
-        <div className="text-xs sm:text-sm font-extrabold text-black mb-3 sm:mb-6 sm:hidden">
+        <div className="text-sm font-black text-black mb-3 sm:hidden">
           818 Produits
         </div>
 
         {/* Main Grid: Desktop Sidebar + Product Catalog */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Desktop Left Sidebar Filters (Hidden on Mobile) */}
+          {/* Desktop Left Sidebar Filters */}
           <aside className="hidden lg:block lg:col-span-3 space-y-6">
             <div className="flex items-center justify-between pb-3 border-b border-gray-200">
               <h2 className="text-xl font-black text-black">Filtres</h2>
@@ -188,7 +193,7 @@ export default function ShopPage({
                       type="text"
                       value={brandSearch}
                       onChange={(e) => setBrandSearch(e.target.value)}
-                      placeholder="Ex : Dior, Huda Beauty..."
+                      placeholder="Ex : Color Wow, Laneige..."
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-black placeholder-gray-400 outline-none focus:ring-1 focus:ring-black"
                     />
                   </div>
@@ -243,7 +248,7 @@ export default function ShopPage({
             </div>
           </aside>
 
-          {/* Right Product Grid (2 Items per row on mobile, 3 on desktop) */}
+          {/* Right Product Grid (2 Columns on Mobile, 3 on Desktop) */}
           <main className="lg:col-span-9">
             {/* Desktop Header Line */}
             <div className="hidden sm:flex items-center justify-between mb-6">
@@ -269,36 +274,31 @@ export default function ShopPage({
               </div>
             </div>
 
-            {/* Product Grid (2 Columns on mobile: grid-cols-2) */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
+            {/* Product Grid: 2 Columns on Mobile, Big & Crisp Typography */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
               {displayedProducts.map((product) => {
                 const isWishlisted = wishlist.includes(product.id);
+                const isAdded = addedProductId === product.id;
 
                 return (
                   <div
                     key={product.id}
-                    className="bg-white rounded-2xl border border-gray-200 p-2.5 sm:p-4 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group relative"
+                    className="bg-white rounded-2xl border border-gray-200/90 p-3 sm:p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200 group relative"
                   >
                     <div>
                       {/* Top Badges & Wishlist Toggle */}
-                      <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                        {product.badge ? (
-                          <span className="bg-black text-white text-[9px] sm:text-[11px] font-bold px-2 sm:px-2.5 py-0.5 rounded-sm sm:rounded-md">
-                            {product.badge}
-                          </span>
-                        ) : (
-                          <span className="bg-black text-white text-[9px] sm:text-[11px] font-bold px-2 sm:px-2.5 py-0.5 rounded-sm sm:rounded-md">
-                            Nouveauté
-                          </span>
-                        )}
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="bg-black text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-sm">
+                          {product.badge || 'Nouveauté'}
+                        </span>
                         <button
                           onClick={() => onToggleWishlist(product.id)}
-                          className="p-1 sm:p-1.5 rounded-full hover:bg-gray-100 transition-colors text-black"
+                          className="p-1 rounded-full hover:bg-gray-100 transition-colors text-black"
                           aria-label="Wishlist"
                         >
                           <Heart
                             className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                              isWishlisted ? 'fill-[#d80075] text-[#d80075]' : 'text-black stroke-[1.5]'
+                              isWishlisted ? 'fill-[#d80075] text-[#d80075]' : 'text-black stroke-[1.75]'
                             }`}
                           />
                         </button>
@@ -307,49 +307,84 @@ export default function ShopPage({
                       {/* Product Image Link */}
                       <Link
                         href={`/product/${product.id}`}
-                        className="w-full h-[140px] sm:h-[220px] relative overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center cursor-pointer block mb-2 sm:mb-3 p-2"
+                        className="w-full h-[150px] sm:h-[220px] relative overflow-hidden rounded-xl bg-white flex items-center justify-center cursor-pointer block mb-3 p-1"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={product.image}
                           alt={product.title}
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                         />
                       </Link>
 
-                      {/* Product Metadata */}
+                      {/* Product Typography & Details */}
                       <div>
-                        <div className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider truncate">
+                        {/* Brand in Bold Uppercase */}
+                        <div className="text-xs sm:text-sm font-extrabold text-black uppercase tracking-tight leading-none mb-1 truncate">
                           {product.brand}
                         </div>
+
+                        {/* Product Title (13px, crisp black) */}
                         <Link
                           href={`/product/${product.id}`}
-                          className="text-[11px] sm:text-xs text-gray-900 font-medium line-clamp-2 mt-0.5 sm:mt-1 hover:underline cursor-pointer min-h-[28px] sm:min-h-[32px] block leading-tight"
+                          className="text-[12px] sm:text-[13px] text-neutral-900 font-medium line-clamp-2 hover:underline cursor-pointer min-h-[32px] sm:min-h-[36px] block leading-snug"
                         >
                           {product.title}
                         </Link>
+
+                        {/* Volume / Subtitle */}
                         {product.subtitle && (
-                          <div className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 truncate">
+                          <div className="text-[11px] sm:text-xs text-gray-500 font-normal mt-0.5 truncate">
                             {product.subtitle}
                           </div>
                         )}
 
                         {/* Price */}
-                        <div className="mt-1.5 sm:mt-2 flex items-baseline gap-2">
-                          <span className="text-xs sm:text-base font-extrabold text-black">
+                        <div className="mt-1 sm:mt-1.5">
+                          <span className="text-sm sm:text-base font-black text-black">
                             {product.price}
+                          </span>
+                        </div>
+
+                        {/* Unit Price */}
+                        {product.unitPrice && (
+                          <div className="text-[10px] sm:text-[11px] text-gray-400 font-normal mt-0.5">
+                            {product.unitPrice}
+                          </div>
+                        )}
+
+                        {/* Star Rating and Count */}
+                        <div className="flex items-center gap-1 mt-1 text-[11px] font-semibold text-black">
+                          <div className="flex text-black">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black text-black" />
+                            ))}
+                          </div>
+                          <span className="text-[10px] sm:text-[11px] text-black font-semibold">
+                            {product.reviewsCount}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Direct Add to Cart Action */}
-                    <div className="mt-3 pt-2 border-t border-gray-100">
+                    {/* Direct "Ajouter" Button */}
+                    <div className="mt-3 pt-2">
                       <button
-                        onClick={() => onAddToCart(product)}
-                        className="w-full py-1.5 sm:py-2.5 rounded-xl border border-black font-bold text-[10px] sm:text-xs text-black hover:bg-black hover:text-white transition-all text-center"
+                        onClick={() => handleAddClick(product)}
+                        className={`w-full py-2 sm:py-2.5 rounded-lg border border-black font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 ${
+                          isAdded
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-white text-black hover:bg-black hover:text-white'
+                        }`}
                       >
-                        Ajouter au panier
+                        {isAdded ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>Ajouté</span>
+                          </>
+                        ) : (
+                          <span>Ajouter</span>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -360,7 +395,7 @@ export default function ShopPage({
         </div>
       </div>
 
-      {/* Mobile Filters Full Screen Modal / Drawer (Matching Screenshot 2) */}
+      {/* Mobile Filters Full Screen Modal */}
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 bg-white flex flex-col justify-between animate-fade-in">
           {/* Modal Header */}

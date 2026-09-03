@@ -16,6 +16,7 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const allProducts = [...BEST_SELLERS, ...NEW_LAUNCHES];
   const filteredProducts = searchQuery.trim()
@@ -41,26 +42,26 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
-        {/* Mobile Hamburger + Eclora Logo */}
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+        {/* Left: Mobile Hamburger + Eclora Logo */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setIsMobileNavOpen(true)}
             className="p-1 text-black hover:opacity-75 transition-opacity sm:hidden"
             aria-label="Menu"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-6 h-6 stroke-[1.75]" />
           </button>
 
           <Link href="/" className="flex-shrink-0 cursor-pointer block">
-            <h1 className="text-xl sm:text-3xl font-extrabold tracking-[0.2em] text-black font-sans uppercase hover:opacity-80 transition-opacity">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-[0.22em] text-black font-sans uppercase hover:opacity-80 transition-opacity">
               ECLORA
             </h1>
           </Link>
         </div>
 
-        {/* Search Bar Container */}
-        <div className="relative flex-1 max-w-2xl mx-2 sm:mx-6">
+        {/* Desktop Search Bar (Hidden on Mobile) */}
+        <div className="relative flex-1 max-w-2xl mx-2 sm:mx-6 hidden sm:block">
           <div className="relative flex items-center">
             <Search className="absolute left-4 w-4 h-4 text-gray-500 pointer-events-none" />
             <input
@@ -124,22 +125,31 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
           )}
         </div>
 
-        {/* Navigation Action Icons */}
-        <div className="flex items-center gap-4 sm:gap-6 text-black text-xs font-medium">
-          {/* Store & Services */}
+        {/* Right Navigation Action Icons */}
+        <div className="flex items-center gap-3 sm:gap-6 text-black text-xs font-medium">
+          {/* Mobile Search Icon */}
+          <button
+            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+            className="p-1 sm:hidden hover:opacity-75 transition-opacity"
+            aria-label="Recherche"
+          >
+            <Search className="w-5 h-5 stroke-[1.75]" />
+          </button>
+
+          {/* Store & Services (Desktop) */}
           <button className="hidden md:flex items-center gap-2 hover:text-gray-600 transition-colors">
             <MapPin className="w-5 h-5 stroke-[1.75]" />
             <span className="leading-tight font-medium">Magasin et Services</span>
           </button>
 
           {/* User Account */}
-          <button className="flex items-center gap-2 hover:text-gray-600 transition-colors">
+          <button className="flex items-center gap-2 hover:text-gray-600 transition-colors" aria-label="Compte">
             <User className="w-5 h-5 stroke-[1.75]" />
             <span className="hidden sm:inline leading-tight font-medium">Se connecter</span>
           </button>
 
           {/* Wishlist Icon */}
-          <button className="relative p-1 hover:text-gray-600 transition-colors">
+          <button className="relative p-1 hover:text-gray-600 transition-colors" aria-label="Favoris">
             <Heart className="w-5 h-5 stroke-[1.75]" />
             {wishlistCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-[#d80075] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
@@ -156,15 +166,38 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
           >
             <div className="relative">
               <ShoppingBag className="w-5 h-5 stroke-[1.75]" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-[#d80075] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
+              <span className="absolute -top-1.5 -right-2 bg-[#d80075] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {cartCount > 0 ? cartCount : 1}
+              </span>
             </div>
           </Link>
         </div>
       </div>
+
+      {/* Mobile Search Bar Expansion */}
+      {isMobileSearchOpen && (
+        <div className="p-3 bg-gray-50 border-t border-gray-200 sm:hidden animate-fade-in">
+          <div className="relative flex items-center">
+            <Search className="absolute left-3.5 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher un produit, une marque..."
+              className="w-full bg-white text-xs text-black placeholder-gray-500 rounded-full pl-10 pr-9 py-2 border border-gray-300 outline-none focus:border-black"
+              autoFocus
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 text-gray-500 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Mobile Slide-Over Navigation Drawer */}
       {isMobileNavOpen && (
