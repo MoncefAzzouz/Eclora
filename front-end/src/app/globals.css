@@ -7,7 +7,7 @@
     --eclora-black: #000000;
     --eclora-pink: #d80075;
     --eclora-red: #d32f2f;
-    --eclora-peach: #fde8e8;
+    --eclora-peach: #faede5;
     --eclora-gray-bg: #f2f2f2;
     --eclora-border: #e5e5e5;
   }
@@ -15,8 +15,9 @@
   body {
     background-color: #ffffff;
     color: #000000;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
   }
 }
 

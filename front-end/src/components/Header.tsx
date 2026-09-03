@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Search, MapPin, User, Heart, ShoppingBag, X } from 'lucide-react';
 import { BEST_SELLERS, NEW_LAUNCHES, Product } from '@/data/products';
 
@@ -28,11 +29,11 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
         {/* Eclora Logo */}
-        <div className="flex-shrink-0 cursor-pointer">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-[0.22em] text-black font-sans uppercase">
+        <Link href="/" className="flex-shrink-0 cursor-pointer block">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-[0.22em] text-black font-sans uppercase hover:opacity-80 transition-opacity">
             ECLORA
           </h1>
-        </div>
+        </Link>
 
         {/* Search Bar Container */}
         <div className="relative flex-1 max-w-2xl mx-2 sm:mx-6">
@@ -124,19 +125,20 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
           </button>
 
           {/* Cart Icon */}
-          <button
-            onClick={onOpenCart}
-            className="relative p-1 hover:text-gray-600 transition-colors flex items-center gap-1.5"
+          <Link
+            href="/panier"
+            className="relative p-1 hover:text-gray-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+            aria-label="Mon Panier"
           >
             <div className="relative">
               <ShoppingBag className="w-5 h-5 stroke-[1.75]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-black text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-2 bg-[#d80075] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </div>
-          </button>
+          </Link>
         </div>
       </div>
     </header>
