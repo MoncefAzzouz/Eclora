@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 interface PromoGridProps {
   onDiscover: () => void;
@@ -8,74 +9,76 @@ interface PromoGridProps {
 
 export default function PromoGrid({ onDiscover }: PromoGridProps) {
   return (
-    <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10">
+    <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-10">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Card - Exclusivité web */}
-        <div className="bg-[#fff0f3] rounded-2xl overflow-hidden border border-pink-100 flex flex-col sm:flex-row items-stretch shadow-xs hover:shadow-md transition-shadow">
-          <div className="w-full sm:w-1/2 min-h-[220px] relative bg-cover bg-center">
+        {/* Card 1 - Exclusivité web */}
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group">
+          <div className="w-full h-[200px] sm:h-[240px] relative overflow-hidden bg-neutral-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"
+              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=85"
               alt="Exclusivité web beauty products"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
-          <div className="w-full sm:w-1/2 p-6 flex flex-col justify-between bg-white/60 backdrop-blur-xs">
+
+          <div className="p-5 sm:p-6 bg-white flex flex-col justify-between space-y-4">
             <div>
-              <h3 className="text-base sm:text-lg font-extrabold text-black tracking-tight mb-1">
+              <h3 className="text-lg sm:text-xl font-extrabold text-black tracking-tight mb-1.5">
                 Exclusivité web
               </h3>
-              <div className="my-2">
-                <span className="text-xl sm:text-2xl font-black text-black block leading-tight">
+              <div className="mb-2">
+                <span className="text-2xl sm:text-3xl font-black text-black block leading-none">
                   Jusqu&apos;à -30%
                 </span>
-                <span className="text-xs sm:text-sm text-gray-800 font-medium">
+                <span className="text-xs sm:text-sm text-neutral-800 font-medium mt-1 block">
                   sur une sélection de produits*.
                 </span>
               </div>
             </div>
 
-            <div className="mt-4">
-              <button
-                onClick={onDiscover}
-                className="px-6 py-2.5 rounded-full border border-black text-black font-bold text-xs hover:bg-black hover:text-white transition-colors"
+            <div className="pt-2 space-y-2">
+              <Link
+                href="/shop/maquillage"
+                className="w-full py-3 sm:py-3.5 rounded-xl border border-black text-black font-extrabold text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
               >
                 Découvrir
-              </button>
-              <p className="text-[10px] text-gray-500 mt-3 font-normal leading-normal">
-                *Offre fidélité. Hors Point Rouge. Voir conditions <span className="underline cursor-pointer">ici</span>.
+              </Link>
+              <p className="text-[11px] text-gray-500 font-normal">
+                *Offre fidélité en Algérie. Hors Point Rouge.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Card - Place au renouveau */}
-        <div className="bg-[#f9f6f0] rounded-2xl overflow-hidden border border-amber-100/60 flex flex-col sm:flex-row items-stretch shadow-xs hover:shadow-md transition-shadow">
-          <div className="w-full sm:w-1/2 min-h-[220px] relative">
+        {/* Card 2 - Place au renouveau */}
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group">
+          <div className="w-full h-[200px] sm:h-[240px] relative overflow-hidden bg-neutral-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80"
+              src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=85"
               alt="Skincare skincare lineup"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
-          <div className="w-full sm:w-1/2 p-6 flex flex-col justify-between bg-white/60 backdrop-blur-xs">
+
+          <div className="p-5 sm:p-6 bg-white flex flex-col justify-between space-y-4">
             <div>
-              <h3 className="text-base sm:text-lg font-extrabold text-black tracking-tight mb-2">
+              <h3 className="text-lg sm:text-xl font-extrabold text-black tracking-tight mb-1.5">
                 Place au renouveau
               </h3>
-              <p className="text-xs sm:text-sm text-gray-700 font-normal leading-relaxed">
+              <p className="text-xs sm:text-sm text-neutral-800 font-normal leading-relaxed">
                 Préparez-vous à une nouvelle saison beauté avec nos favoris.
               </p>
             </div>
 
-            <div className="mt-6">
-              <button
-                onClick={onDiscover}
-                className="px-6 py-2.5 rounded-full border border-black text-black font-bold text-xs hover:bg-black hover:text-white transition-colors"
+            <div className="pt-2">
+              <Link
+                href="/shop/soin-visage"
+                className="w-full py-3 sm:py-3.5 rounded-xl border border-black text-black font-extrabold text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
               >
                 Découvrir
-              </button>
+              </Link>
             </div>
           </div>
         </div>
