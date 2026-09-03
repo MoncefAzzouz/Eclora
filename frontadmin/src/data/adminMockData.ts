@@ -191,6 +191,18 @@ export const INITIAL_BANNERS: Banner[] = [
     isActive: true,
     position: 4,
   },
+  {
+    id: 'ban-middle-2',
+    type: 'promo-middle',
+    title: 'Avant-première Erborian',
+    badge: '★ AVANT-PREMIÈRE',
+    description: 'Triple Care BB Milk. Testez ce soin 3-en-1 : sérum, hydratant et base de teint.',
+    buttonText: 'Découvrir',
+    imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
+    targetLink: '/shop/soin-visage',
+    isActive: true,
+    position: 5,
+  },
 ];
 
 export const INITIAL_MAIN_PAGE_SECTIONS: MainPageSection[] = [
