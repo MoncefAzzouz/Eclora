@@ -9,12 +9,12 @@ interface MiddleBannerProps {
 
 export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
   return (
-    <section className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:mt-8">
+    <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-10">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Card 1 - Plus qu'un parfum, une émotion */}
-        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col sm:flex-row shadow-2xs hover:shadow-md transition-shadow group">
-          {/* Left Image (~46%) */}
-          <div className="w-full sm:w-[46%] h-[180px] sm:h-auto sm:min-h-[220px] relative overflow-hidden bg-neutral-900 flex-shrink-0">
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col sm:flex-row sm:h-[230px] shadow-2xs hover:shadow-md transition-shadow group">
+          {/* Left Image (~44%) */}
+          <div className="w-full sm:w-[44%] h-[180px] sm:h-full relative overflow-hidden bg-neutral-900 flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=85"
@@ -23,21 +23,21 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
             />
           </div>
 
-          {/* Right Content (~54%) */}
-          <div className="w-full sm:w-[54%] p-5 sm:p-6 bg-white flex flex-col justify-between space-y-4">
+          {/* Right Content (~56%) */}
+          <div className="w-full sm:w-[56%] p-5 sm:p-6 bg-white flex flex-col justify-between">
             <div>
-              <h3 className="text-base sm:text-lg font-black text-black tracking-tight mb-2 font-sans">
+              <h3 className="text-sm sm:text-base font-black text-black tracking-tight mb-1.5 font-sans">
                 Plus qu&apos;un parfum, une émotion
               </h3>
-              <p className="text-xs text-neutral-800 font-medium leading-relaxed">
+              <p className="text-xs text-neutral-800 font-medium leading-snug">
                 Senteurs fruitées, florales ou chaleureuses à votre image.
               </p>
             </div>
 
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-1 pt-2">
               <Link
                 href="/shop/parfum"
-                className="w-full py-2.5 sm:py-3 rounded-lg border border-black text-black font-extrabold text-xs sm:text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
+                className="w-full py-2.5 rounded-lg border border-black text-black font-extrabold text-xs sm:text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
               >
                 Découvrir
               </Link>
@@ -49,9 +49,9 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
         </div>
 
         {/* Card 2 - Avant-première Erborian */}
-        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col sm:flex-row shadow-2xs hover:shadow-md transition-shadow group">
-          {/* Left Image (~46%) */}
-          <div className="w-full sm:w-[46%] h-[180px] sm:h-auto sm:min-h-[220px] relative overflow-hidden bg-gradient-to-r from-orange-200 to-amber-200 flex-shrink-0">
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col sm:flex-row sm:h-[230px] shadow-2xs hover:shadow-md transition-shadow group">
+          {/* Left Image (~44%) */}
+          <div className="w-full sm:w-[44%] h-[180px] sm:h-full relative overflow-hidden bg-gradient-to-br from-orange-300 via-amber-200 to-orange-400 flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=85"
@@ -60,31 +60,31 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
             />
 
             {/* Star Badge */}
-            <div className="absolute top-3 left-3 bg-black/90 backdrop-blur-xs text-white rounded-full px-2.5 py-1 flex items-center gap-1 shadow-md">
+            <div className="absolute top-2.5 left-2.5 bg-black/90 backdrop-blur-xs text-white rounded-full px-2 py-0.5 flex items-center gap-1 shadow-md">
               <span className="text-amber-300 text-[10px]">★</span>
               <span className="text-[9px] font-black uppercase tracking-wider">
-                AVANT-PREMIÈRE CHEZ ECLORA
+                AVANT-PREMIÈRE
               </span>
             </div>
           </div>
 
-          {/* Right Content (~54%) */}
-          <div className="w-full sm:w-[54%] p-5 sm:p-6 bg-white flex flex-col justify-between space-y-4">
+          {/* Right Content (~56%) */}
+          <div className="w-full sm:w-[56%] p-5 sm:p-6 bg-white flex flex-col justify-between">
             <div>
-              <div className="inline-block bg-[#f4ece4] px-2.5 py-1 rounded-md mb-2">
+              <div className="inline-block bg-[#f4ece4] px-2.5 py-1 rounded-md mb-1.5">
                 <h3 className="text-xs sm:text-sm font-black text-black tracking-tight font-sans">
                   Avant-première Erborian
                 </h3>
               </div>
-              <p className="text-xs text-neutral-800 font-medium leading-relaxed">
+              <p className="text-xs text-neutral-800 font-medium leading-snug">
                 Triple Care BB Milk. Testez ce soin 3-en-1 : sérum, hydratant et base de teint.
               </p>
             </div>
 
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-1 pt-2">
               <Link
                 href="/shop/soin-visage"
-                className="w-full py-2.5 sm:py-3 rounded-lg border border-black text-black font-extrabold text-xs sm:text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
+                className="w-full py-2.5 rounded-lg border border-black text-black font-extrabold text-xs sm:text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
               >
                 Découvrir
               </Link>
