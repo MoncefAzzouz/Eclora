@@ -108,7 +108,7 @@ export default function MainPageControlSection() {
                   brand: 'ECLORA',
                   title: prodId,
                   image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80',
-                  price: '39,90 €',
+                  price: '8 500 DA',
                 };
 
                 return (

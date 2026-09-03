@@ -26,7 +26,7 @@ export default function ClientsSection() {
       city: city.trim() || 'Alger',
       country: 'Algérie',
       totalOrders: 0,
-      totalSpent: '0,00 €',
+      totalSpent: '0 DA',
       loyaltyTier: 'Classic',
       joinedDate: 'Aujourd\'hui',
       status: 'Actif',
