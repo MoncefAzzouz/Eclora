@@ -9,7 +9,7 @@ interface MiddleBannerProps {
 
 export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
   return (
-    <section className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 mt-6 sm:mt-10">
+    <section className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:mt-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Card 1 - Plus qu'un parfum, une émotion */}
         <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/90 flex flex-col sm:flex-row shadow-2xs hover:shadow-md transition-shadow group">
@@ -29,18 +29,21 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
               <h3 className="text-base sm:text-lg font-black text-black tracking-tight mb-2 font-sans">
                 Plus qu&apos;un parfum, une émotion
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-800 font-normal leading-snug">
+              <p className="text-xs text-neutral-800 font-medium leading-relaxed">
                 Senteurs fruitées, florales ou chaleureuses à votre image.
               </p>
             </div>
 
-            <div className="pt-1">
+            <div className="space-y-1.5 pt-1">
               <Link
                 href="/shop/parfum"
                 className="w-full py-2.5 sm:py-3 rounded-lg border border-black text-black font-extrabold text-xs sm:text-sm hover:bg-black hover:text-white transition-all text-center block shadow-2xs"
               >
                 Découvrir
               </Link>
+              <p className="text-[10px] text-gray-500 font-normal leading-tight">
+                *Voir nos offres et exclusivités en parfumerie.
+              </p>
             </div>
           </div>
         </div>
@@ -60,7 +63,7 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
             <div className="absolute top-3 left-3 bg-black/90 backdrop-blur-xs text-white rounded-full px-2.5 py-1 flex items-center gap-1 shadow-md">
               <span className="text-amber-300 text-[10px]">★</span>
               <span className="text-[9px] font-black uppercase tracking-wider">
-                AVANT-PREMIÈRE
+                AVANT-PREMIÈRE CHEZ ECLORA
               </span>
             </div>
           </div>
@@ -73,7 +76,7 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
                   Avant-première Erborian
                 </h3>
               </div>
-              <p className="text-xs sm:text-sm text-neutral-800 font-normal leading-snug">
+              <p className="text-xs text-neutral-800 font-medium leading-relaxed">
                 Triple Care BB Milk. Testez ce soin 3-en-1 : sérum, hydratant et base de teint.
               </p>
             </div>
