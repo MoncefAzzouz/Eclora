@@ -84,7 +84,7 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1 pb-12">
-        {/* Main Hero Banner - Dior Miss Dior */}
+        {/* Main Eclora Beauty Hero Banner */}
         <HeroBanner onDiscover={() => setQuickViewProduct(BEST_SELLERS[0])} />
 
         {/* Dual Promo Banners */}

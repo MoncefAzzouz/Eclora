@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
 
 interface HeroBannerProps {
   onDiscover: () => void;
@@ -10,35 +10,41 @@ interface HeroBannerProps {
 export default function HeroBanner({ onDiscover }: HeroBannerProps) {
   return (
     <section className="relative w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 mt-3 sm:mt-6">
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900 min-h-[460px] sm:min-h-[500px] md:min-h-[560px] flex flex-col justify-end sm:justify-end shadow-md">
-        {/* Hero Background Image */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1800&q=85"
-          alt="Dior Miss Dior Campaign"
-          className="absolute inset-0 w-full h-full object-cover object-[center_20%] sm:object-center"
+      <div className="relative isolate flex min-h-[500px] overflow-hidden rounded-2xl bg-[#d7b8a3] shadow-[0_24px_70px_rgba(86,49,32,0.18)] sm:min-h-[540px] sm:rounded-3xl md:min-h-[590px]">
+        <Image
+          src="/images/eclora-beauty-hero.png"
+          alt="Eclora beauty edit with makeup, skincare, haircare and fragrance"
+          fill
+          preload
+          sizes="(max-width: 1440px) 100vw, 1376px"
+          quality={90}
+          className="object-cover object-[58%_center] sm:object-center"
         />
 
-        {/* Ambient overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none sm:bg-gradient-to-r sm:from-black/10 sm:to-black/20" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#5a2f22]/40 via-transparent to-white/5 sm:bg-gradient-to-r sm:from-[#fff8f1]/55 sm:via-transparent sm:to-black/5" />
 
-        {/* Floating White Dior Card (Bottom on Mobile, Right Bottom on Desktop) */}
-        <div className="relative z-10 w-full flex justify-center sm:justify-end p-3 sm:p-8 md:p-12">
-          <div className="bg-white rounded-2xl shadow-2xl p-5 sm:p-7 md:p-8 max-w-sm sm:max-w-md w-full border border-gray-100 text-black">
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-black mb-1.5 sm:mb-2 font-sans">
-              Dior
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-800 leading-snug font-normal mb-5 sm:mb-6">
-              Miss Dior Eau de Parfum, la nouvelle icône couture aux notes vanillées et sensuelles.
+        <div className="relative z-10 flex w-full items-end p-3 sm:items-center sm:p-8 md:p-12 lg:p-16">
+          <div className="w-full max-w-[430px] rounded-2xl border border-white/60 bg-[#fffaf5]/94 p-5 text-[#21140f] shadow-[0_24px_70px_rgba(67,34,21,0.22)] backdrop-blur-md sm:rounded-3xl sm:p-8 md:max-w-[470px] md:p-10">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#9b573f] sm:text-xs">
+              The Eclora edit
             </p>
-            <div className="w-full">
-              <Link
-                href="/shop/parfum"
-                className="w-full py-3 sm:py-3.5 rounded-lg border border-black text-black font-extrabold text-xs sm:text-sm hover:bg-black hover:text-white transition-all duration-200 tracking-wide text-center block shadow-2xs"
-              >
-                Découvrir
-              </Link>
-            </div>
+            <h1 className="mb-3 text-3xl font-black leading-[0.95] tracking-[-0.045em] sm:text-4xl md:text-5xl">
+              Beauty, in every form.
+            </h1>
+            <p className="mb-6 max-w-sm text-sm leading-relaxed text-[#4b352d] sm:text-base">
+              Makeup, skincare, hair, fragrance &amp; more — discover iconic
+              favourites and the emerging brands worth knowing.
+            </p>
+            <button
+              type="button"
+              onClick={onDiscover}
+              className="group inline-flex w-full items-center justify-center rounded-full bg-[#21140f] px-7 py-3.5 text-sm font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#a14955] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21140f] sm:w-auto sm:min-w-44"
+            >
+              Explore Eclora
+              <span aria-hidden="true" className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
+            </button>
           </div>
         </div>
       </div>
