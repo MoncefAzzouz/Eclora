@@ -202,7 +202,7 @@ export default function CategoryNav() {
       onMouseLeave={() => setActiveCategory(null)}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center space-x-6 lg:space-x-8 overflow-x-auto no-scrollbar py-3 text-[13px] text-black whitespace-nowrap font-avantgarde font-medium">
+        <div className="flex items-center space-x-6 lg:space-x-8 overflow-x-auto no-scrollbar py-3.5 text-[14px] text-black whitespace-nowrap font-avantgarde font-medium">
           {categories.map((cat) => {
             const isPink = cat.color === 'pink';
             const isRed = cat.color === 'red';
@@ -216,9 +216,9 @@ export default function CategoryNav() {
               >
                 <Link
                   href={`/shop/${cat.slug}`}
-                  className={`inline-block pb-1 tracking-[0.02em] transition-all font-medium ${
+                  className={`inline-block pb-1 tracking-[0.01em] transition-all ${
                     isActive
-                      ? 'text-black border-b-2 border-black font-semibold'
+                      ? 'text-black border-b-2 border-black'
                       : isPink
                       ? 'text-[#d80075] hover:text-[#b0005e]'
                       : isRed
