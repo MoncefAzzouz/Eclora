@@ -10,6 +10,7 @@
     --eclora-peach: #faede5;
     --eclora-gray-bg: #f2f2f2;
     --eclora-border: #e5e5e5;
+    --font-avantgarde: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Md", "ITCAvantGardeStd-Bk", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Apple Gothic", sans-serif;
   }
 
   body {
@@ -19,6 +20,11 @@
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
   }
+}
+
+.font-avantgarde {
+  font-family: var(--font-avantgarde);
+  font-weight: 500;
 }
 
 /* Custom scrollbar utility for horizontal carousels */

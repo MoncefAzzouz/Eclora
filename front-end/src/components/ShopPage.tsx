@@ -103,18 +103,19 @@ export default function ShopPage({
         </div>
 
         {/* Subcategory Horizontal Pills Carousel */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 sm:mb-6 text-xs sm:text-sm font-bold whitespace-nowrap">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 sm:mb-6 text-xs sm:text-sm font-avantgarde font-medium whitespace-nowrap">
           {CATEGORY_PILLS.map((pill) => {
             const isSelected = activeCategoryPill.toLowerCase() === pill.toLowerCase();
             return (
               <button
                 key={pill}
                 onClick={() => setActiveCategoryPill(pill)}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl transition-all ${
+                className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl transition-all font-medium ${
                   isSelected
                     ? 'bg-black text-white shadow-xs'
                     : 'bg-[#faede5] text-black hover:bg-[#f5ded4]'
                 }`}
+                style={{ fontFamily: 'var(--font-avantgarde)', fontWeight: 500 }}
               >
                 {pill}
               </button>

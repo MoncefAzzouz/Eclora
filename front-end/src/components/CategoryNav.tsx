@@ -202,7 +202,7 @@ export default function CategoryNav() {
       onMouseLeave={() => setActiveCategory(null)}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center space-x-6 lg:space-x-8 overflow-x-auto no-scrollbar py-3 text-xs font-semibold text-black whitespace-nowrap">
+        <div className="flex items-center space-x-6 lg:space-x-8 overflow-x-auto no-scrollbar py-3 text-[13px] text-black whitespace-nowrap font-avantgarde font-medium">
           {categories.map((cat) => {
             const isPink = cat.color === 'pink';
             const isRed = cat.color === 'red';
@@ -216,15 +216,19 @@ export default function CategoryNav() {
               >
                 <Link
                   href={`/shop/${cat.slug}`}
-                  className={`inline-block pb-1 transition-all ${
+                  className={`inline-block pb-1 tracking-[0.02em] transition-all font-medium ${
                     isActive
-                      ? 'text-black font-extrabold border-b-2 border-black'
+                      ? 'text-black border-b-2 border-black font-semibold'
                       : isPink
-                      ? 'text-[#d80075] hover:text-[#b0005e] font-bold'
+                      ? 'text-[#d80075] hover:text-[#b0005e]'
                       : isRed
-                      ? 'text-[#d32f2f] hover:text-[#a02020] font-bold'
-                      : 'hover:text-gray-600 font-medium'
+                      ? 'text-[#d32f2f] hover:text-[#a02020]'
+                      : 'hover:text-gray-600'
                   }`}
+                  style={{
+                    fontFamily: 'var(--font-avantgarde)',
+                    fontWeight: 500,
+                  }}
                 >
                   {cat.name}
                 </Link>

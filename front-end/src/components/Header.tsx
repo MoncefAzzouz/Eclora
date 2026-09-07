@@ -221,7 +221,7 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
               </div>
 
               <div className="p-4 divide-y divide-gray-100 overflow-y-auto max-h-[calc(100vh-140px)]">
-                <div className="py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest font-avantgarde">
                   Catégories
                 </div>
                 {CATEGORIES.map((cat) => (
@@ -229,7 +229,8 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
                     key={cat.slug}
                     href={`/shop/${cat.slug}`}
                     onClick={() => setIsMobileNavOpen(false)}
-                    className="flex items-center justify-between py-3 text-xs font-bold transition-colors hover:text-[#d80075]"
+                    className="flex items-center justify-between py-3 text-[13px] font-medium font-avantgarde transition-colors hover:text-[#d80075]"
+                    style={{ fontFamily: 'var(--font-avantgarde)', fontWeight: 500 }}
                   >
                     <span
                       className={
