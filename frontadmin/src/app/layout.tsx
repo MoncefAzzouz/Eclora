@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -11,7 +12,8 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "ECLORA Admin | Panneau d'Administration",
-  description: "Panneau d'administration Eclora : gestion des catégories, bannières, commandes clients et catalogue de produits.",
+  description: "Panneau d'administration Eclora : commandes, catalogue, contenu de la boutique et livraison.",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({
@@ -22,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
