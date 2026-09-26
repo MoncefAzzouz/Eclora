@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Heart, Trash2, Info, ChevronUp, ChevronDown, ChevronRight, Sparkles, ShieldCheck, Check } from 'lucide-react';
-import { Product, BEST_SELLERS } from '@/data/products';
+import { Heart, Info, ChevronUp, ChevronDown, ChevronRight, Sparkles, ShieldCheck, Check } from 'lucide-react';
+import { Product } from '@/data/products';
+import { useCart } from '@/lib/shop/cart';
+import { shopApi, formatDA } from '@/lib/shop/api';
 
 export interface CartItemType {
   product: Product;
@@ -11,33 +13,15 @@ export interface CartItemType {
   shade?: string;
 }
 
-interface PanierPageProps {
-  initialItems?: CartItemType[];
-}
-
-export default function PanierPage({ initialItems }: PanierPageProps) {
-  // Default sample cart item matching the screenshot if empty
-  const defaultSampleProduct: Product = {
-    id: 'onesize-dawn',
-    brand: 'ONESIZE',
-    title: "On 'Til Dawn - Spray fixateur matifiant et waterproof",
-    volume: '46 ml',
-    price: '4 400 DA',
-    rating: 4.9,
-    reviewsCount: 1420,
-    category: 'maquillage',
-    image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80',
-  };
-
-  const [items, setItems] = useState<CartItemType[]>(
-    initialItems && initialItems.length > 0
-      ? initialItems
-      : [{ product: defaultSampleProduct, quantity: 1 }]
-  );
+export default function PanierPage() {
+  const cart = useCart();
+  const items = cart.items;
 
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoDiscount, setPromoDiscount] = useState(0);
   const [isPromoOpen, setIsPromoOpen] = useState(true);
 
   const toggleWishlist = (productId: string) => {
@@ -47,14 +31,14 @@ export default function PanierPage({ initialItems }: PanierPageProps) {
   };
 
   const updateQuantity = (productId: string, newQty: number) => {
-    if (newQty < 1) return;
-    setItems((prev) =>
-      prev.map((item) => (item.product.id === productId ? { ...item, quantity: newQty } : item))
-    );
+    const current = items.find((item) => item.product.id === productId);
+    if (!current || newQty < 1) return;
+    cart.updateQuantity(productId, newQty - current.quantity, current.shade);
   };
 
   const removeItem = (productId: string) => {
-    setItems((prev) => prev.filter((item) => item.product.id !== productId));
+    const current = items.find((item) => item.product.id === productId);
+    cart.remove(productId, current?.shade);
   };
 
   // Helper to parse price number
@@ -68,13 +52,27 @@ export default function PanierPage({ initialItems }: PanierPageProps) {
     0
   );
 
-  const discount = promoApplied ? subtotal * 0.1 : 0;
+  const discount = promoApplied ? promoDiscount : 0;
   const finalTotal = subtotal - discount;
 
-  const handleApplyPromo = (e: React.FormEvent) => {
+  /** The code is checked by the backend, and checked again when the order is placed. */
+  const handleApplyPromo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (promoCode.trim().toUpperCase() === 'WELCOME5' || promoCode.trim().length > 0) {
+    setPromoError(null);
+    if (!promoCode.trim()) return;
+    try {
+      const result = await shopApi.validatePromo(promoCode.trim(), Math.round(subtotal));
+      setPromoDiscount(result.discount);
       setPromoApplied(true);
+      try {
+        sessionStorage.setItem('eclora-promo', promoCode.trim().toUpperCase());
+      } catch {
+        // ignore
+      }
+    } catch (err) {
+      setPromoApplied(false);
+      setPromoDiscount(0);
+      setPromoError(err instanceof Error ? err.message : 'Code promo invalide');
     }
   };
 
@@ -332,8 +330,10 @@ export default function PanierPage({ initialItems }: PanierPageProps) {
                   </div>
                   {promoApplied ? (
                     <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> Code promo appliqué avec succès !
+                      <Check className="w-3.5 h-3.5" /> Code promo appliqué : −{formatDA(promoDiscount)}
                     </p>
+                  ) : promoError ? (
+                    <p className="text-[11px] text-red-600 font-bold">{promoError}</p>
                   ) : (
                     <p className="text-[11px] text-gray-500 font-normal leading-tight">
                       Saisissez le code sans espaces entre les caractères.
@@ -379,17 +379,26 @@ export default function PanierPage({ initialItems }: PanierPageProps) {
               <div className="flex items-center justify-between text-sm font-black text-black">
                 <span>Total estimé</span>
                 <span className="text-xl font-black text-black">
-                  {Math.round(finalTotal)} DA
+                  {formatDA(Math.round(finalTotal))}
                 </span>
               </div>
 
               {/* Checkout Action Button */}
-              <button
-                disabled={items.length === 0}
-                className="w-full bg-black text-white text-xs sm:text-sm font-black uppercase tracking-wider py-4 rounded-xl hover:bg-neutral-800 active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <span>Valider mon panier</span>
-              </button>
+              {items.length === 0 ? (
+                <button
+                  disabled
+                  className="w-full bg-black text-white text-xs sm:text-sm font-black uppercase tracking-wider py-4 rounded-xl opacity-50 flex items-center justify-center gap-2"
+                >
+                  <span>Valider mon panier</span>
+                </button>
+              ) : (
+                <Link
+                  href="/commande"
+                  className="w-full bg-black text-white text-xs sm:text-sm font-black uppercase tracking-wider py-4 rounded-xl hover:bg-neutral-800 active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2"
+                >
+                  <span>Commander sans compte</span>
+                </Link>
+              )}
 
               {/* Security & Guarantees */}
               <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-gray-500 font-medium">

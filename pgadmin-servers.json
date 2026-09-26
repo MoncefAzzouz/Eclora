@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Eclora (docker)",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "eclora",
+      "Username": "eclora",
+      "SSLMode": "prefer",
+      "Comment": "Password: eclora"
+    }
+  }
+}

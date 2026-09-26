@@ -15,11 +15,13 @@ import {
   Check,
   Play,
 } from 'lucide-react';
-import { Product, BEST_SELLERS, NEW_LAUNCHES } from '@/data/products';
+import { Product } from '@/data/products';
 import ProductCarousel from '@/components/ProductCarousel';
 
 interface ProductDetailPageProps {
   product: Product;
+  /** Related products shown in the two carousels. */
+  related?: Product[];
   wishlist: string[];
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product, shadeName?: string) => void;
@@ -27,6 +29,7 @@ interface ProductDetailPageProps {
 
 export default function ProductDetailPage({
   product,
+  related = [],
   wishlist,
   onToggleWishlist,
   onAddToCart,
@@ -51,17 +54,12 @@ export default function ProductDetailPage({
   const [addedSuccess, setAddedSuccess] = useState(false);
 
   // Helpful reviews counter state
-  const [reviewHelpful, setReviewHelpful] = useState<Record<string, { up: number; down: number; voted?: 'up' | 'down' }>>({});
-
-  useEffect(() => {
-    if (product.reviews) {
-      const initial: Record<string, { up: number; down: number }> = {};
-      product.reviews.forEach((r) => {
-        initial[r.id] = { up: r.helpfulCount, down: r.unhelpfulCount };
-      });
-      setReviewHelpful(initial);
-    }
-  }, [product]);
+  const [reviewHelpful, setReviewHelpful] = useState<Record<string, { up: number; down: number; voted?: 'up' | 'down' }>>(
+    () =>
+      Object.fromEntries(
+        (product.reviews ?? []).map((r) => [r.id, { up: r.helpfulCount, down: r.unhelpfulCount }])
+      )
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -442,7 +440,7 @@ export default function ProductDetailPage({
         {/* Carousel Section: Complétez votre routine */}
         <ProductCarousel
           title="Complétez votre routine"
-          products={BEST_SELLERS}
+          products={related}
           wishlist={wishlist}
           onToggleWishlist={onToggleWishlist}
           onOpenQuickView={() => {}}
@@ -647,7 +645,7 @@ export default function ProductDetailPage({
         {/* Carousel Section: Vous aimerez aussi */}
         <ProductCarousel
           title="Vous aimerez aussi"
-          products={NEW_LAUNCHES}
+          products={related}
           wishlist={wishlist}
           onToggleWishlist={onToggleWishlist}
           onOpenQuickView={() => {}}

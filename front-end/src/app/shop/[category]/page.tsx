@@ -1,104 +1,79 @@
 'use client';
 
-import React, { useState, use } from 'react';
+import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import CategoryNav from '@/components/CategoryNav';
 import Footer from '@/components/Footer';
-import CartDrawer, { CartItem } from '@/components/CartDrawer';
+import CartDrawer from '@/components/CartDrawer';
 import QuickViewModal from '@/components/QuickViewModal';
 import ShopPage from '@/components/ShopPage';
-import { BEST_SELLERS, Product } from '@/data/products';
+import type { Product } from '@/data/products';
+import { shopApi, toProduct } from '@/lib/shop/api';
+import { useCart } from '@/lib/shop/cart';
+import { useAsyncData } from '@/lib/useAsyncData';
+import { useWishlist } from '@/lib/shop/wishlist';
 
-export default function CategoryShopPage({ params }: { params: Promise<{ category: string }> }) {
-  const resolvedParams = use(params);
-  const rawCat = resolvedParams.category || 'maquillage';
-  const categoryName = rawCat.charAt(0).toUpperCase() + rawCat.slice(1).replace('-', ' ');
-
-  const [wishlist, setWishlist] = useState<string[]>(['huda-easy-bake']);
-  const [cart, setCart] = useState<CartItem[]>([
-    { product: BEST_SELLERS[0], quantity: 1 },
-  ]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+export default function ShopCategoryPage() {
+  const { category } = useParams<{ category: string }>();
+  const cart = useCart();
+  const { wishlist, toggle: toggleWishlist } = useWishlist();
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
-  const handleToggleWishlist = (productId: string) => {
-    setWishlist((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-  };
+  const { data, loading, error } = useAsyncData(async () => {
+    const [products, categories, brands] = await Promise.all([
+      shopApi.products({ category, limit: 100 }),
+      shopApi.categories(),
+      shopApi.brands(),
+    ]);
+    return { products: products.map(toProduct), categories, brands };
+  }, [category]);
 
-  const handleAddToCart = (prod: Product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === prod.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === prod.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { product: prod, quantity: 1 }];
-    });
-  };
-
-  const handleUpdateQuantity = (productId: string, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) => {
-          if (item.product.id === productId) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[]
-    );
-  };
-
-  const handleRemoveFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
+  const categoryName = data?.categories.find((c) => c.slug === category)?.name ?? category;
+  const brandFilters = (data?.brands ?? []).map((b) => ({ name: b.name, count: b.count }));
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col font-sans">
+    <div className="min-h-screen bg-white">
       <AnnouncementBar />
       <Header
         wishlistCount={wishlist.length}
-        cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenQuickView={(p) => setQuickViewProduct(p)}
+        cartCount={cart.count}
+        onOpenCart={() => cart.setOpen(true)}
+        onOpenQuickView={setQuickViewProduct}
       />
       <CategoryNav />
 
-      <main className="flex-1">
+      {error ? (
+        <p className="max-w-7xl mx-auto px-4 py-16 text-sm text-red-700">{error}</p>
+      ) : (
         <ShopPage
-          categoryName={categoryName}
+          categoryName={String(categoryName)}
+          products={data?.products ?? []}
+          brands={brandFilters}
+          loading={loading}
           wishlist={wishlist}
-          onToggleWishlist={handleToggleWishlist}
-          onAddToCart={handleAddToCart}
+          onToggleWishlist={toggleWishlist}
+          onAddToCart={(product) => cart.add(product)}
         />
-      </main>
+      )}
 
       <Footer />
 
       <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cart}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveFromCart}
+        isOpen={cart.isOpen}
+        onClose={() => cart.setOpen(false)}
+        items={cart.items}
+        onUpdateQuantity={(id, delta) => cart.updateQuantity(id, delta)}
+        onRemoveItem={(id) => cart.remove(id)}
       />
-
       <QuickViewModal
         product={quickViewProduct}
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
-        onAddToCart={handleAddToCart}
+        onAddToCart={(product) => cart.add(product)}
         isWishlisted={quickViewProduct ? wishlist.includes(quickViewProduct.id) : false}
-        onToggleWishlist={handleToggleWishlist}
+        onToggleWishlist={toggleWishlist}
       />
     </div>
   );

@@ -159,18 +159,21 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
           </button>
 
           {/* Cart Icon */}
-          <Link
-            href="/panier"
+          <button
+            type="button"
+            onClick={onOpenCart}
             className="relative p-1 hover:text-gray-600 transition-colors flex items-center gap-1.5 cursor-pointer"
-            aria-label="Mon Panier"
+            aria-label={`Mon panier (${cartCount})`}
           >
             <div className="relative">
               <ShoppingBag className="w-5 h-5 stroke-[1.75]" />
-              <span className="absolute -top-1.5 -right-2 bg-[#d80075] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {cartCount > 0 ? cartCount : 1}
-              </span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-[#d80075] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </div>
-          </Link>
+          </button>
         </div>
       </div>
 

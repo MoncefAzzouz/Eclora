@@ -6,7 +6,6 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Phone, Mail, MapPin, Printer, User, Truck, CreditCard, Check } from 'lucide-react';
 import { api } from '@/lib/admin/api';
 import { emitDataChanged, useApi } from '@/lib/admin/useApi';
-import { useAuth } from '@/lib/admin/auth';
 import { formatDA, formatDateTime } from '@/lib/admin/format';
 import { DELIVERY_TYPE, ORDER_STATUS, ORDER_TRANSITIONS, PAYMENT_METHOD, PAYMENT_STATUS } from '@/lib/admin/constants';
 import { wilayaName } from '@/lib/admin/wilayas';
@@ -25,7 +24,6 @@ const ACTION_LABEL: Record<OrderStatus, string> = {
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
   const toast = useToast();
   const { data: order, loading, error, reload } = useApi(() => api.orders.get(id), [id]);
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null);
@@ -44,7 +42,7 @@ export default function OrderDetailPage() {
     setSaving(true);
     const ok = await toast.run(async () => {
       if (pendingStatus === 'SHIPPED' && tracking.trim()) await api.orders.update(order.id, { trackingNumber: tracking.trim() });
-      await api.orders.updateStatus(order.id, pendingStatus, statusNote, user?.name);
+      await api.orders.updateStatus(order.id, pendingStatus, statusNote);
     }, `Commande ${ORDER_STATUS[pendingStatus].label.toLowerCase()}`);
     setSaving(false);
     if (ok) {

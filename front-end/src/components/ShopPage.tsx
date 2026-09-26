@@ -3,10 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Star, Heart, Search, ChevronDown, ChevronUp, ChevronRight, X, Check } from 'lucide-react';
-import { Product, SHOP_PRODUCTS, SHOP_BRANDS } from '@/data/products';
+import { Product, BrandFilterItem } from '@/data/products';
 
 interface ShopPageProps {
   categoryName: string;
+  products: Product[];
+  brands: BrandFilterItem[];
+  loading?: boolean;
   wishlist: string[];
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product) => void;
@@ -14,6 +17,9 @@ interface ShopPageProps {
 
 export default function ShopPage({
   categoryName,
+  products: allProducts,
+  brands: SHOP_BRANDS,
+  loading,
   wishlist,
   onToggleWishlist,
   onAddToCart,
@@ -52,8 +58,9 @@ export default function ShopPage({
   );
 
   const displayedProducts = selectedBrands.length > 0
-    ? SHOP_PRODUCTS.filter((p) => selectedBrands.includes(p.brand))
-    : SHOP_PRODUCTS;
+    ? allProducts.filter((p) => selectedBrands.includes(p.brand))
+    : allProducts;
+  const isLoading = loading ?? false;
 
   const handleAddClick = (product: Product) => {
     onAddToCart(product);
@@ -274,6 +281,16 @@ export default function ShopPage({
                 </div>
               </div>
             </div>
+
+            {isLoading && (
+              <p className="py-16 text-center text-sm text-gray-500">Chargement des produits...</p>
+            )}
+
+            {!isLoading && displayedProducts.length === 0 && (
+              <p className="py-16 text-center text-sm text-gray-500">
+                Aucun produit dans cette catégorie pour le moment.
+              </p>
+            )}
 
             {/* Product Grid: 2 Columns on Mobile, Big & Crisp Typography */}
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
