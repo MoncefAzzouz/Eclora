@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Eclora — storefront + admin
 
-## Getting Started
-
-First, run the development server:
+One Next.js app (Next 16, React 19, Tailwind 4) containing both the customer shop and the
+admin panel. UI in French, prices in DA, delivery to the 58 wilayas.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Shop: http://localhost:3000
+- Admin: http://localhost:3000/admin — demo login `admin@eclora.dz` / `admin123`
+  (or `support@eclora.dz` / `support123` for a restricted role)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  app/
+    layout.tsx            Root layout (fonts, <html>)
+    page.tsx              Shop home
+    shop/[category]/  product/[id]/  panier/
+    admin/
+      layout.tsx          Admin shell: loads the palette + providers
+      admin-theme.css     Admin colours, scoped to .eclora-admin
+      login/
+      (panel)/            Everything behind the login guard
+        layout.tsx        Session + role guard, sidebar, topbar
+        dashboard/  orders/  orders/[id]/  clients/  clients/[id]/  reviews/
+        products/  products/new/  products/[id]/  categories/  brands/
+        homepage/  banners/  promo-codes/  delivery/  settings/
+  components/             Storefront components (Header, ProductCarousel, ...)
+  components/admin/       Admin UI kit, layout (sidebar/topbar/nav), product form
+  data/products.ts        Storefront's hard-coded catalogue (until the backend exists)
+  lib/admin/              Admin data layer: api/, mock/, auth, useApi, format, constants, wilayas
+  types/admin.ts          Admin domain types — mirror the future Prisma schema
+```
 
-## Learn More
+### Colours
 
-To learn more about Next.js, take a look at the following resources:
+The storefront uses Tailwind's default palette. The admin's plum + rose palette is defined in
+`app/admin/admin-theme.css` as CSS variable overrides under `.eclora-admin`, applied by the
+admin layout. Tailwind utilities read those variables (`.bg-black { background-color:
+var(--color-black) }`), so the admin recolours itself without touching the shop.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Connecting the backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Admin screens never touch the mock data directly — they call `api.*` from `src/lib/admin/api/index.ts`.
+Each group there is annotated with its REST endpoint (e.g. `/api/admin/orders`). To go live,
+replace the mock implementations with `fetch` calls; the function signatures are the contract.
+The storefront still reads `src/data/products.ts` and needs the same treatment.
 
-## Deploy on Vercel
+Conventions the backend should follow:
+- Money is an integer number of dinars (`8500`, not `"8 500 DA"`); format only in the UI.
+- Enums are UPPER_CASE strings (`PENDING`, `CONFIRMED`, ...). French labels live in `lib/admin/constants.ts`.
+- Dates are ISO strings.
+- Order workflow (COD): `PENDING → CONFIRMED → SHIPPED → DELIVERED`, with `CANCELLED` / `RETURNED`.
+  Stock is reserved on confirmation and returned on cancel-after-confirm or return.
+- Roles: `OWNER`, `ADMIN`, `EDITOR`, `SUPPORT` — page access is defined in
+  `components/admin/layout/nav.ts` and must also be enforced server-side.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Admin data currently lives in the browser's localStorage. "Réinitialiser les données de démo"
+(Paramètres → Boutique, dev only) restores the seed data.

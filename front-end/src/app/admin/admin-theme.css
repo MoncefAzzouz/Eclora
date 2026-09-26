@@ -1,0 +1,94 @@
+/*
+  Eclora admin palette — warm plum + rose.
+
+  Scoped to `.eclora-admin` instead of `@theme` (which is global) so the
+  storefront keeps its own colours. Tailwind utilities read these variables,
+  e.g. `.bg-black { background-color: var(--color-black) }`, so every admin
+  class inside this subtree resolves to the palette below.
+*/
+.eclora-admin {
+  /* Primary surfaces & buttons */
+  --color-black: #2a1b2e;
+
+  /* Warm plum-tinted greys — page background, text, borders */
+  --color-slate-50: #faf8f9;
+  --color-slate-100: #f4eff2;
+  --color-slate-200: #e9e1e7;
+  --color-slate-300: #d8ccd4;
+  --color-slate-400: #a99ca6;
+  --color-slate-500: #7c6b80;
+  --color-slate-600: #665a6b;
+  --color-slate-700: #4f4453;
+  --color-slate-800: #3a2f3e;
+  --color-slate-900: #2a1b2e;
+  --color-slate-950: #1e1222;
+
+  /* Sidebar ramp (dark plum). 900 is lighter than the panel so hovers read. */
+  --color-neutral-200: #efe8f1;
+  --color-neutral-300: #dcd1e0;
+  --color-neutral-400: #b9a9be;
+  --color-neutral-500: #9a87a0;
+  --color-neutral-600: #6e5476;
+  --color-neutral-700: #5a4162;
+  --color-neutral-800: #46304e;
+  --color-neutral-900: #3a2740;
+  --color-neutral-950: #1e1222;
+
+  /* Brand rose — accents, active nav, chart hover */
+  --color-pink-50: #fdf2f6;
+  --color-pink-100: #fbe4ec;
+  --color-pink-200: #f7c9da;
+  --color-pink-300: #f2a3c0;
+  --color-pink-400: #ec6e9c;
+  --color-pink-500: #e8467c;
+  --color-pink-600: #d6336c;
+  --color-pink-700: #b02659;
+  --color-pink-800: #8e1e48;
+  --color-pink-900: #76193c;
+
+  /* Status: delivered / active */
+  --color-emerald-50: #e9f6f0;
+  --color-emerald-100: #d3ede1;
+  --color-emerald-200: #b4e0cd;
+  --color-emerald-400: #34b38a;
+  --color-emerald-500: #17916a;
+  --color-emerald-600: #12805a;
+  --color-emerald-700: #0e6b4b;
+  --color-emerald-800: #0b5a3f;
+
+  /* Status: new / warning */
+  --color-amber-50: #fdf4e5;
+  --color-amber-100: #fae8c8;
+  --color-amber-200: #f3d9a6;
+  --color-amber-700: #96620a;
+  --color-amber-800: #7a4f08;
+
+  /* Status: confirmed */
+  --color-blue-50: #ecf1fc;
+  --color-blue-100: #dae4f8;
+  --color-blue-200: #c2d3f2;
+  --color-blue-500: #3b6fd4;
+  --color-blue-800: #1f4593;
+
+  /* Status: shipped */
+  --color-violet-50: #f3edfb;
+  --color-violet-100: #e7dbf7;
+  --color-violet-200: #d6c4f0;
+  --color-violet-800: #5a32a3;
+
+  /* Status: cancelled / destructive */
+  --color-red-50: #fdedec;
+  --color-red-100: #fbdad7;
+  --color-red-200: #f6beb9;
+  --color-red-300: #f09a93;
+  --color-red-500: #d14136;
+  --color-red-600: #c3352b;
+  --color-red-700: #a82a22;
+
+  /* Secondary KPI accents */
+  --color-purple-500: #8b5cf6;
+
+  background-color: #faf8f9;
+  color: #2a1b2e;
+  letter-spacing: normal;
+}

@@ -20,8 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${montserrat.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-white text-black font-sans">
+    // suppressHydrationWarning: browser extensions inject attributes on <html>/<body>
+    // before hydration. It only ignores attribute diffs on these elements, not the app tree.
+    <html lang="fr" className={`${montserrat.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-white text-black font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>
