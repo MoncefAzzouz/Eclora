@@ -53,10 +53,13 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
             <Menu className="w-6 h-6 stroke-[1.75]" />
           </button>
 
-          <Link href="/" className="flex-shrink-0 cursor-pointer block">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-[0.22em] text-black font-sans uppercase hover:opacity-80 transition-opacity">
-              ECLORA
-            </h1>
+          <Link href="/" className="flex-shrink-0 cursor-pointer block hover:opacity-80 transition-opacity">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/svg/Eclora Horizontal.svg"
+              alt="ECLORA"
+              className="h-8 sm:h-10 w-auto"
+            />
           </Link>
         </div>
 
