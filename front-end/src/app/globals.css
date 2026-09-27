@@ -10,16 +10,21 @@
     --eclora-peach: #faede5;
     --eclora-gray-bg: #f2f2f2;
     --eclora-border: #e5e5e5;
-    --font-avantgarde: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Md", "ITCAvantGardeStd-Bk", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Apple Gothic", sans-serif;
+    --font-poppins: var(--font-poppins), sans-serif;
+    --font-avantgarde: var(--font-poppins), "ITC Avant Garde Gothic", "ITCAvantGardeStd-Md", "ITCAvantGardeStd-Bk", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Apple Gothic", sans-serif;
   }
 
   body {
     background-color: #ffffff;
     color: #000000;
-    font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
   }
+}
+
+.font-poppins {
+  font-family: var(--font-poppins), sans-serif;
 }
 
 .font-avantgarde {

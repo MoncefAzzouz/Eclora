@@ -10,35 +10,39 @@ interface HeroBannerProps {
 export default function HeroBanner({ onDiscover }: HeroBannerProps) {
   return (
     <section className="relative w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 mt-3 sm:mt-6">
-      <div className="relative isolate flex min-h-[500px] overflow-hidden rounded-2xl bg-[#d7b8a3] shadow-[0_24px_70px_rgba(86,49,32,0.18)] sm:min-h-[540px] sm:rounded-3xl md:min-h-[590px]">
+      {/* Mobile crops to the model; from sm up the container matches the artwork's
+          native 2172x724 so the full composition stays uncropped. */}
+      <div className="relative isolate flex min-h-[420px] overflow-hidden rounded-2xl bg-[#1d6f72] shadow-[0_24px_70px_rgba(16,64,66,0.22)] sm:min-h-0 sm:aspect-[2172/724] sm:rounded-3xl">
         <Image
-          src="/images/eclora-beauty-hero.png"
-          alt="Eclora beauty edit with makeup, skincare, haircare and fragrance"
+          src="/images/2.png"
+          alt="Gracias Sérum Figue de Barbarie hair serum, shown with a model applying it"
           fill
           preload
           sizes="(max-width: 1440px) 100vw, 1376px"
           quality={90}
-          className="object-cover object-[58%_center] sm:object-center"
+          className="object-cover object-[22%_center] sm:object-center"
         />
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#5a2f22]/40 via-transparent to-white/5 sm:bg-gradient-to-r sm:from-[#fff8f1]/55 sm:via-transparent sm:to-black/5" />
+        {/* Scrim sits under the copy only: bottom on mobile, right on desktop,
+            so neither the model nor the bottle is washed out. */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0c3f41]/70 via-[#0c3f41]/10 to-transparent sm:bg-gradient-to-l sm:from-[#0c3f41]/75 sm:via-[#0c3f41]/15 sm:to-transparent" />
 
-        <div className="relative z-10 flex w-full items-end p-3 sm:items-center sm:p-8 md:p-12 lg:p-16">
-          <div className="w-full max-w-[430px] rounded-2xl border border-white/60 bg-[#fffaf5]/94 p-5 text-[#21140f] shadow-[0_24px_70px_rgba(67,34,21,0.22)] backdrop-blur-md sm:rounded-3xl sm:p-8 md:max-w-[470px] md:p-10">
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#9b573f] sm:text-xs">
+        <div className="relative z-10 flex w-full items-end justify-start p-4 sm:items-center sm:justify-end sm:p-8 md:p-10 lg:p-12">
+          <div className="w-full max-w-[430px] text-white sm:max-w-[300px] sm:text-right md:max-w-[360px]">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.28em] text-[#9fe7e4] sm:text-xs">
               The Eclora edit
             </p>
-            <h1 className="mb-3 text-3xl font-black leading-[0.95] tracking-[-0.045em] sm:text-4xl md:text-5xl">
+            <h1 className="mb-3 text-3xl font-black leading-[0.95] tracking-[-0.045em] drop-shadow-[0_2px_12px_rgba(6,40,42,0.55)] sm:text-4xl md:text-5xl">
               Beauty, in every form.
             </h1>
-            <p className="mb-6 max-w-sm text-sm leading-relaxed text-[#4b352d] sm:text-base">
+            <p className="mb-6 text-sm leading-relaxed text-white/85 drop-shadow-[0_1px_8px_rgba(6,40,42,0.5)] sm:text-[13px] md:text-base">
               Makeup, skincare, hair, fragrance &amp; more — discover iconic
               favourites and the emerging brands worth knowing.
             </p>
             <button
               type="button"
               onClick={onDiscover}
-              className="group inline-flex w-full items-center justify-center rounded-full bg-[#21140f] px-7 py-3.5 text-sm font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#a14955] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21140f] sm:w-auto sm:min-w-44"
+              className="group inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-extrabold text-[#0c3f41] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#9fe7e4] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto sm:min-w-44"
             >
               Explore Eclora
               <span aria-hidden="true" className="ml-2 transition-transform duration-300 group-hover:translate-x-1">

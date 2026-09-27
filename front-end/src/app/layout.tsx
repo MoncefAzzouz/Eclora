@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
-const montserrat = Montserrat({
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-montserrat",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning: browser extensions inject attributes on <html>/<body>
     // before hydration. It only ignores attribute diffs on these elements, not the app tree.
-    <html lang="fr" className={`${montserrat.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="fr" className={`${poppins.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-white text-black font-sans" suppressHydrationWarning>
         {children}
       </body>
