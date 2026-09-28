@@ -10,154 +10,95 @@ import ProductCarousel from '@/components/ProductCarousel';
 import MiddleBanner from '@/components/MiddleBanner';
 import TrustBar from '@/components/TrustBar';
 import Footer from '@/components/Footer';
-import CartDrawer, { CartItem } from '@/components/CartDrawer';
+import CartDrawer from '@/components/CartDrawer';
 import QuickViewModal from '@/components/QuickViewModal';
-import { BEST_SELLERS, NEW_LAUNCHES, Product } from '@/data/products';
-
-const LOCAL_PRODUCT_IMAGES = [
-  '/images/image.png',
-  '/images/image copy.png',
-  '/images/image copy 2.png',
-  '/images/image copy 3.png',
-  '/images/image copy 4.png',
-  '/images/image copy 5.png',
-  '/images/image copy 6.png',
-  '/images/image copy 7.png',
-  '/images/image copy 8.png',
-  '/images/image copy 9.png',
-];
-
-const HOME_BEST_SELLERS = BEST_SELLERS.map((product, index) => ({
-  ...product,
-  image: LOCAL_PRODUCT_IMAGES[index] ?? product.image,
-}));
-
-const HOME_NEW_LAUNCHES = [...NEW_LAUNCHES, ...BEST_SELLERS.slice(0, 4)].map((product, index) => ({
-  ...product,
-  image: LOCAL_PRODUCT_IMAGES[(index + 4) % LOCAL_PRODUCT_IMAGES.length] ?? product.image,
-}));
+import type { Product } from '@/data/products';
+import { shopApi, toProduct } from '@/lib/shop/api';
+import { useCart } from '@/lib/shop/cart';
+import { useAsyncData } from '@/lib/useAsyncData';
+import { useWishlist } from '@/lib/shop/wishlist';
 
 export default function Home() {
-  const [wishlist, setWishlist] = useState<string[]>(['huda-easy-bake']);
-  const [cart, setCart] = useState<CartItem[]>([
-    { product: BEST_SELLERS[0], quantity: 1 },
-  ]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const cart = useCart();
+  const { wishlist, toggle: toggleWishlist } = useWishlist();
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const { data, loading, error } = useAsyncData(() => shopApi.home());
 
-  // Toggle wishlist item
-  const handleToggleWishlist = (productId: string) => {
-    setWishlist((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-  };
+  const sections = (data?.sections ?? []).map((section) => ({
+    id: section.id,
+    title: section.title,
+    products: section.products.map(toProduct),
+  }));
 
-  // Add to cart
-  const handleAddToCart = (product: Product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-  };
-
-  // Update item quantity
-  const handleUpdateQuantity = (productId: string, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) => {
-          if (item.product.id === productId) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[]
-    );
-  };
-
-  // Remove from cart
-  const handleRemoveFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
+  const scrollToProducts = () => document.getElementById('produits')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-pink-100 selection:text-pink-900">
-      {/* Top Announcement Bar */}
-      <AnnouncementBar />
-
-      {/* Main Header */}
+      <AnnouncementBar text={data?.announcement} />
       <Header
         wishlistCount={wishlist.length}
-        cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenQuickView={(product) => setQuickViewProduct(product)}
+        cartCount={cart.count}
+        onOpenCart={() => cart.setOpen(true)}
+        onOpenQuickView={setQuickViewProduct}
       />
-
-      {/* Category Navigation Bar */}
       <CategoryNav />
 
-      {/* Main Content Area */}
       <main className="flex-1 pb-12">
-        {/* Main Eclora Beauty Hero Banner */}
-        <HeroBanner onDiscover={() => setQuickViewProduct(BEST_SELLERS[0])} />
+        <HeroBanner onDiscover={scrollToProducts} banner={data?.banners.hero[0]} />
+        <PromoGrid onDiscover={scrollToProducts} banners={data?.banners.dual} />
 
-        {/* Dual Promo Banners */}
-        <PromoGrid onDiscover={() => setQuickViewProduct(BEST_SELLERS[1])} />
+        <div id="produits">
+          {error && (
+            <p className="max-w-7xl mx-auto px-4 py-10 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl my-6">
+              {error} — vérifiez que le serveur (backend) est démarré.
+            </p>
+          )}
+          {loading && <p className="max-w-7xl mx-auto px-4 py-16 text-sm text-neutral-500">Chargement de la boutique...</p>}
 
-        {/* Best Sellers Section */}
-        <ProductCarousel
-          title="Meilleures ventes maquillage"
-          products={HOME_BEST_SELLERS}
-          wishlist={wishlist}
-          onToggleWishlist={handleToggleWishlist}
-          onOpenQuickView={(product) => setQuickViewProduct(product)}
-        />
+          {sections.slice(0, 1).map((section) => (
+            <ProductCarousel
+              key={section.id}
+              title={section.title}
+              products={section.products}
+              wishlist={wishlist}
+              onToggleWishlist={toggleWishlist}
+              onOpenQuickView={setQuickViewProduct}
+            />
+          ))}
 
-        {/* Middle Dual Promos (Erborian & Perfumes) */}
-        <MiddleBanner onDiscover={() => setQuickViewProduct(NEW_LAUNCHES[1])} />
+          {sections.length > 0 && <MiddleBanner onDiscover={scrollToProducts} banners={data?.banners.middle} />}
 
-        {/* New Beauty Launches Section */}
-        <ProductCarousel
-          title="Derniers meileurs"
-          products={HOME_NEW_LAUNCHES}
-          wishlist={wishlist}
-          onToggleWishlist={handleToggleWishlist}
-          onOpenQuickView={(product) => setQuickViewProduct(product)}
-        />
+          {sections.slice(1).map((section) => (
+            <ProductCarousel
+              key={section.id}
+              title={section.title}
+              products={section.products}
+              wishlist={wishlist}
+              onToggleWishlist={toggleWishlist}
+              onOpenQuickView={setQuickViewProduct}
+            />
+          ))}
+        </div>
 
-        {/* Trust & Guarantee Service Bar */}
         <TrustBar />
       </main>
 
-      {/* Eclora Dark Footer */}
       <Footer />
 
-      {/* Interactive Cart Slide-over Drawer */}
       <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cart}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveFromCart}
+        isOpen={cart.isOpen}
+        onClose={() => cart.setOpen(false)}
+        items={cart.items}
+        onUpdateQuantity={(id, delta) => cart.updateQuantity(id, delta)}
+        onRemoveItem={(id) => cart.remove(id)}
       />
-
-      {/* Product Quick View Modal */}
       <QuickViewModal
         product={quickViewProduct}
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
-        onAddToCart={handleAddToCart}
+        onAddToCart={(product) => cart.add(product)}
         isWishlisted={quickViewProduct ? wishlist.includes(quickViewProduct.id) : false}
-        onToggleWishlist={handleToggleWishlist}
+        onToggleWishlist={toggleWishlist}
       />
     </div>
   );

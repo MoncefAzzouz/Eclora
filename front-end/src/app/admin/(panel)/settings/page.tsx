@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Save, Plus, Edit2, Trash2, RotateCcw } from 'lucide-react';
+import { Save, Plus, Edit2, Trash2 } from 'lucide-react';
 import { api } from '@/lib/admin/api';
 import { useApi } from '@/lib/admin/useApi';
 import { useAuth } from '@/lib/admin/auth';
@@ -43,7 +43,6 @@ function StoreForm({ section, saved: data, reload }: { section: 'store' | 'payme
   const toast = useToast();
   const [values, setValues] = useState<StoreSettings>(data);
   const [saving, setSaving] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
 
   const set = <K extends keyof StoreSettings>(k: K, v: StoreSettings[K]) => setValues({ ...values, [k]: v });
   const dirty = JSON.stringify(values) !== JSON.stringify(data);
@@ -133,22 +132,14 @@ function StoreForm({ section, saved: data, reload }: { section: 'store' | 'payme
       {saveBar}
 
       {process.env.NODE_ENV !== 'production' && (
-        <Card title="Données de démonstration" description="Outil de développement, disparaîtra avec le backend">
-          <Button variant="secondary" icon={RotateCcw} onClick={() => setConfirmReset(true)}>Réinitialiser les données de démo</Button>
+        <Card title="Données de démonstration" description="Outil de développement">
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Les données sont maintenant dans PostgreSQL. Pour repartir des données de démo :
+            <code className="mx-1 px-1.5 py-0.5 bg-slate-100 rounded font-mono text-[11px]">cd backend &amp;&amp; npm run seed</code>
+            (cela efface les commandes et produits existants).
+          </p>
         </Card>
       )}
-
-      <ConfirmDialog
-        open={confirmReset}
-        onClose={() => setConfirmReset(false)}
-        onConfirm={async () => {
-          await api.resetDemoData();
-          window.location.reload();
-        }}
-        title="Réinitialiser ?"
-        message="Toutes les modifications faites dans l’admin (produits, commandes, paramètres...) seront effacées et remplacées par les données de démo."
-        confirmLabel="Réinitialiser"
-      />
     </div>
   );
 }

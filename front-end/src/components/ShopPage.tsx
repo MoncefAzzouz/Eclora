@@ -3,27 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Star, Heart, Search, ChevronDown, ChevronUp, ChevronRight, X, Check } from 'lucide-react';
-import { Product, SHOP_PRODUCTS, SHOP_BRANDS } from '@/data/products';
-
-const LOCAL_SHOP_PRODUCT_IMAGES = [
-  '/images/image.png',
-  '/images/image copy.png',
-  '/images/image copy 2.png',
-  '/images/image copy 3.png',
-  '/images/image copy 4.png',
-  '/images/image copy 5.png',
-  '/images/image copy 6.png',
-  '/images/image copy 7.png',
-  '/images/image copy 8.png',
-];
-
-const LOCAL_SHOP_PRODUCTS = SHOP_PRODUCTS.map((product, index) => ({
-  ...product,
-  image: LOCAL_SHOP_PRODUCT_IMAGES[index] ?? product.image,
-}));
+import { Product, BrandFilterItem } from '@/data/products';
 
 interface ShopPageProps {
   categoryName: string;
+  products: Product[];
+  brands: BrandFilterItem[];
+  loading?: boolean;
   wishlist: string[];
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product) => void;
@@ -31,6 +17,9 @@ interface ShopPageProps {
 
 export default function ShopPage({
   categoryName,
+  products: allProducts,
+  brands: SHOP_BRANDS,
+  loading,
   wishlist,
   onToggleWishlist,
   onAddToCart,
@@ -69,8 +58,9 @@ export default function ShopPage({
   );
 
   const displayedProducts = selectedBrands.length > 0
-    ? LOCAL_SHOP_PRODUCTS.filter((p) => selectedBrands.includes(p.brand))
-    : LOCAL_SHOP_PRODUCTS;
+    ? allProducts.filter((p) => selectedBrands.includes(p.brand))
+    : allProducts;
+  const isLoading = loading ?? false;
 
   const handleAddClick = (product: Product) => {
     onAddToCart(product);
@@ -111,10 +101,10 @@ export default function ShopPage({
 
         {/* Category Description Banner Header */}
         <div className="bg-gradient-to-r from-[#f05b2a] to-[#faae3c] rounded-2xl sm:rounded-3xl p-5 sm:p-8 mb-4 sm:mb-6 border border-white/25">
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1 sm:mb-2">
+          <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight mb-1 sm:mb-2">
             Nouveautés par catégorie
           </h1>
-          <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-normal max-w-4xl hidden sm:block">
+          <p className="text-xs sm:text-sm text-gray-800 leading-relaxed font-normal max-w-4xl hidden sm:block">
             Essentiel beauté incontournable, le maquillage et les parfums sont nos meilleurs alliés ! Teint frais, lèvres gourmandes et smoky eyes, le makeup parfait est à portée de main chez Eclora.
           </p>
         </div>
@@ -291,6 +281,16 @@ export default function ShopPage({
                 </div>
               </div>
             </div>
+
+            {isLoading && (
+              <p className="py-16 text-center text-sm text-gray-500">Chargement des produits...</p>
+            )}
+
+            {!isLoading && displayedProducts.length === 0 && (
+              <p className="py-16 text-center text-sm text-gray-500">
+                Aucun produit dans cette catégorie pour le moment.
+              </p>
+            )}
 
             {/* Product Grid: 2 Columns on Mobile, Big & Crisp Typography */}
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">

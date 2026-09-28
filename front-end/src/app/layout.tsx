@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/lib/shop/cart";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,7 +25,7 @@ export default function RootLayout({
     // before hydration. It only ignores attribute diffs on these elements, not the app tree.
     <html lang="fr" className={`${poppins.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-white text-black font-sans" suppressHydrationWarning>
-        {children}
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

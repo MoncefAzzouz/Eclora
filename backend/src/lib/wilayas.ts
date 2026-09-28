@@ -1,0 +1,71 @@
+export interface Wilaya {
+  code: number;
+  name: string;
+  zone: 'CENTER' | 'NORTH' | 'HIGHLANDS' | 'SOUTH';
+}
+
+export const WILAYAS: Wilaya[] = [
+  { code: 1, name: 'Adrar', zone: 'SOUTH' },
+  { code: 2, name: 'Chlef', zone: 'NORTH' },
+  { code: 3, name: 'Laghouat', zone: 'HIGHLANDS' },
+  { code: 4, name: 'Oum El Bouaghi', zone: 'HIGHLANDS' },
+  { code: 5, name: 'Batna', zone: 'HIGHLANDS' },
+  { code: 6, name: 'Béjaïa', zone: 'NORTH' },
+  { code: 7, name: 'Biskra', zone: 'HIGHLANDS' },
+  { code: 8, name: 'Béchar', zone: 'SOUTH' },
+  { code: 9, name: 'Blida', zone: 'CENTER' },
+  { code: 10, name: 'Bouira', zone: 'NORTH' },
+  { code: 11, name: 'Tamanrasset', zone: 'SOUTH' },
+  { code: 12, name: 'Tébessa', zone: 'HIGHLANDS' },
+  { code: 13, name: 'Tlemcen', zone: 'NORTH' },
+  { code: 14, name: 'Tiaret', zone: 'HIGHLANDS' },
+  { code: 15, name: 'Tizi Ouzou', zone: 'NORTH' },
+  { code: 16, name: 'Alger', zone: 'CENTER' },
+  { code: 17, name: 'Djelfa', zone: 'HIGHLANDS' },
+  { code: 18, name: 'Jijel', zone: 'NORTH' },
+  { code: 19, name: 'Sétif', zone: 'HIGHLANDS' },
+  { code: 20, name: 'Saïda', zone: 'HIGHLANDS' },
+  { code: 21, name: 'Skikda', zone: 'NORTH' },
+  { code: 22, name: 'Sidi Bel Abbès', zone: 'NORTH' },
+  { code: 23, name: 'Annaba', zone: 'NORTH' },
+  { code: 24, name: 'Guelma', zone: 'NORTH' },
+  { code: 25, name: 'Constantine', zone: 'NORTH' },
+  { code: 26, name: 'Médéa', zone: 'NORTH' },
+  { code: 27, name: 'Mostaganem', zone: 'NORTH' },
+  { code: 28, name: "M'Sila", zone: 'HIGHLANDS' },
+  { code: 29, name: 'Mascara', zone: 'NORTH' },
+  { code: 30, name: 'Ouargla', zone: 'SOUTH' },
+  { code: 31, name: 'Oran', zone: 'NORTH' },
+  { code: 32, name: 'El Bayadh', zone: 'HIGHLANDS' },
+  { code: 33, name: 'Illizi', zone: 'SOUTH' },
+  { code: 34, name: 'Bordj Bou Arréridj', zone: 'HIGHLANDS' },
+  { code: 35, name: 'Boumerdès', zone: 'CENTER' },
+  { code: 36, name: 'El Tarf', zone: 'NORTH' },
+  { code: 37, name: 'Tindouf', zone: 'SOUTH' },
+  { code: 38, name: 'Tissemsilt', zone: 'HIGHLANDS' },
+  { code: 39, name: 'El Oued', zone: 'SOUTH' },
+  { code: 40, name: 'Khenchela', zone: 'HIGHLANDS' },
+  { code: 41, name: 'Souk Ahras', zone: 'NORTH' },
+  { code: 42, name: 'Tipaza', zone: 'CENTER' },
+  { code: 43, name: 'Mila', zone: 'NORTH' },
+  { code: 44, name: 'Aïn Defla', zone: 'NORTH' },
+  { code: 45, name: 'Naâma', zone: 'HIGHLANDS' },
+  { code: 46, name: 'Aïn Témouchent', zone: 'NORTH' },
+  { code: 47, name: 'Ghardaïa', zone: 'SOUTH' },
+  { code: 48, name: 'Relizane', zone: 'NORTH' },
+  { code: 49, name: 'Timimoun', zone: 'SOUTH' },
+  { code: 50, name: 'Bordj Badji Mokhtar', zone: 'SOUTH' },
+  { code: 51, name: 'Ouled Djellal', zone: 'HIGHLANDS' },
+  { code: 52, name: 'Béni Abbès', zone: 'SOUTH' },
+  { code: 53, name: 'In Salah', zone: 'SOUTH' },
+  { code: 54, name: 'In Guezzam', zone: 'SOUTH' },
+  { code: 55, name: 'Touggourt', zone: 'SOUTH' },
+  { code: 56, name: 'Djanet', zone: 'SOUTH' },
+  { code: 57, name: "El M'Ghair", zone: 'SOUTH' },
+  { code: 58, name: 'El Meniaa', zone: 'SOUTH' },
+];
+
+export function wilayaName(code: number): string {
+  const w = WILAYAS.find((x) => x.code === code);
+  return w ? `${String(code).padStart(2, '0')} - ${w.name}` : `Wilaya ${code}`;
+}

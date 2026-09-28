@@ -1,0 +1,363 @@
+// Eclora database schema.
+// Money is stored as Int = whole Algerian dinars (DA). Enums match the strings
+// the admin and storefront already use.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Catalog ────────────────────────────────────────────────────────────────
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  position      Int           @default(0)
+  isVisible     Boolean       @default(true)
+  isHighlighted Boolean       @default(false)
+  badgeColor    BadgeColor?
+  subcategories Subcategory[]
+  products      Product[]
+  createdAt     DateTime      @default(now())
+}
+
+model Subcategory {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String
+  position   Int       @default(0)
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products   Product[]
+
+  @@unique([categoryId, slug])
+}
+
+model Brand {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  logoUrl    String?
+  isFeatured Boolean   @default(false)
+  products   Product[]
+}
+
+model Product {
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  name              String
+  sku               String        @unique
+  price             Int
+  compareAtPrice    Int?
+  stock             Int           @default(0)
+  lowStockThreshold Int           @default(10)
+  volume            String?
+  images            String[]      @default([])
+  badge             String?
+  badgeType         BadgeType?
+  tags              String[]      @default([])
+  isNew             Boolean       @default(false)
+  isBestSeller      Boolean       @default(false)
+  status            ProductStatus @default(DRAFT)
+  description       String?
+  usageTips         String?
+  ingredients       String?
+  rating            Float         @default(0)
+  reviewsCount      Int           @default(0)
+
+  brandId       String
+  brand         Brand        @relation(fields: [brandId], references: [id])
+  categoryId    String
+  category      Category     @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+
+  shades      Shade[]
+  reviews     Review[]
+  orderItems  OrderItem[]
+  homeEntries HomeSectionProduct[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([brandId])
+}
+
+model Shade {
+  id        String  @id @default(cuid())
+  name      String
+  hex       String
+  stock     Int     @default(0)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String       @id @default(cuid())
+  authorName String
+  rating     Int
+  title      String
+  text       String
+  status     ReviewStatus @default(PENDING)
+  productId  String
+  product    Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  clientId   String?
+  client     Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdAt  DateTime     @default(now())
+
+  @@index([status])
+}
+
+// ─── Customers & orders ─────────────────────────────────────────────────────
+
+model Client {
+  id           String       @id @default(cuid())
+  name         String
+  email        String?
+  phone        String       @unique
+  passwordHash String?
+  wilayaCode   Int
+  address      String?
+  status       ClientStatus @default(ACTIVE)
+  adminNote    String?
+  /// Created by a guest checkout, never signed up. Set false once they register.
+  isGuest      Boolean      @default(true)
+  orders       Order[]
+  reviews      Review[]
+  createdAt    DateTime     @default(now())
+}
+
+model Order {
+  id            String       @id @default(cuid())
+  number        String       @unique
+  clientId      String?
+  client        Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  wilayaCode    Int
+  commune       String
+  address       String
+  deliveryType  DeliveryType
+  items         OrderItem[]
+
+  subtotal    Int
+  shippingFee Int
+  discount    Int    @default(0)
+  promoCode   String?
+  total       Int
+
+  paymentMethod  PaymentMethod
+  paymentStatus  PaymentStatus @default(PENDING)
+  status         OrderStatus   @default(PENDING)
+  trackingNumber String?
+  adminNote      String?
+
+  history   OrderEvent[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  /// Copied at purchase time so the order stays correct if the product changes.
+  name      String
+  brand     String
+  image     String
+  shade     String?
+  unitPrice Int
+  quantity  Int
+}
+
+model OrderEvent {
+  id      String      @id @default(cuid())
+  orderId String
+  order   Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status  OrderStatus
+  note    String?
+  by      String?
+  at      DateTime    @default(now())
+}
+
+// ─── Storefront content ─────────────────────────────────────────────────────
+
+model Banner {
+  id        String         @id @default(cuid())
+  placement BannerPlacement
+  title     String
+  subtitle  String?
+  description String?
+  badge     String?
+  buttonText String        @default("Découvrir")
+  imageUrl  String
+  link      String         @default("/")
+  isActive  Boolean        @default(true)
+  position  Int            @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+}
+
+model HomeSection {
+  id        String               @id @default(cuid())
+  title     String
+  position  Int                  @default(0)
+  isVisible Boolean              @default(true)
+  products  HomeSectionProduct[]
+}
+
+model HomeSectionProduct {
+  sectionId String
+  section   HomeSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position  Int         @default(0)
+
+  @@id([sectionId, productId])
+}
+
+// ─── Marketing & delivery ───────────────────────────────────────────────────
+
+model PromoCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  type      PromoType
+  value     Int       @default(0)
+  minOrder  Int       @default(0)
+  maxUses   Int?
+  usedCount Int       @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  isActive  Boolean   @default(true)
+}
+
+model ShippingRate {
+  wilayaCode    Int     @id
+  wilayaName    String
+  homePrice     Int
+  stopdeskPrice Int
+  deliveryDays  String  @default("2-3 jours")
+  isActive      Boolean @default(true)
+}
+
+// ─── Settings & staff ───────────────────────────────────────────────────────
+
+model StoreSettings {
+  id                    Int      @id @default(1)
+  storeName             String   @default("Eclora")
+  contactEmail          String   @default("contact@eclora.dz")
+  contactPhone          String   @default("")
+  address               String   @default("")
+  announcementText      String   @default("")
+  announcementEnabled   Boolean  @default(true)
+  freeShippingThreshold Int      @default(0)
+  payCod                Boolean  @default(true)
+  payBaridimob          Boolean  @default(false)
+  payCib                Boolean  @default(false)
+  instagram             String   @default("")
+  facebook              String   @default("")
+  tiktok                String   @default("")
+  maintenanceMode       Boolean  @default(false)
+  updatedAt             DateTime @updatedAt @default(now())
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(SUPPORT)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum BadgeColor {
+  PINK
+  RED
+}
+
+enum BadgeType {
+  BLACK
+  PINK
+  RED
+  GOLD
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ClientStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  RETURNED
+  CANCELLED
+}
+
+enum DeliveryType {
+  HOME
+  STOPDESK
+}
+
+enum PaymentMethod {
+  COD
+  BARIDIMOB
+  CIB
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum BannerPlacement {
+  HERO
+  PROMO_DUAL
+  PROMO_MIDDLE
+}
+
+enum PromoType {
+  PERCENT
+  FIXED
+  FREE_SHIPPING
+}
+
+enum AdminRole {
+  OWNER
+  ADMIN
+  EDITOR
+  SUPPORT
+}
