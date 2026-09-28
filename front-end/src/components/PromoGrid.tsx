@@ -17,9 +17,9 @@ export default function PromoGrid({ onDiscover }: PromoGridProps) {
           <div className="w-full sm:w-[44%] h-[180px] sm:h-full relative overflow-hidden bg-gradient-to-br from-pink-400 via-orange-300 to-amber-300 flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=85"
-              alt="Exclusivité web beauty products"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              src="/images/image copy 12.png"
+              alt="Masque capillaire Gracias Premium en promotion"
+              className="w-full h-full object-cover object-[70%_center] group-hover:scale-105 transition-transform duration-300"
             />
           </div>
 
@@ -64,8 +64,8 @@ export default function PromoGrid({ onDiscover }: PromoGridProps) {
           <div className="w-full sm:w-[44%] h-[180px] sm:h-full relative overflow-hidden bg-[#e8ded4] flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=85"
-              alt="Skincare skincare lineup"
+              src="/images/image copy 11.png"
+              alt="Produits Gracias Premium pour une nouvelle saison beauté"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>

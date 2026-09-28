@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Heart, Star } from 'lucide-react';
 import { Product } from '@/data/products';
@@ -22,6 +22,24 @@ export default function ProductCarousel({
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
+
+  useEffect(() => {
+    if (isAutoPlayPaused) return;
+
+    const interval = window.setInterval(() => {
+      const carousel = carouselRef.current;
+      if (!carousel || carousel.scrollWidth <= carousel.clientWidth) return;
+
+      const isAtEnd = carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 12;
+      carousel.scrollTo({
+        left: isAtEnd ? 0 : carousel.scrollLeft + 294,
+        behavior: 'smooth',
+      });
+    }, 3000);
+
+    return () => window.clearInterval(interval);
+  }, [isAutoPlayPaused, products.length]);
 
   const handleScroll = () => {
     if (carouselRef.current) {
@@ -51,7 +69,13 @@ export default function ProductCarousel({
       </div>
 
       {/* Carousel Container with Arrows */}
-      <div className="relative group">
+      <div
+        className="relative group"
+        onMouseEnter={() => setIsAutoPlayPaused(true)}
+        onMouseLeave={() => setIsAutoPlayPaused(false)}
+        onFocusCapture={() => setIsAutoPlayPaused(true)}
+        onBlurCapture={() => setIsAutoPlayPaused(false)}
+      >
         {/* Left Floating Scroll Arrow */}
         {showLeftArrow && (
           <button
@@ -117,13 +141,13 @@ export default function ProductCarousel({
                   {/* Product Image Link */}
                   <Link
                     href={`/product/${product.id}`}
-                    className="w-full h-[180px] sm:h-[200px] my-2 relative overflow-hidden rounded-xl cursor-pointer flex items-center justify-center bg-gray-50 block"
+                    className="w-full h-[180px] sm:h-[200px] my-2 relative overflow-hidden rounded-xl cursor-pointer flex items-center justify-center bg-white block"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain scale-[1.18] group-hover/card:scale-[1.24] transition-transform duration-300"
                     />
                   </Link>
 

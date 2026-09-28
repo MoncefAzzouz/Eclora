@@ -14,6 +14,29 @@ import CartDrawer, { CartItem } from '@/components/CartDrawer';
 import QuickViewModal from '@/components/QuickViewModal';
 import { BEST_SELLERS, NEW_LAUNCHES, Product } from '@/data/products';
 
+const LOCAL_PRODUCT_IMAGES = [
+  '/images/image.png',
+  '/images/image copy.png',
+  '/images/image copy 2.png',
+  '/images/image copy 3.png',
+  '/images/image copy 4.png',
+  '/images/image copy 5.png',
+  '/images/image copy 6.png',
+  '/images/image copy 7.png',
+  '/images/image copy 8.png',
+  '/images/image copy 9.png',
+];
+
+const HOME_BEST_SELLERS = BEST_SELLERS.map((product, index) => ({
+  ...product,
+  image: LOCAL_PRODUCT_IMAGES[index] ?? product.image,
+}));
+
+const HOME_NEW_LAUNCHES = [...NEW_LAUNCHES, ...BEST_SELLERS.slice(0, 4)].map((product, index) => ({
+  ...product,
+  image: LOCAL_PRODUCT_IMAGES[(index + 4) % LOCAL_PRODUCT_IMAGES.length] ?? product.image,
+}));
+
 export default function Home() {
   const [wishlist, setWishlist] = useState<string[]>(['huda-easy-bake']);
   const [cart, setCart] = useState<CartItem[]>([
@@ -93,7 +116,7 @@ export default function Home() {
         {/* Best Sellers Section */}
         <ProductCarousel
           title="Meilleures ventes maquillage"
-          products={BEST_SELLERS}
+          products={HOME_BEST_SELLERS}
           wishlist={wishlist}
           onToggleWishlist={handleToggleWishlist}
           onOpenQuickView={(product) => setQuickViewProduct(product)}
@@ -105,7 +128,7 @@ export default function Home() {
         {/* New Beauty Launches Section */}
         <ProductCarousel
           title="Derniers meileurs"
-          products={NEW_LAUNCHES}
+          products={HOME_NEW_LAUNCHES}
           wishlist={wishlist}
           onToggleWishlist={handleToggleWishlist}
           onOpenQuickView={(product) => setQuickViewProduct(product)}

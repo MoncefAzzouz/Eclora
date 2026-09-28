@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { ShoppingBag, Truck, CreditCard, RotateCcw } from 'lucide-react';
+import { ShoppingBag, Truck, CreditCard } from 'lucide-react';
 
 export default function TrustBar() {
   const TRUST_ITEMS = [
     {
       icon: ShoppingBag,
-      title: 'Retrait en magasin',
-      description: 'Click & Collect en 2h offert dans nos boutiques',
-      linkText: 'En savoir plus',
+      title: 'Boutique Eclora',
+      description: 'Découvrez notre sélection de produits beauté choisis avec soin',
+      linkText: 'Découvrir la boutique',
     },
     {
       icon: Truck,
@@ -23,18 +23,12 @@ export default function TrustBar() {
       description: 'Paiement en espèces à la réception ou via BaridiMob',
       linkText: 'En savoir plus',
     },
-    {
-      icon: RotateCcw,
-      title: 'Retours faciles',
-      description: 'Echange ou retour sous 14 jours',
-      linkText: 'Retourner mon article',
-    },
   ];
 
   return (
     <section className="bg-white border-t border-b border-gray-200 mt-16 py-8">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {TRUST_ITEMS.map((item, idx) => {
             const Icon = item.icon;
             return (

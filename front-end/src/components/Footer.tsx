@@ -17,7 +17,7 @@ export default function Footer() {
             <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4">
               Aide
             </h3>
-            <ul className="space-y-2.5 text-xs text-white/85 font-normal">
+            <ul className="space-y-2.5 text-[13px] text-white/85 font-normal">
               <li className="hover:text-white cursor-pointer transition-colors">FAQ</li>
               <li className="hover:text-white cursor-pointer transition-colors">Moyens de paiement acceptés</li>
               <li className="hover:text-white cursor-pointer transition-colors">Nous contacter</li>
@@ -34,7 +34,7 @@ export default function Footer() {
             <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4">
               Mon Eclora
             </h3>
-            <ul className="space-y-2.5 text-xs text-white/85 font-normal">
+            <ul className="space-y-2.5 text-[13px] text-white/85 font-normal">
               <li className="hover:text-white cursor-pointer transition-colors">Mon compte</li>
               <li className="hover:text-white cursor-pointer transition-colors">My Eclora</li>
               <li className="hover:text-white cursor-pointer transition-colors">Authenticité des avis</li>
@@ -47,7 +47,7 @@ export default function Footer() {
             <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4">
               A propos d&apos;Eclora
             </h3>
-            <ul className="space-y-2.5 text-xs text-white/85 font-normal">
+            <ul className="space-y-2.5 text-[13px] text-white/85 font-normal">
               <li className="hover:text-white cursor-pointer transition-colors">Qui sommes-nous ?</li>
               <li className="hover:text-white cursor-pointer transition-colors">Carrières</li>
               <li className="hover:text-white cursor-pointer transition-colors">Nos engagements</li>
@@ -62,7 +62,7 @@ export default function Footer() {
             <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4">
               Actualités
             </h3>
-            <ul className="space-y-2.5 text-xs text-white/85 font-normal">
+            <ul className="space-y-2.5 text-[13px] text-white/85 font-normal">
               <li className="hover:text-white cursor-pointer transition-colors">Idées cadeaux</li>
               <li className="hover:text-white cursor-pointer transition-colors">Cartes cadeaux</li>
               <li className="hover:text-white cursor-pointer transition-colors">Gravure parfum</li>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Search, MapPin, User, Heart, ShoppingBag, X, Menu, ChevronRight } from 'lucide-react';
 import { BEST_SELLERS, NEW_LAUNCHES, Product } from '@/data/products';
@@ -17,6 +17,16 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const allProducts = [...BEST_SELLERS, ...NEW_LAUNCHES];
   const filteredProducts = searchQuery.trim()
@@ -41,7 +51,13 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
   ];
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <header
+      className={`sticky top-0 z-40 border-b transition-colors duration-300 ${
+        isScrolled
+          ? 'bg-white/75 border-white/40 backdrop-blur-xl shadow-sm'
+          : 'bg-white border-gray-200'
+      }`}
+    >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
         {/* Left: Mobile Hamburger + Eclora Logo */}
         <div className="flex items-center gap-2 sm:gap-3">

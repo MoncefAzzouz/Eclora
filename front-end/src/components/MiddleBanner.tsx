@@ -17,8 +17,8 @@ export default function MiddleBanner({ onDiscover }: MiddleBannerProps) {
           <div className="w-full sm:w-[44%] h-[180px] sm:h-full relative overflow-hidden bg-neutral-900 flex-shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=85"
-              alt="Plus qu'un parfum, une émotion"
+              src="/images/image copy 13.png"
+              alt="Collection maquillage Gracias Premium"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>

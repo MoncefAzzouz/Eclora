@@ -384,12 +384,16 @@ export default function PanierPage({ initialItems }: PanierPageProps) {
               </div>
 
               {/* Checkout Action Button */}
-              <button
-                disabled={items.length === 0}
-                className="w-full bg-black text-white text-xs sm:text-sm font-black uppercase tracking-wider py-4 rounded-xl hover:bg-neutral-800 active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              <Link
+                href="/livraison"
+                aria-disabled={items.length === 0}
+                tabIndex={items.length === 0 ? -1 : undefined}
+                className={`w-full bg-black text-white text-xs sm:text-sm font-black uppercase tracking-wider py-4 rounded-xl hover:bg-neutral-800 active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2 ${
+                  items.length === 0 ? 'pointer-events-none opacity-50' : ''
+                }`}
               >
                 <span>Valider mon panier</span>
-              </button>
+              </Link>
 
               {/* Security & Guarantees */}
               <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-gray-500 font-medium">
