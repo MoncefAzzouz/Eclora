@@ -3,6 +3,7 @@
 import { PrismaClient, type OrderStatus, type PaymentMethod, type Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { WILAYAS } from '../src/lib/wilayas.js';
+import { BANNER_URLS, productImageUrl, syncStorefrontMediaFiles } from '../src/lib/storefront-media.js';
 
 const prisma = new PrismaClient();
 
@@ -106,6 +107,7 @@ const ZONE_PRICES = {
 } as const;
 
 async function main() {
+  await syncStorefrontMediaFiles();
   console.log('Clearing existing data...');
   await prisma.$transaction([
     prisma.orderEvent.deleteMany(),
@@ -167,7 +169,7 @@ async function main() {
         compareAtPrice: p.compareAtPrice ?? null,
         stock: p.shades ? p.shades.reduce((t, s) => t + s.stock, 0) : p.stock,
         volume: p.volume ?? null,
-        images: [p.image],
+        images: [productImageUrl(i)],
         badge: p.badge ?? null,
         badgeType: p.badgeType ?? null,
         isNew: p.isNew ?? false,
@@ -322,11 +324,12 @@ async function main() {
   // ─── Storefront content ─────────────────────────────────────────────────
   await prisma.banner.createMany({
     data: [
-      { placement: 'HERO', title: 'Eclora Beauty', subtitle: 'Nouvelle saison', description: 'Découvrez les nouveautés maquillage et parfum de la rentrée.', buttonText: 'Découvrir', imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1800&q=85', link: '/shop/maquillage', position: 1 },
-      { placement: 'PROMO_DUAL', title: 'Exclusivité web', subtitle: "Jusqu'à -30%", description: 'sur une sélection de produits*. Offre fidélité en Algérie.', buttonText: 'Découvrir', imageUrl: img('photo-1522337360788-8b13dee7a37e'), link: '/shop/maquillage', position: 1 },
-      { placement: 'PROMO_DUAL', title: 'Place au renouveau', description: 'Préparez-vous à une nouvelle saison beauté avec nos favoris.', buttonText: 'Découvrir', imageUrl: img('photo-1570172619644-dfd03ed5d881'), link: '/shop/soin', position: 2 },
-      { placement: 'PROMO_MIDDLE', title: "Plus qu'un parfum, une émotion", description: 'Senteurs fruitées, florales ou chaleureuses à votre image.', buttonText: 'Découvrir', imageUrl: img('photo-1592945403244-b3fbafd7f539'), link: '/shop/parfum', position: 1 },
-      { placement: 'PROMO_MIDDLE', title: 'Avant-première Erborian', badge: 'Bientôt', description: 'Le soin coréen arrive chez Eclora.', buttonText: 'En savoir plus', imageUrl: img('photo-1570172619644-dfd03ed5d881'), link: '/shop/soin', isActive: false, position: 2 },
+      { placement: 'HERO', title: 'Beauty, in every form.', subtitle: 'The Eclora edit', description: 'Makeup, skincare, hair, fragrance — discover iconic favourites and the emerging brands worth knowing.', buttonText: 'Explore Eclora', imageUrl: BANNER_URLS.heroPrimary, link: '/shop/maquillage', position: 1 },
+      { placement: 'HERO', title: 'Une nouvelle saison beauté', subtitle: 'Gracias Premium', description: 'Découvrez une sélection colorée de soins et de parfums pour votre nouvelle routine.', buttonText: 'Découvrir', imageUrl: BANNER_URLS.heroSecondary, link: '/shop/nouveautes', position: 2 },
+      { placement: 'PROMO_DUAL', title: 'Exclusivité web', subtitle: "Jusqu'à -30%", description: 'sur une sélection de produits*.', buttonText: 'Découvrir', imageUrl: BANNER_URLS.exclusive, link: '/shop/maquillage', position: 1 },
+      { placement: 'PROMO_DUAL', title: 'Place au renouveau', description: 'Préparez-vous à une nouvelle saison beauté avec nos favoris.', buttonText: 'Découvrir', imageUrl: BANNER_URLS.renewal, link: '/shop/soin', position: 2 },
+      { placement: 'PROMO_MIDDLE', title: "Plus qu'un parfum, une émotion", description: 'Senteurs fruitées, florales ou chaleureuses à votre image.', buttonText: 'Découvrir', imageUrl: BANNER_URLS.fragrance, link: '/shop/parfum', position: 1 },
+      { placement: 'PROMO_MIDDLE', title: 'Avant-première soin', badge: 'Bientôt', description: 'Une nouvelle routine soin arrive chez Eclora.', buttonText: 'En savoir plus', imageUrl: BANNER_URLS.skincare, link: '/shop/soin', isActive: false, position: 2 },
     ],
   });
 

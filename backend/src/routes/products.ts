@@ -26,7 +26,11 @@ const productSchema = z.object({
   stock: z.number().int().min(0).default(0),
   lowStockThreshold: z.number().int().min(0).default(10),
   volume: z.string().nullish(),
-  images: z.array(z.string().url('URL d’image invalide')).default([]),
+  // Admin uploads are stored as same-origin /uploads paths; external https
+  // images remain supported as well.
+  images: z
+    .array(z.string().refine((v) => /^https?:\/\//.test(v) || v.startsWith('/'), 'URL d’image invalide'))
+    .default([]),
   shades: z.array(shadeSchema).default([]),
   badge: z.string().nullish(),
   badgeType: z.enum(['BLACK', 'PINK', 'RED', 'GOLD']).nullish(),
