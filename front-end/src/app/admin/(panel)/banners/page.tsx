@@ -9,6 +9,7 @@ import { BANNER_PLACEMENT } from '@/lib/admin/constants';
 import type { Banner, BannerPlacement } from '@/types/admin';
 import { Badge, Button, Card, ConfirmDialog, EmptyState, ErrorState, Field, IconButton, Input, LoadingState, Modal, PageHeader, Select, Textarea, Toggle } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
+import ImagePicker from '@/components/admin/ui/ImagePicker';
 
 type Draft = Omit<Banner, 'id' | 'position'> & { id?: string };
 
@@ -154,17 +155,13 @@ export default function BannersPage() {
               </div>
             </div>
             <div className="space-y-4">
-              <Field label="URL de l’image *" hint={draft.placement === 'HERO' ? 'Format large recommandé : 1800 × 800 px' : 'Format recommandé : 800 × 600 px'}>
-                <Input value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} placeholder="https://..." />
-              </Field>
-              <div className="rounded-xl overflow-hidden bg-slate-100 border border-slate-200 aspect-[16/9] flex items-center justify-center">
-                {draft.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={draft.imageUrl} alt="Aperçu" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-[11px] text-slate-400">Aperçu de l’image</span>
-                )}
-              </div>
+              <ImagePicker
+                label="Image *"
+                value={draft.imageUrl}
+                onChange={(imageUrl) => setDraft({ ...draft, imageUrl })}
+                aspect={draft.placement === 'HERO' ? '16/7' : '4/3'}
+                hint={draft.placement === 'HERO' ? 'Format large recommandé : 1800 × 800 px' : 'Format recommandé : 800 × 600 px'}
+              />
               <Field label="Lien" hint="Ex : /shop/parfum ou /product/dior-sauvage">
                 <Input value={draft.link} onChange={(e) => setDraft({ ...draft, link: e.target.value })} />
               </Field>

@@ -14,11 +14,15 @@ import { promoCodesRouter, shippingRouter } from './routes/marketing.js';
 import { settingsRouter, teamRouter } from './routes/settings.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { shopRouter } from './routes/storefront.js';
+import { uploadsRouter, UPLOAD_DIR } from './routes/uploads.js';
 
 const app = express();
 
 app.use(cors({ origin: env.corsOrigins, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
+
+// Admin-uploaded images. Static, public to read: the storefront renders them.
+app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '365d', immutable: true }));
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'eclora-backend', time: new Date().toISOString() });
@@ -42,6 +46,7 @@ app.use('/api/admin/promo-codes', requireAdmin, promoCodesRouter);
 app.use('/api/admin/shipping-rates', requireAdmin, shippingRouter);
 app.use('/api/admin/settings', requireAdmin, settingsRouter);
 app.use('/api/admin/users', requireAdmin, teamRouter);
+app.use('/api/admin/uploads', requireAdmin, uploadsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
@@ -50,4 +55,5 @@ app.listen(env.port, () => {
   console.log(`▲ Eclora API  http://localhost:${env.port}`);
   console.log(`  shop  : /api/shop/*`);
   console.log(`  admin : /api/admin/*`);
+  console.log(`  files : /uploads/*`);
 });

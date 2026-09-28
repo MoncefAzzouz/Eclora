@@ -1,6 +1,7 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
 import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
+import { MulterError } from 'multer';
 import { HttpError } from '../lib/http.js';
 
 export const notFoundHandler: RequestHandler = (req, res) => {
@@ -10,6 +11,15 @@ export const notFoundHandler: RequestHandler = (req, res) => {
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof HttpError) {
     res.status(err.status).json({ error: err.message });
+    return;
+  }
+
+  if (err instanceof MulterError) {
+    const message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'Fichier trop volumineux (5 Mo maximum).'
+        : `Envoi du fichier impossible : ${err.message}`;
+    res.status(400).json({ error: message });
     return;
   }
 

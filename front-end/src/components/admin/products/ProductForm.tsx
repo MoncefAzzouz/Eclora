@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, ImageUp } from 'lucide-react';
 import { api } from '@/lib/admin/api';
 import { emitDataChanged } from '@/lib/admin/useApi';
 import { formatDA, slugify, uid } from '@/lib/admin/format';
@@ -70,6 +70,8 @@ export default function ProductForm({
   const [errors, setErrors] = useState<Errors>({});
   const [imageUrl, setImageUrl] = useState('');
   const [tagInput, setTagInput] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const set = <K extends keyof ProductInput>(key: K, value: ProductInput[K]) => setValues((v) => ({ ...v, [key]: value }));
@@ -81,6 +83,22 @@ export default function ProductForm({
     if (!/^https?:\/\//.test(url)) return toast.error('Saisissez une URL d’image valide (https://...)');
     set('images', [...values.images, url]);
     setImageUrl('');
+  };
+
+  /** Uploads a file from the admin's computer and appends it to the gallery. */
+  const uploadImage = async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) return toast.error('Fichier trop volumineux (5 Mo maximum).');
+    setUploading(true);
+    try {
+      const { url } = await api.uploads.image(file);
+      set('images', [...values.images, url]);
+      toast.success('Image importée');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Envoi impossible');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
   };
 
   const moveImage = (i: number, dir: -1 | 1) => {
@@ -204,12 +222,33 @@ export default function ProductForm({
                 ))}
               </ul>
             )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void uploadImage(file);
+              }}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              icon={ImageUp}
+              loading={uploading}
+              onClick={() => fileRef.current?.click()}
+              className="w-full"
+            >
+              Importer depuis mon ordinateur
+            </Button>
+            <p className="mt-1.5 mb-3 text-[11px] text-slate-400">JPG, PNG, WEBP, AVIF ou GIF — 5 Mo maximum.</p>
             <div className="flex gap-2">
               <Input
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
-                placeholder="https://... (l’envoi de fichiers arrivera avec le backend)"
+                placeholder="ou collez une URL https://..."
               />
               <Button type="button" variant="secondary" icon={Plus} onClick={addImage}>Ajouter</Button>
             </div>

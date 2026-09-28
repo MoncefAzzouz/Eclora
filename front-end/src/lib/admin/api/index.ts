@@ -76,6 +76,49 @@ async function request<T>(path: string, { method = 'GET', body, token }: Request
   return data as T;
 }
 
+/**
+ * Uploads a file as multipart/form-data. The Content-Type header is left unset
+ * on purpose so the browser adds the multipart boundary itself.
+ */
+async function upload<T>(path: string, file: File): Promise<T> {
+  const auth = readToken();
+  const form = new FormData();
+  form.append('file', file);
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE}${path}`, {
+      method: 'POST',
+      headers: { ...(auth ? { Authorization: `Bearer ${auth}` } : {}) },
+      body: form,
+      cache: 'no-store',
+    });
+  } catch {
+    throw new ApiError('Serveur injoignable. Le backend est-il démarré ?', 0);
+  }
+
+  const text = await response.text();
+  const data = text ? (JSON.parse(text) as unknown) : null;
+  if (!response.ok) {
+    const message =
+      data && typeof data === 'object' && 'error' in data ? String((data as { error: unknown }).error) : 'Envoi impossible';
+    throw new ApiError(message, response.status);
+  }
+  return data as T;
+}
+
+// ─── Uploads ────────────────────────────────────────────────────────────────
+export interface UploadedFile {
+  url: string;
+  filename: string;
+  size: number;
+}
+
+const uploads = {
+  /** Sends an image from the admin's computer, returns its public URL. */
+  image: (file: File) => upload<UploadedFile>('/admin/uploads', file),
+};
+
 // ─── Auth ───────────────────────────────────────────────────────────────────
 const auth = {
   login: (email: string, password: string) =>
@@ -256,4 +299,5 @@ export const api = {
   shipping,
   settings,
   team,
+  uploads,
 };

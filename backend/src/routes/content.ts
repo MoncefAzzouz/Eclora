@@ -17,7 +17,10 @@ const bannerSchema = z.object({
   description: z.string().nullish(),
   badge: z.string().nullish(),
   buttonText: z.string().default('Découvrir'),
-  imageUrl: z.string().url('URL d’image invalide'),
+  // Either an absolute URL or a relative path from our own /uploads folder.
+  imageUrl: z
+    .string()
+    .refine((v) => /^https?:\/\//.test(v) || v.startsWith('/'), 'URL d’image invalide'),
   link: z.string().default('/'),
   isActive: z.boolean().default(true),
   startsAt: z.string().datetime().nullish(),

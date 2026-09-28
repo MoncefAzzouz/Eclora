@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, ExternalLink, X } from 'lucide-react';
+import Image from 'next/image';
+import { ExternalLink, X } from 'lucide-react';
 import { NAV_GROUPS, type AlertKey } from './nav';
 import type { AdminRole } from '@/types/admin';
 
@@ -27,10 +28,15 @@ export default function Sidebar({ role, alerts, open, onClose }: SidebarProps) {
       >
         <div className="p-6 border-b border-neutral-800 flex items-start justify-between">
           <Link href="/admin/dashboard" onClick={onClose}>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-pink-500 fill-pink-500" />
-              <span className="text-xl font-extrabold tracking-[0.2em] uppercase">ECLORA</span>
-            </div>
+            <Image
+              src="/svg/eclora-horizontal-white.svg"
+              alt="Eclora"
+              width={156}
+              height={48}
+              unoptimized
+              preload
+              className="h-9 w-auto"
+            />
             <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mt-1">
               Panneau d&apos;administration
             </span>
