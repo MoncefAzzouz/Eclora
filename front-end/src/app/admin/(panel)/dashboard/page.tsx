@@ -69,7 +69,7 @@ export default function DashboardPage() {
                   t.count > 0 ? 'border-slate-200 hover:border-black' : 'border-slate-100 opacity-60'
                 }`}
               >
-                <span className={`w-9 h-9 rounded-lg flex items-center justify-center ${t.count > 0 ? 'bg-black text-white' : 'bg-slate-100 text-slate-400'}`}>
+                <span className={`w-9 h-9 rounded-lg flex items-center justify-center ${t.count > 0 ? 'bg-gradient-to-br from-[#f05b2a] to-[#faae3c] text-white' : 'bg-slate-100 text-slate-400'}`}>
                   <t.icon className="w-4 h-4" />
                 </span>
                 <span className="flex-1 text-xs font-bold text-slate-700">{t.label}</span>
@@ -87,7 +87,7 @@ export default function DashboardPage() {
                   <li key={s} className="flex items-center gap-2 text-xs">
                     <span className="w-24"><StatusBadge map={ORDER_STATUS} value={s} /></span>
                     <span className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <span className="block h-full bg-slate-800 rounded-full" style={{ width: `${totalOrders ? (n / totalOrders) * 100 : 0}%` }} />
+                      <span className="block h-full bg-gradient-to-r from-[#f05b2a] to-[#faae3c] rounded-full" style={{ width: `${totalOrders ? (n / totalOrders) * 100 : 0}%` }} />
                     </span>
                     <span className="w-6 text-right font-bold tabular-nums">{n}</span>
                   </li>
@@ -180,7 +180,7 @@ function RevenueChart({ days }: { days: { date: string; revenue: number; orders:
                 className="flex-1 h-full flex items-end outline-none"
               >
                 <span
-                  className={`w-full rounded-t-[4px] transition-colors ${hover === i ? 'bg-pink-600' : 'bg-slate-900'}`}
+                  className={`w-full rounded-t-[4px] transition-colors ${hover === i ? 'bg-[#f05b2a]' : 'bg-[#faae3c]'}`}
                   style={{ height: `${Math.max((d.revenue / max) * 100, d.revenue ? 2 : 0)}%` }}
                 />
               </button>

@@ -10,7 +10,7 @@ import type { Tone } from '@/lib/admin/constants';
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
 const BUTTON_STYLES: Record<ButtonVariant, string> = {
-  primary: 'bg-black text-white hover:bg-slate-800 disabled:bg-slate-400',
+  primary: 'bg-gradient-to-r from-[#f05b2a] to-[#faae3c] text-white hover:brightness-105 disabled:from-slate-400 disabled:to-slate-400',
   secondary: 'bg-white text-slate-800 border border-slate-200 hover:bg-slate-100 disabled:text-slate-400',
   ghost: 'text-slate-600 hover:bg-slate-100 hover:text-black',
   danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
@@ -153,7 +153,7 @@ export function Card({
 // ─── Form controls ──────────────────────────────────────────────────────────
 
 const CONTROL =
-  'w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-black font-semibold outline-none focus:ring-2 focus:ring-black focus:bg-white transition disabled:opacity-60';
+  'w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-black font-semibold outline-none focus:ring-2 focus:ring-[#f05b2a] focus:bg-white transition disabled:opacity-60';
 
 export function Field({
   label,
@@ -221,7 +221,7 @@ export function Toggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
-        checked ? 'bg-black' : 'bg-slate-300'
+        checked ? 'bg-gradient-to-r from-[#f05b2a] to-[#faae3c]' : 'bg-slate-300'
       }`}
     >
       <span

@@ -80,7 +80,9 @@ export default function ProductForm({
 
   const addImage = () => {
     const url = imageUrl.trim();
-    if (!/^https?:\/\//.test(url)) return toast.error('Saisissez une URL d’image valide (https://...)');
+    if (!/^https?:\/\//.test(url) && !url.startsWith('/')) {
+      return toast.error('Saisissez une URL d’image valide (https://... ou /uploads/...)');
+    }
     set('images', [...values.images, url]);
     setImageUrl('');
   };

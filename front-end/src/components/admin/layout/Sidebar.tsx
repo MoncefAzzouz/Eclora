@@ -22,26 +22,26 @@ export default function Sidebar({ role, alerts, open, onClose }: SidebarProps) {
     <>
       {open && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={onClose} />}
       <aside
-        className={`w-64 bg-black text-white flex flex-col h-screen fixed lg:sticky top-0 left-0 border-r border-neutral-800 flex-shrink-0 z-40 transition-transform lg:translate-x-0 ${
+        className={`w-64 bg-white text-slate-900 flex flex-col h-screen fixed lg:sticky top-0 left-0 border-r border-slate-200 flex-shrink-0 z-40 transition-transform lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="p-6 border-b border-neutral-800 flex items-start justify-between">
+        <div className="p-6 border-b border-slate-200 flex items-start justify-between">
           <Link href="/admin/dashboard" onClick={onClose}>
             <Image
-              src="/svg/eclora-horizontal-white.svg"
+              src="/svg/Eclora Horizontal.svg"
               alt="Eclora"
               width={156}
               height={48}
               unoptimized
               preload
-              className="h-9 w-auto"
+              className="h-10 w-auto"
             />
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mt-1">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mt-1">
               Panneau d&apos;administration
             </span>
           </Link>
-          <button className="lg:hidden text-neutral-400 hover:text-white" onClick={onClose} aria-label="Fermer le menu">
+          <button className="lg:hidden text-slate-500 hover:text-black" onClick={onClose} aria-label="Fermer le menu">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -52,7 +52,7 @@ export default function Sidebar({ role, alerts, open, onClose }: SidebarProps) {
             if (!items.length) return null;
             return (
               <div key={group.title} className="space-y-1">
-                <div className="px-3 pb-1 text-[10px] font-bold text-neutral-500 uppercase tracking-wider">{group.title}</div>
+                <div className="px-3 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{group.title}</div>
                 {items.map((item) => {
                   const Icon = item.icon;
                   const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -63,17 +63,19 @@ export default function Sidebar({ role, alerts, open, onClose }: SidebarProps) {
                       href={item.href}
                       onClick={onClose}
                       className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                        active ? 'bg-pink-600 text-white shadow-md shadow-pink-900/30' : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'
+                        active
+                          ? 'bg-gradient-to-r from-[#f05b2a] to-[#faae3c] text-white shadow-md shadow-orange-200/70'
+                          : 'text-slate-700 hover:bg-orange-50 hover:text-black'
                       }`}
                     >
                       <span className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-neutral-400'}`} />
+                        <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-500'}`} />
                         {item.label}
                       </span>
                       {count > 0 && (
                         <span
                           className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-                            active ? 'bg-white text-pink-700' : 'bg-pink-600 text-white'
+                            active ? 'bg-white text-[#f05b2a]' : 'bg-[#f05b2a] text-white'
                           }`}
                         >
                           {count}
@@ -87,12 +89,12 @@ export default function Sidebar({ role, alerts, open, onClose }: SidebarProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-neutral-800">
+        <div className="p-4 border-t border-slate-200">
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-neutral-700 text-neutral-300 text-xs font-bold hover:bg-white hover:text-black transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-black hover:text-white transition-colors"
           >
             Voir la boutique
             <ExternalLink className="w-3.5 h-3.5" />

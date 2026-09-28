@@ -1,17 +1,52 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ApiBanner } from '@/lib/shop/api';
 
 interface HeroBannerProps {
   onDiscover: () => void;
-  /** Hero banner managed in the admin. Falls back to the built-in artwork. */
-  banner?: ApiBanner;
+  /** Active hero banners managed in the admin. */
+  banners?: ApiBanner[];
 }
 
-export default function HeroBanner({ onDiscover, banner }: HeroBannerProps) {
+const FALLBACK_BANNERS: ApiBanner[] = [
+  {
+    id: 'fallback-hero-1',
+    title: 'Beauty, in every form.',
+    subtitle: 'The Eclora edit',
+    description: 'Makeup, skincare, hair, fragrance — discover iconic favourites and the emerging brands worth knowing.',
+    buttonText: 'Explore Eclora',
+    imageUrl: '/images/2.png',
+    link: '/shop/maquillage',
+  },
+  {
+    id: 'fallback-hero-2',
+    title: 'Une nouvelle saison beauté',
+    subtitle: 'Gracias Premium',
+    description: 'Découvrez une sélection colorée de soins et de parfums pour votre nouvelle routine.',
+    buttonText: 'Découvrir',
+    imageUrl: '/images/3.png',
+    link: '/shop/nouveautes',
+  },
+];
+
+export default function HeroBanner({ onDiscover, banners }: HeroBannerProps) {
+  const slides = banners?.length ? banners : FALLBACK_BANNERS;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const banner = slides[activeIndex] ?? slides[0]!;
+
+  useEffect(() => {
+    if (activeIndex >= slides.length) setActiveIndex(0);
+  }, [activeIndex, slides.length]);
+
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const timer = window.setInterval(() => setActiveIndex((current) => (current + 1) % slides.length), 5500);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+
   const eyebrow = banner?.subtitle || 'The Eclora edit';
   const title = banner?.title || 'Beauty, in every form.';
   const description =
@@ -36,8 +71,9 @@ export default function HeroBanner({ onDiscover, banner }: HeroBannerProps) {
           native 2172x724 so the full composition stays uncropped. */}
       <div className="relative isolate flex min-h-[420px] overflow-hidden rounded-2xl bg-[#1d6f72] shadow-[0_24px_70px_rgba(16,64,66,0.22)] sm:min-h-0 sm:aspect-[2172/724] sm:rounded-3xl">
         <Image
-          src={banner?.imageUrl || '/images/2.png'}
-          alt={banner?.title || 'Gracias Sérum Figue de Barbarie hair serum, shown with a model applying it'}
+          key={banner.id}
+          src={banner.imageUrl}
+          alt={banner.title}
           fill
           preload
           sizes="(max-width: 1440px) 100vw, 1376px"
@@ -60,7 +96,7 @@ export default function HeroBanner({ onDiscover, banner }: HeroBannerProps) {
             <p className="mb-6 text-sm leading-relaxed text-white/85 drop-shadow-[0_1px_8px_rgba(6,40,42,0.5)] sm:text-[13px] md:text-base">
               {description}
             </p>
-            {banner?.link ? (
+            {banner.link ? (
               <Link href={banner.link} className={ctaClassName}>
                 {ctaLabel}
               </Link>
@@ -71,6 +107,21 @@ export default function HeroBanner({ onDiscover, banner }: HeroBannerProps) {
             )}
           </div>
         </div>
+
+        {slides.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-4" aria-label="Choisir une bannière">
+            {slides.map((slide, index) => (
+              <button
+                key={slide.id}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                aria-label={`Afficher la bannière ${index + 1}`}
+                aria-current={index === activeIndex}
+                className={`h-2 rounded-full shadow-sm transition-all ${index === activeIndex ? 'w-7 bg-white' : 'w-2 bg-white/55 hover:bg-white/80'}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

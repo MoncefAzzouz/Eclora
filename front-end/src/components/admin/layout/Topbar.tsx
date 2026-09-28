@@ -103,7 +103,7 @@ export default function Topbar({
 
         <div className="relative pl-2 border-l border-slate-200" ref={profileRef}>
           <button onClick={() => setProfileOpen((v) => !v)} className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100">
-            <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-[11px]">
+            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f05b2a] to-[#faae3c] text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
               {initials(user.name)}
             </span>
             <span className="hidden sm:block text-left">

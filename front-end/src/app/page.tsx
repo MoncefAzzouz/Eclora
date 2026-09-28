@@ -44,7 +44,7 @@ export default function Home() {
       <CategoryNav />
 
       <main className="flex-1 pb-12">
-        <HeroBanner onDiscover={scrollToProducts} banner={data?.banners.hero[0]} />
+        <HeroBanner onDiscover={scrollToProducts} banners={data?.banners.hero} />
         <PromoGrid onDiscover={scrollToProducts} banners={data?.banners.dual} />
 
         <div id="produits">

@@ -1,5 +1,5 @@
 /*
-  Eclora admin palette — warm plum + rose.
+  Eclora admin palette — clean neutrals + brand orange.
 
   Scoped to `.eclora-admin` instead of `@theme` (which is global) so the
   storefront keeps its own colours. Tailwind utilities read these variables,
@@ -8,43 +8,42 @@
 */
 .eclora-admin {
   /* Primary surfaces & buttons */
-  --color-black: #2a1b2e;
+  --color-black: #111827;
 
-  /* Warm plum-tinted greys — page background, text, borders */
-  --color-slate-50: #faf8f9;
-  --color-slate-100: #f4eff2;
-  --color-slate-200: #e9e1e7;
-  --color-slate-300: #d8ccd4;
-  --color-slate-400: #a99ca6;
-  --color-slate-500: #7c6b80;
-  --color-slate-600: #665a6b;
-  --color-slate-700: #4f4453;
-  --color-slate-800: #3a2f3e;
-  --color-slate-900: #2a1b2e;
-  --color-slate-950: #1e1222;
+  /* Neutral greys — page background, text, borders */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
 
-  /* Sidebar ramp (dark plum). 900 is lighter than the panel so hovers read. */
-  --color-neutral-200: #efe8f1;
-  --color-neutral-300: #dcd1e0;
-  --color-neutral-400: #b9a9be;
-  --color-neutral-500: #9a87a0;
-  --color-neutral-600: #6e5476;
-  --color-neutral-700: #5a4162;
-  --color-neutral-800: #46304e;
-  --color-neutral-900: #3a2740;
-  --color-neutral-950: #1e1222;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral-950: #030712;
 
-  /* Brand rose — accents, active nav, chart hover */
-  --color-pink-50: #fdf2f6;
-  --color-pink-100: #fbe4ec;
-  --color-pink-200: #f7c9da;
-  --color-pink-300: #f2a3c0;
-  --color-pink-400: #ec6e9c;
-  --color-pink-500: #e8467c;
-  --color-pink-600: #d6336c;
-  --color-pink-700: #b02659;
-  --color-pink-800: #8e1e48;
-  --color-pink-900: #76193c;
+  /* Brand orange — accents, active nav, chart hover */
+  --color-pink-50: #fff7ed;
+  --color-pink-100: #ffedd5;
+  --color-pink-200: #fed7aa;
+  --color-pink-300: #fdba74;
+  --color-pink-400: #fb923c;
+  --color-pink-500: #f97316;
+  --color-pink-600: #f05b2a;
+  --color-pink-700: #d9481d;
+  --color-pink-800: #b93818;
+  --color-pink-900: #9a3412;
 
   /* Status: delivered / active */
   --color-emerald-50: #e9f6f0;
@@ -86,9 +85,9 @@
   --color-red-700: #a82a22;
 
   /* Secondary KPI accents */
-  --color-purple-500: #8b5cf6;
+  --color-purple-500: #faae3c;
 
-  background-color: #faf8f9;
-  color: #2a1b2e;
+  background-color: #f8fafc;
+  color: #111827;
   letter-spacing: normal;
 }
