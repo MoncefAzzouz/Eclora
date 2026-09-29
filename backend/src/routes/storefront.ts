@@ -77,7 +77,12 @@ shopRouter.get(
       }),
       prisma.homeSection.findMany({
         where: { isVisible: true },
-        include: { products: { orderBy: { position: 'asc' }, include: { product: { include: { shades: true } } } } },
+        include: {
+          products: {
+            orderBy: { position: 'asc' },
+            include: { product: { include: { shades: true, brand: true, category: true } } },
+          },
+        },
         orderBy: { position: 'asc' },
       }),
       getSettings(),
@@ -94,7 +99,11 @@ shopRouter.get(
         title: section.title,
         products: section.products
           .filter((entry) => entry.product.status === 'ACTIVE')
-          .map((entry) => s.product(entry.product)),
+          .map((entry) => ({
+            ...s.product(entry.product),
+            brandName: entry.product.brand.name,
+            categorySlug: entry.product.category.slug,
+          })),
       })),
       announcement: settings.announcementEnabled ? settings.announcementText : '',
       freeShippingThreshold: settings.freeShippingThreshold,
