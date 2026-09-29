@@ -44,7 +44,14 @@ function OrderThanks() {
     <div className="min-h-screen bg-[#faf8f7]">
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-[900px] mx-auto px-4 py-4 text-center">
-          <Link href="/" className="text-xl font-black tracking-[0.2em]">ECLORA</Link>
+          <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/svg/Eclora Horizontal.svg"
+              alt="ECLORA"
+              className="mx-auto h-8 w-auto sm:h-10"
+            />
+          </Link>
         </div>
       </header>
 
