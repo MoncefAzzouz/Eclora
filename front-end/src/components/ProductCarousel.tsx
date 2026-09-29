@@ -32,8 +32,11 @@ export default function ProductCarousel({
       if (!carousel || carousel.scrollWidth <= carousel.clientWidth) return;
 
       const isAtEnd = carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 12;
+      const firstCard = carousel.firstElementChild as HTMLElement | null;
+      const gap = Number.parseFloat(window.getComputedStyle(carousel).columnGap) || 0;
+      const step = (firstCard?.offsetWidth ?? 240) + gap;
       carousel.scrollTo({
-        left: isAtEnd ? 0 : carousel.scrollLeft + 294,
+        left: isAtEnd ? 0 : carousel.scrollLeft + step,
         behavior: 'smooth',
       });
     }, 3000);
@@ -51,19 +54,22 @@ export default function ProductCarousel({
 
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
-      const scrollAmount = direction === 'left' ? -340 : 340;
+      const firstCard = carouselRef.current.firstElementChild as HTMLElement | null;
+      const gap = Number.parseFloat(window.getComputedStyle(carouselRef.current).columnGap) || 0;
+      const step = (firstCard?.offsetWidth ?? 240) + gap;
+      const scrollAmount = direction === 'left' ? -step : step;
       carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
+    <section className="mx-auto mt-10 max-w-[1440px] px-4 sm:mt-14 sm:px-6 lg:px-8">
       {/* Section Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight font-sans">
+      <div className="mb-4 flex items-center justify-between gap-3 sm:mb-5">
+        <h2 className="font-sans text-xl font-black tracking-tight text-black sm:text-[28px] sm:leading-tight">
           {title}
         </h2>
-        <button className="px-4 py-1.5 rounded-lg border border-gray-300 text-black text-xs font-bold hover:border-black transition-colors">
+        <button className="flex-shrink-0 rounded-lg border border-gray-300 px-4 py-1.5 text-xs font-bold text-black transition-colors hover:border-black sm:text-sm">
           Voir tout
         </button>
       </div>
@@ -102,7 +108,7 @@ export default function ProductCarousel({
         <div
           ref={carouselRef}
           onScroll={handleScroll}
-          className="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pb-6 pt-2 snap-x snap-mandatory"
+          className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto pb-5 pt-1 sm:gap-4"
         >
           {products.map((product) => {
             const isWishlisted = wishlist.includes(product.id);
@@ -110,13 +116,13 @@ export default function ProductCarousel({
             return (
               <div
                 key={product.id}
-                className="flex-none w-[220px] sm:w-[250px] md:w-[270px] snap-start bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-300 group/card relative"
+                className="group/card relative flex w-[200px] flex-none snap-start flex-col justify-between rounded-lg border border-gray-300 bg-white p-2.5 transition-colors hover:border-gray-400 sm:w-[220px] sm:p-3 md:w-[240px]"
               >
                 <div>
                   {/* Top Badges & Wishlist Button */}
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-1 flex items-center justify-between">
                     {product.badge ? (
-                      <span className="bg-black text-white text-[11px] font-bold px-2.5 py-1 rounded-md tracking-tight">
+                      <span className="rounded bg-black px-2 py-1 text-[10px] font-bold tracking-tight text-white sm:text-[11px]">
                         {product.badge}
                       </span>
                     ) : (
@@ -127,11 +133,11 @@ export default function ProductCarousel({
                         e.stopPropagation();
                         onToggleWishlist(product.id);
                       }}
-                      className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-black z-10"
+                      className="z-10 rounded-full p-1 transition-colors hover:bg-gray-100 text-black"
                       aria-label="Wishlist toggle"
                     >
                       <Heart
-                        className={`w-5 h-5 ${
+                        className={`h-5 w-5 ${
                           isWishlisted ? 'fill-[#d80075] text-[#d80075]' : 'text-black stroke-[1.5]'
                         }`}
                       />
@@ -141,63 +147,63 @@ export default function ProductCarousel({
                   {/* Product Image Link */}
                   <Link
                     href={`/product/${product.id}`}
-                    className="w-full h-[180px] sm:h-[200px] my-2 relative overflow-hidden rounded-xl cursor-pointer flex items-center justify-center bg-white block"
+                    className="relative my-1.5 flex h-[180px] w-full cursor-pointer items-center justify-center overflow-hidden bg-white sm:h-[210px]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="w-full h-full object-contain scale-[1.18] group-hover/card:scale-[1.24] transition-transform duration-300"
+                      className="h-full w-full scale-[1.3] object-contain transition-transform duration-300 group-hover/card:scale-[1.36]"
                     />
                   </Link>
 
                   {/* Product Info */}
-                  <div className="mt-3">
-                    <div className="text-xs font-black text-black uppercase tracking-wider">
+                  <div className="mt-2">
+                    <div className="text-[11px] font-black uppercase tracking-wide text-black sm:text-xs">
                       {product.brand}
                     </div>
                     <Link
                       href={`/product/${product.id}`}
-                      className="text-xs text-gray-900 font-medium line-clamp-2 mt-1 hover:underline cursor-pointer min-h-[32px] block"
+                      className="mt-1 block min-h-[34px] cursor-pointer line-clamp-2 text-[12px] font-medium leading-[1.4] text-gray-900 hover:underline sm:text-[13px]"
                     >
                       {product.title}
                     </Link>
                     {product.volume && (
-                      <div className="text-[11px] text-gray-500 mt-0.5">{product.volume}</div>
+                      <div className="mt-0.5 text-[11px] text-gray-500 sm:text-xs">{product.volume}</div>
                     )}
 
                     {/* Price Display */}
-                    <div className="mt-2.5 flex items-baseline gap-2">
-                      <span className="text-sm sm:text-base font-extrabold text-black">
+                    <div className="mt-2 flex items-baseline gap-2">
+                      <span className="text-base font-extrabold text-black sm:text-lg">
                         {product.price}
                       </span>
                       {product.originalPrice && (
-                        <span className="text-[10px] text-gray-400 line-through">
+                        <span className="text-[10px] text-gray-400 line-through sm:text-[11px]">
                           {product.originalPrice}
                         </span>
                       )}
                     </div>
 
                     {/* Rating & Reviews */}
-                    <div className="flex items-center gap-1 mt-1 text-xs">
+                    <div className="mt-1 flex items-center gap-1 text-xs">
                       <div className="flex text-black">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-black text-black" />
+                          <Star key={i} className="h-3.5 w-3.5 fill-black text-black" />
                         ))}
                       </div>
-                      <span className="text-[10px] text-gray-500 font-normal">
+                      <span className="text-[10px] font-normal text-gray-500 sm:text-[11px]">
                         {product.reviewsCount} avis
                       </span>
                     </div>
 
                     {/* Format / Shade info tag */}
                     {product.shadeInfo && (
-                      <div className="text-[10px] text-gray-500 mt-1 font-medium">
+                      <div className="mt-1 text-[10px] font-medium text-gray-500 sm:text-[11px]">
                         {product.shadeInfo}
                       </div>
                     )}
                     {product.tags && product.tags.length > 0 && (
-                      <div className="text-[10px] text-gray-500 mt-0.5">
+                      <div className="mt-0.5 text-[10px] text-gray-500 sm:text-[11px]">
                         {product.tags.join(', ')}
                       </div>
                     )}
@@ -205,10 +211,10 @@ export default function ProductCarousel({
                 </div>
 
                 {/* CTA Action Button */}
-                <div className="mt-4 pt-2">
+                <div className="mt-3 pt-1.5">
                   <Link
                     href={`/product/${product.id}`}
-                    className="w-full py-2.5 rounded-xl border border-black text-black font-bold text-xs hover:bg-black hover:text-white transition-all text-center block"
+                    className="block w-full rounded-lg border-2 border-black py-2 text-center text-xs font-bold text-black transition-colors hover:bg-black hover:text-white sm:text-sm"
                   >
                     Découvrir
                   </Link>
