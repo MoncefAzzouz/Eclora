@@ -64,8 +64,8 @@ export default function ShopCategoryPage() {
         isOpen={cart.isOpen}
         onClose={() => cart.setOpen(false)}
         items={cart.items}
-        onUpdateQuantity={(id, delta) => cart.updateQuantity(id, delta)}
-        onRemoveItem={(id) => cart.remove(id)}
+        onUpdateQuantity={(id, delta, shade) => cart.updateQuantity(id, delta, shade)}
+        onRemoveItem={(id, shade) => cart.remove(id, shade)}
       />
       <QuickViewModal
         product={quickViewProduct}

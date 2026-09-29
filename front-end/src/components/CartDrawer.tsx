@@ -8,14 +8,15 @@ import { Product } from '@/data/products';
 export interface CartItem {
   product: Product;
   quantity: number;
+  shade?: string;
 }
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
-  onUpdateQuantity: (productId: string, delta: number) => void;
-  onRemoveItem: (productId: string) => void;
+  onUpdateQuantity: (productId: string, delta: number, shade?: string) => void;
+  onRemoveItem: (productId: string, shade?: string) => void;
 }
 
 export default function CartDrawer({
@@ -96,8 +97,8 @@ export default function CartDrawer({
                 <p className="text-xs text-gray-500 mt-1">Découvrez nos best-sellers et promotions !</p>
               </div>
             ) : (
-              items.map(({ product, quantity }) => (
-                <div key={product.id} className="py-4 flex gap-4">
+              items.map(({ product, quantity, shade }) => (
+                <div key={`${product.id}-${shade ?? 'default'}`} className="py-4 flex gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={product.image}
@@ -114,9 +115,12 @@ export default function CartDrawer({
                           <h4 className="text-xs text-gray-800 font-medium line-clamp-2">
                             {product.title}
                           </h4>
+                          {shade && <p className="mt-0.5 text-[11px] text-gray-500">{shade}</p>}
                         </div>
                         <button
-                          onClick={() => onRemoveItem(product.id)}
+                          type="button"
+                          onClick={() => onRemoveItem(product.id, shade)}
+                          aria-label={`Supprimer ${product.title} du panier`}
                           className="text-gray-400 hover:text-red-600 transition-colors p-1"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -127,14 +131,16 @@ export default function CartDrawer({
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                         <button
-                          onClick={() => onUpdateQuantity(product.id, -1)}
+                          type="button"
+                          onClick={() => onUpdateQuantity(product.id, -1, shade)}
                           className="px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-gray-100"
                         >
                           -
                         </button>
                         <span className="px-3 text-xs font-bold text-black">{quantity}</span>
                         <button
-                          onClick={() => onUpdateQuantity(product.id, 1)}
+                          type="button"
+                          onClick={() => onUpdateQuantity(product.id, 1, shade)}
                           className="px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-gray-100"
                         >
                           +

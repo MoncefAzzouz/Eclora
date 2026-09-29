@@ -70,8 +70,8 @@ export default function ProductPage() {
         isOpen={cart.isOpen}
         onClose={() => cart.setOpen(false)}
         items={cart.items}
-        onUpdateQuantity={(itemId, delta) => cart.updateQuantity(itemId, delta)}
-        onRemoveItem={(itemId) => cart.remove(itemId)}
+        onUpdateQuantity={(itemId, delta, shade) => cart.updateQuantity(itemId, delta, shade)}
+        onRemoveItem={(itemId, shade) => cart.remove(itemId, shade)}
       />
       <QuickViewModal
         product={quickViewProduct}

@@ -30,15 +30,16 @@ export default function PanierPage() {
     );
   };
 
-  const updateQuantity = (productId: string, newQty: number) => {
-    const current = items.find((item) => item.product.id === productId);
+  const updateQuantity = (productId: string, newQty: number, shade?: string) => {
+    const current = items.find(
+      (item) => item.product.id === productId && (item.shade ?? '') === (shade ?? '')
+    );
     if (!current || newQty < 1) return;
-    cart.updateQuantity(productId, newQty - current.quantity, current.shade);
+    cart.updateQuantity(productId, newQty - current.quantity, shade);
   };
 
-  const removeItem = (productId: string) => {
-    const current = items.find((item) => item.product.id === productId);
-    cart.remove(productId, current?.shade);
+  const removeItem = (productId: string, shade?: string) => {
+    cart.remove(productId, shade);
   };
 
   // Helper to parse price number
@@ -82,10 +83,13 @@ export default function PanierPage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           {/* Brand Logo */}
-          <Link href="/" className="inline-block">
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-[0.24em] text-black uppercase font-sans hover:opacity-80 transition-opacity">
-              ECLORA
-            </span>
+          <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/svg/Eclora Horizontal.svg"
+              alt="ECLORA"
+              className="h-8 w-auto sm:h-10"
+            />
           </Link>
 
           {/* Stepper (1 Panier, 2, 3) */}
@@ -146,7 +150,7 @@ export default function PanierPage() {
 
                   return (
                     <div
-                      key={item.product.id}
+                      key={`${item.product.id}-${item.shade ?? 'default'}`}
                       className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-2xs relative transition-all"
                     >
                       {/* Wishlist Heart Icon */}
@@ -189,6 +193,11 @@ export default function PanierPage() {
                                 {item.product.volume}
                               </div>
                             )}
+                            {item.shade && (
+                              <div className="mt-0.5 text-xs font-medium text-gray-500">
+                                {item.shade}
+                              </div>
+                            )}
 
                             {/* Red Point tag */}
                             <div className="inline-block mt-2.5">
@@ -206,7 +215,7 @@ export default function PanierPage() {
                                 <select
                                   value={item.quantity}
                                   onChange={(e) =>
-                                    updateQuantity(item.product.id, parseInt(e.target.value, 10))
+                                    updateQuantity(item.product.id, parseInt(e.target.value, 10), item.shade)
                                   }
                                   className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-bold text-black appearance-none pr-7 cursor-pointer outline-none focus:border-black"
                                 >
@@ -221,7 +230,7 @@ export default function PanierPage() {
 
                               {/* Delete Button */}
                               <button
-                                onClick={() => removeItem(item.product.id)}
+                                onClick={() => removeItem(item.product.id, item.shade)}
                                 className="text-xs font-bold text-gray-700 hover:text-black uppercase tracking-wider hover:underline transition-colors"
                               >
                                 SUPPRIMER

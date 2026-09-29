@@ -138,8 +138,13 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-[#f8f8f8] text-black">
       <header className="sticky top-0 z-30 border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/" className="text-2xl font-extrabold tracking-[0.24em] sm:text-3xl">
-            ECLORA
+          <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/svg/Eclora Horizontal.svg"
+              alt="ECLORA"
+              className="h-8 w-auto sm:h-10"
+            />
           </Link>
 
           <div className="flex items-center gap-3 text-xs font-semibold sm:gap-4">
