@@ -51,6 +51,7 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
   ];
 
   return (
+    <>
     <header
       className={`sticky top-0 z-40 border-b transition-colors duration-300 ${
         isScrolled
@@ -220,17 +221,19 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
           </div>
         </div>
       )}
+    </header>
 
-      {/* Mobile Slide-Over Navigation Drawer */}
-      {isMobileNavOpen && (
-        <div className="fixed inset-0 z-50 flex sm:hidden animate-fade-in">
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
-            onClick={() => setIsMobileNavOpen(false)}
-          />
-          <div className="relative bg-white w-4/5 max-w-sm h-full shadow-2xl flex flex-col justify-between z-10">
+    {/* Kept outside the blurred sticky header so it uses the viewport as its
+        containing block and the white drawer covers its full height. */}
+    {isMobileNavOpen && (
+      <div className="fixed inset-0 z-50 flex animate-fade-in sm:hidden">
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-xs"
+          onClick={() => setIsMobileNavOpen(false)}
+        />
+        <div className="relative z-10 flex h-dvh w-4/5 max-w-sm flex-col justify-between bg-white shadow-2xl">
             <div>
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center justify-between border-b border-gray-200 bg-white p-4">
                 <span className="text-xl font-extrabold tracking-[0.2em] text-black uppercase font-sans">
                   ECLORA
                 </span>
@@ -242,7 +245,7 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
                 </button>
               </div>
 
-              <div className="p-4 divide-y divide-gray-100 overflow-y-auto max-h-[calc(100vh-140px)]">
+              <div className="max-h-[calc(100dvh-140px)] divide-y divide-gray-100 overflow-y-auto bg-white p-4">
                 <div className="py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest font-avantgarde">
                   Catégories
                 </div>
@@ -271,7 +274,7 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-200 bg-gray-50 text-xs font-semibold text-gray-600 space-y-2">
+            <div className="space-y-2 border-t border-gray-200 bg-gray-50 p-4 text-xs font-semibold text-gray-600">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-black" />
                 <span>Magasins & Services</span>
@@ -281,9 +284,9 @@ export default function Header({ wishlistCount, cartCount, onOpenCart, onOpenQui
                 <span>Mon compte</span>
               </div>
             </div>
-          </div>
         </div>
-      )}
-    </header>
+      </div>
+    )}
+    </>
   );
 }

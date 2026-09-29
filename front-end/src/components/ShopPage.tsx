@@ -293,7 +293,7 @@ export default function ShopPage({
             )}
 
             {/* Product Grid: 2 Columns on Mobile, Big & Crisp Typography */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
               {displayedProducts.map((product) => {
                 const isWishlisted = wishlist.includes(product.id);
                 const isAdded = addedProductId === product.id;
@@ -301,21 +301,21 @@ export default function ShopPage({
                 return (
                   <div
                     key={product.id}
-                    className="bg-white rounded-2xl border border-gray-200/90 p-3 sm:p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200 group relative"
+                    className="group relative flex min-h-[410px] flex-col justify-between rounded-lg border border-gray-300 bg-white p-2 transition-colors duration-200 hover:border-gray-400 sm:min-h-[500px] sm:p-3"
                   >
                     <div>
                       {/* Top Badges & Wishlist Toggle */}
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="bg-black text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-sm">
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="rounded bg-black px-2 py-1 text-[10px] font-bold text-white sm:text-[11px]">
                           {product.badge || 'Nouveauté'}
                         </span>
                         <button
                           onClick={() => onToggleWishlist(product.id)}
-                          className="p-1 rounded-full hover:bg-gray-100 transition-colors text-black"
+                          className="rounded-full p-1 text-black transition-colors hover:bg-gray-100"
                           aria-label="Wishlist"
                         >
                           <Heart
-                            className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                            className={`h-5 w-5 ${
                               isWishlisted ? 'fill-[#d80075] text-[#d80075]' : 'text-black stroke-[1.75]'
                             }`}
                           />
@@ -325,71 +325,86 @@ export default function ShopPage({
                       {/* Product Image Link */}
                       <Link
                         href={`/product/${product.id}`}
-                        className="w-full h-[150px] sm:h-[220px] relative overflow-hidden rounded-xl bg-white flex items-center justify-center cursor-pointer block mb-3 p-1"
+                        className="relative mb-2 flex h-[175px] w-full cursor-pointer items-center justify-center overflow-hidden bg-white sm:h-[235px]"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={product.image}
                           alt={product.title}
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                          className="h-full w-full scale-[1.35] object-contain transition-transform duration-200 group-hover:scale-[1.42]"
                         />
                       </Link>
 
                       {/* Product Typography & Details */}
                       <div>
                         {/* Brand in Bold Uppercase */}
-                        <div className="text-xs sm:text-sm font-extrabold text-black uppercase tracking-tight leading-none mb-1 truncate">
+                        <div className="mb-1 line-clamp-2 min-h-[24px] text-[11px] font-extrabold uppercase leading-tight tracking-tight text-black sm:min-h-[28px] sm:text-[13px]">
                           {product.brand}
                         </div>
 
                         {/* Product Title (13px, crisp black) */}
                         <Link
                           href={`/product/${product.id}`}
-                          className="text-[12px] sm:text-[13px] text-neutral-900 font-medium line-clamp-2 hover:underline cursor-pointer min-h-[32px] sm:min-h-[36px] block leading-snug"
+                          className="block min-h-[38px] cursor-pointer line-clamp-2 text-[13px] font-medium leading-snug text-neutral-900 hover:underline sm:min-h-[40px] sm:text-sm"
                         >
                           {product.title}
                         </Link>
 
                         {/* Volume / Subtitle */}
                         {product.subtitle && (
-                          <div className="text-[11px] sm:text-xs text-gray-500 font-normal mt-0.5 truncate">
+                          <div className="mt-0.5 truncate text-[11px] font-normal text-gray-500 sm:text-xs">
                             {product.subtitle}
+                          </div>
+                        )}
+                        {product.volume && product.volume !== product.subtitle && (
+                          <div className="mt-0.5 text-[11px] font-normal text-gray-500 sm:text-xs">
+                            {product.volume}
                           </div>
                         )}
 
                         {/* Price */}
-                        <div className="mt-1 sm:mt-1.5">
-                          <span className="text-sm sm:text-base font-black text-black">
+                        <div className="mt-2 flex items-baseline gap-1.5">
+                          <span className="text-base font-black text-black sm:text-lg">
                             {product.price}
                           </span>
+                          {product.originalPrice && (
+                            <span className="text-[10px] text-gray-400 line-through sm:text-[11px]">
+                              {product.originalPrice}
+                            </span>
+                          )}
                         </div>
 
                         {/* Unit Price */}
                         {product.unitPrice && (
-                          <div className="text-[10px] sm:text-[11px] text-gray-400 font-normal mt-0.5">
+                          <div className="mt-0.5 text-[10px] font-normal text-gray-400 sm:text-[11px]">
                             {product.unitPrice}
                           </div>
                         )}
 
                         {/* Star Rating and Count */}
-                        <div className="flex items-center gap-1 mt-1 text-[11px] font-semibold text-black">
+                        <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-black">
                           <div className="flex text-black">
                             {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black text-black" />
+                              <Star key={i} className="h-3 w-3 fill-black text-black sm:h-3.5 sm:w-3.5" />
                             ))}
                           </div>
-                          <span className="text-[10px] sm:text-[11px] text-black font-semibold">
+                          <span className="text-[10px] font-semibold text-black sm:text-[11px]">
                             {product.reviewsCount}
                           </span>
                         </div>
+                        {product.shadeInfo && (
+                          <div className="mt-1 text-[10px] font-medium text-gray-700 sm:text-[11px]">
+                            {product.shadeInfo}
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Direct "Ajouter" Button */}
-                    <div className="mt-3 pt-2">
+                    <div className="mt-3 pt-1.5">
                       <button
                         onClick={() => handleAddClick(product)}
-                        className={`w-full py-2 sm:py-2.5 rounded-lg border border-black font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 ${
+                        className={`flex w-full items-center justify-center gap-1.5 rounded-lg border-2 border-black py-2.5 text-xs font-bold transition-colors sm:text-sm ${
                           isAdded
                             ? 'bg-emerald-600 text-white border-emerald-600'
                             : 'bg-white text-black hover:bg-black hover:text-white'
