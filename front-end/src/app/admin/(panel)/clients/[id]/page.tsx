@@ -9,7 +9,7 @@ import { useApi } from '@/lib/admin/useApi';
 import { formatDA, formatDate, formatDateTime, initials } from '@/lib/admin/format';
 import { CLIENT_STATUS, ORDER_STATUS } from '@/lib/admin/constants';
 import { wilayaName } from '@/lib/admin/wilayas';
-import { Button, Card, ConfirmDialog, EmptyState, ErrorState, LoadingState, StatusBadge, Table, Td, Textarea, Th } from '@/components/admin/ui';
+import { Button, Card, ConfirmDialog, EmptyState, ErrorState, Input, LoadingState, StatusBadge, Table, Td, Textarea, Th } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
 
 export default function ClientDetailPage() {
@@ -18,6 +18,7 @@ export default function ClientDetailPage() {
   const { data, loading, error, reload } = useApi(() => api.clients.get(id), [id]);
   const [note, setNote] = useState<string | null>(null);
   const [confirmBlock, setConfirmBlock] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
 
   if (loading) return <LoadingState />;
   if (error || !data) return <ErrorState message={error ?? 'Client introuvable'} onRetry={reload} />;
@@ -33,6 +34,13 @@ export default function ClientDetailPage() {
     );
     setConfirmBlock(false);
     if (ok) reload();
+  };
+
+  const savePassword = async () => {
+    if (await toast.run(() => api.clients.setPassword(client.id, newPassword), 'Mot de passe défini. Communiquez-le au client par téléphone.')) {
+      setNewPassword('');
+      reload();
+    }
   };
 
   const saveNote = async () => {
@@ -111,6 +119,16 @@ export default function ClientDetailPage() {
               <a href={`tel:${client.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 hover:underline"><Phone className="w-4 h-4 text-slate-400" />{client.phone}</a>
               <a href={`mailto:${client.email}`} className="flex items-center gap-2 hover:underline break-all"><Mail className="w-4 h-4 text-slate-400" />{client.email}</a>
               <div className="flex items-start gap-2"><MapPin className="w-4 h-4 text-slate-400 flex-shrink-0" />{client.address ? `${client.address}, ` : ''}{wilayaName(client.wilayaCode)}</div>
+            </div>
+          </Card>
+          <Card
+            title="Compte client"
+            description={client.isGuest ? 'Client invité (sans compte). Définir un mot de passe lui crée un compte.' : 'A un compte sur le site.'}
+          >
+            <p className="mb-2 text-[11px] text-slate-500">Mot de passe oublié : vérifiez l’identité par téléphone, puis définissez-en un nouveau.</p>
+            <div className="flex gap-2">
+              <Input type="text" autoComplete="off" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Nouveau mot de passe (8+)" />
+              <Button size="sm" onClick={savePassword} disabled={newPassword.length < 8}>Définir</Button>
             </div>
           </Card>
           <Card title="Note interne" description="Visible uniquement par l’équipe">

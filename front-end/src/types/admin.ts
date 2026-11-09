@@ -63,6 +63,7 @@ export interface Category {
   isVisible: boolean;
   isHighlighted: boolean;
   badgeColor?: 'PINK' | 'RED';
+  description?: string;
   subcategories: Subcategory[];
 }
 
@@ -71,7 +72,9 @@ export interface Brand {
   name: string;
   slug: string;
   logoUrl?: string;
+  description?: string;
   isFeatured: boolean;
+  position?: number;
 }
 
 export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -127,8 +130,11 @@ export interface Order {
   customerEmail?: string;
   wilayaCode: number;
   commune: string;
+  communeId?: number;
   address: string;
   deliveryType: DeliveryType;
+  stopdeskId?: number;
+  stopdeskName?: string;
   items: OrderItem[];
   subtotal: number;
   shippingFee: number;
@@ -139,6 +145,8 @@ export interface Order {
   paymentStatus: PaymentStatus;
   status: OrderStatus;
   trackingNumber?: string;
+  yalidineLabel?: string;
+  yalidineStatus?: string;
   history: OrderEvent[];
   adminNote?: string;
   createdAt: string;
@@ -155,6 +163,8 @@ export interface Client {
   address?: string;
   status: ClientStatus;
   adminNote?: string;
+  /** True when the client never created an account (guest checkout only). */
+  isGuest?: boolean;
   createdAt: string;
 }
 
@@ -232,6 +242,38 @@ export interface StoreSettings {
   payments: Record<PaymentMethod, boolean>;
   socials: { instagram: string; facebook: string; tiktok: string };
   maintenanceMode: boolean;
+  yalidine?: {
+    fromWilaya: number;
+    parcel: { length: number; width: number; height: number; weight: number };
+    lastSync?: string;
+  };
+}
+
+export interface DeliveryCommune {
+  id: number;
+  name: string;
+  wilayaCode: number;
+  hasStopDesk: boolean;
+  isDeliverable: boolean;
+  homePrice: number | null;
+  stopdeskPrice: number | null;
+  deliveryDays: string | null;
+}
+
+export interface YalidineStatus {
+  configured: boolean;
+  fromWilaya: number;
+  lastSync?: string;
+  communes: number;
+  centers: number;
+  sync: {
+    running: boolean;
+    step: string;
+    startedAt?: string;
+    finishedAt?: string;
+    error?: string;
+    summary?: { wilayas: number; communes: number; centers: number; pricedWilayas: number };
+  };
 }
 
 export type AdminRole = 'OWNER' | 'ADMIN' | 'EDITOR' | 'SUPPORT';

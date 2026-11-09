@@ -74,6 +74,11 @@ function sameLine(line: CartLine, productId: string, shade?: string) {
   return line.product.id === productId && (line.shade ?? '') === (shade ?? '');
 }
 
+/** Most units of one line: what is in stock, and never more than the server's 20. */
+function maxQuantity(product: Product): number {
+  return Math.min(20, product.stock ?? 20);
+}
+
 const CartContext = createContext<CartApi | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
@@ -81,11 +86,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setOpen] = useState(false);
 
   const add = useCallback((product: Product, shade?: string, quantity = 1) => {
+    const max = maxQuantity(product);
+    if (max <= 0) return;
     const existing = lines.find((l) => sameLine(l, product.id, shade));
     write(
       existing
-        ? lines.map((l) => (sameLine(l, product.id, shade) ? { ...l, quantity: l.quantity + quantity } : l))
-        : [...lines, { product, quantity, shade }]
+        ? lines.map((l) => (sameLine(l, product.id, shade) ? { ...l, product, quantity: Math.min(max, l.quantity + quantity) } : l))
+        : [...lines, { product, quantity: Math.min(max, quantity), shade }]
     );
     setOpen(true);
   }, []);
@@ -93,7 +100,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = useCallback((productId: string, delta: number, shade?: string) => {
     write(
       lines
-        .map((l) => (sameLine(l, productId, shade) ? { ...l, quantity: l.quantity + delta } : l))
+        .map((l) => (sameLine(l, productId, shade) ? { ...l, quantity: Math.min(maxQuantity(l.product), l.quantity + delta) } : l))
         .filter((l) => l.quantity > 0)
     );
   }, []);

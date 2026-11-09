@@ -9,7 +9,7 @@ import type { Category, Subcategory } from '@/types/admin';
 import { Badge, Button, Card, ConfirmDialog, ErrorState, Field, IconButton, Input, LoadingState, Modal, PageHeader, Select, Toggle } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
 
-type CatDraft = { id?: string; name: string; slug: string; isVisible: boolean; isHighlighted: boolean; badgeColor?: 'PINK' | 'RED' };
+type CatDraft = { id?: string; name: string; slug: string; description?: string; isVisible: boolean; isHighlighted: boolean; badgeColor?: 'PINK' | 'RED' };
 type SubDraft = { categoryId: string; id?: string; name: string };
 type DeleteTarget = { kind: 'category'; cat: Category } | { kind: 'sub'; cat: Category; sub: Subcategory };
 
@@ -126,7 +126,7 @@ export default function CategoriesPage() {
                     <IconButton
                       label="Modifier"
                       icon={Edit2}
-                      onClick={() => setCatDraft({ id: cat.id, name: cat.name, slug: cat.slug, isVisible: cat.isVisible, isHighlighted: cat.isHighlighted, badgeColor: cat.badgeColor })}
+                      onClick={() => setCatDraft({ id: cat.id, name: cat.name, slug: cat.slug, description: cat.description ?? '', isVisible: cat.isVisible, isHighlighted: cat.isHighlighted, badgeColor: cat.badgeColor })}
                     />
                     <IconButton label="Supprimer" icon={Trash2} tone="danger" onClick={() => setToDelete({ kind: 'category', cat })} />
                   </div>
@@ -169,6 +169,9 @@ export default function CategoriesPage() {
             </Field>
             <Field label="Slug (URL)" hint={`/shop/${catDraft.slug || slugify(catDraft.name) || '...'}`}>
               <Input value={catDraft.slug} placeholder={slugify(catDraft.name)} onChange={(e) => setCatDraft({ ...catDraft, slug: slugify(e.target.value) })} />
+            </Field>
+            <Field label="Sous-titre" hint="Ex. « Soins du visage » — affiché dans le menu et en tête de page">
+              <Input value={catDraft.description ?? ''} onChange={(e) => setCatDraft({ ...catDraft, description: e.target.value })} />
             </Field>
             <Toggle checked={catDraft.isVisible} onChange={(v) => setCatDraft({ ...catDraft, isVisible: v })} label="Visible dans le menu" />
             <Toggle checked={catDraft.isHighlighted} onChange={(v) => setCatDraft({ ...catDraft, isHighlighted: v, badgeColor: v ? catDraft.badgeColor ?? 'PINK' : undefined })} label="Mettre en avant" description="Affichée en couleur dans le menu" />

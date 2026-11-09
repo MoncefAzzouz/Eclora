@@ -12,14 +12,42 @@ export function formatDA(amount: number): string {
   return `${new Intl.NumberFormat('fr-DZ', { maximumFractionDigits: 0 }).format(amount).replace(/ | /g, ' ')} DA`;
 }
 
-export class ShopApiError extends Error {}
+const TOKEN_KEY = 'eclora-customer-token';
+
+/** The logged-in customer's token, if any. Sent on every call; the API ignores it where unused. */
+export function customerToken(): string | null {
+  try {
+    return typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+export function setCustomerToken(token: string | null) {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // storage blocked: the session lasts until the tab closes
+  }
+}
+
+export class ShopApiError extends Error {
+  constructor(message: string, public status = 0) {
+    super(message);
+  }
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
+  const token = customerToken();
   try {
     response = await fetch(`${BASE}${path}`, {
       ...init,
-      headers: { ...(init?.body ? { 'Content-Type': 'application/json' } : {}), ...init?.headers },
+      headers: {
+        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers,
+      },
       cache: 'no-store',
     });
   } catch {
@@ -30,7 +58,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const data = text ? JSON.parse(text) : null;
   if (!response.ok) {
     const message = data && typeof data === 'object' && 'error' in data ? String(data.error) : 'Une erreur est survenue';
-    throw new ShopApiError(message);
+    throw new ShopApiError(message, response.status);
   }
   return data as T;
 }
@@ -58,8 +86,11 @@ export interface ApiProduct {
   rating: number;
   reviewsCount: number;
   brandName?: string;
+  brandSlug?: string;
+  brandLogoUrl?: string;
   categorySlug?: string;
   categoryName?: string;
+  subcategorySlug?: string;
   subcategoryName?: string;
   reviews?: { id: string; authorName: string; rating: number; title: string; text: string; createdAt: string }[];
 }
@@ -81,7 +112,17 @@ export interface ApiCategory {
   slug: string;
   isHighlighted: boolean;
   badgeColor?: 'PINK' | 'RED';
+  description?: string;
   subcategories: { id: string; name: string; slug: string }[];
+}
+
+export interface ApiBrand {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  description?: string;
+  count: number;
 }
 
 export interface ShopSettings {
@@ -140,6 +181,14 @@ export function toProduct(p: ApiProduct): Product {
     shadeInfo: shades.length ? `${shades.length} teintes` : undefined,
     category: toCategory(p.categorySlug),
     subcategory: p.subcategoryName,
+    slug: p.slug,
+    stock: p.stock,
+    priceValue: p.price,
+    brandSlug: p.brandSlug,
+    brandLogoUrl: p.brandLogoUrl,
+    categorySlug: p.categorySlug,
+    categoryName: p.categoryName,
+    subcategorySlug: p.subcategorySlug,
     isBestSeller: p.isBestSeller,
     isNew: p.isNew,
     description: p.description,
@@ -174,15 +223,33 @@ export const shopApi = {
   home: () => request<HomePayload>('/shop/home'),
   settings: () => request<ShopSettings>('/shop/settings'),
   categories: () => request<ApiCategory[]>('/shop/categories'),
-  brands: () => request<{ id: string; name: string; slug: string; count: number }[]>('/shop/brands'),
-  products: (params: { category?: string; brand?: string; q?: string; sort?: string; limit?: number } = {}) => {
+  brands: (all = false) => request<ApiBrand[]>(`/shop/brands${all ? '?all=1' : ''}`),
+  brand: (slug: string) => request<ApiBrand>(`/shop/brands/${encodeURIComponent(slug)}`),
+  products: (params: ProductQuery = {}) => {
     const query = new URLSearchParams(
-      Object.entries(params).filter(([, v]) => v !== undefined && v !== '') as [string, string][]
+      Object.entries(params)
+        .filter(([, v]) => v !== undefined && v !== '' && v !== false)
+        .map(([k, v]) => [k, v === true ? '1' : String(v)])
     );
-    return request<ApiProduct[]>(`/shop/products${query.toString() ? `?${query}` : ''}`);
+    return request<{ total: number; products: ApiProduct[] }>(`/shop/products${query.toString() ? `?${query}` : ''}`);
   },
   product: (idOrSlug: string) => request<ApiProduct>(`/shop/products/${idOrSlug}`),
   shipping: () => request<ShippingRate[]>('/shop/shipping'),
+  deliveryWilayas: () => request<(ShippingRate & { hasStopdesk: boolean })[]>('/shop/delivery/wilayas'),
+  deliveryWilaya: (code: number) => request<WilayaDelivery>(`/shop/delivery/wilayas/${code}`),
+  deliveryQuote: (body: { wilayaCode: number; communeId?: number | null; deliveryType: 'HOME' | 'STOPDESK'; stopdeskId?: number | null; subtotal: number }) =>
+    request<DeliveryQuote>('/shop/delivery/quote', { method: 'POST', body: JSON.stringify(body) }),
+
+  register: (body: { name: string; phone: string; email?: string; password: string }) =>
+    request<{ token: string; customer: Customer }>('/shop/account/register', { method: 'POST', body: JSON.stringify(body) }),
+  login: (identifier: string, password: string) =>
+    request<{ token: string; customer: Customer }>('/shop/account/login', { method: 'POST', body: JSON.stringify({ identifier, password }) }),
+  me: () => request<Customer>('/shop/account/me'),
+  updateMe: (body: { name: string; email?: string; wilayaCode: number; address?: string }) =>
+    request<Customer>('/shop/account/me', { method: 'PUT', body: JSON.stringify(body) }),
+  changePassword: (current: string, next: string) =>
+    request<void>('/shop/account/password', { method: 'PUT', body: JSON.stringify({ current, next }) }),
+  myOrders: () => request<OrderConfirmation[]>('/shop/account/orders'),
   validatePromo: (code: string, subtotal: number) =>
     request<{ code: string; type: string; value: number; discount: number; freeShipping: boolean }>(
       '/shop/promo/validate',
@@ -196,14 +263,53 @@ export const shopApi = {
     request<{ message: string }>(`/shop/products/${productId}/reviews`, { method: 'POST', body: JSON.stringify(body) }),
 };
 
+export interface ProductQuery {
+  category?: string;
+  subcategory?: string;
+  brand?: string;
+  q?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sort?: string;
+  limit?: number;
+}
+
+export interface WilayaDelivery {
+  rate: ShippingRate;
+  communes: { id: number; name: string; isDeliverable: boolean; hasStopDesk: boolean; homePrice: number; deliveryDays: string }[];
+  centers: { id: number; name: string; address: string; communeId: number; communeName: string; price: number }[];
+}
+
+export interface DeliveryQuote {
+  fee: number;
+  baseFee: number;
+  freeShipping: boolean;
+  deliveryDays: string;
+  communeName?: string;
+  stopdesk?: { id: number; name: string; address: string; communeName: string };
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  wilayaCode: number;
+  address: string;
+  createdAt: string;
+}
+
 export interface CheckoutPayload {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
   wilayaCode: number;
   commune: string;
+  communeId?: number | null;
   address: string;
   deliveryType: 'HOME' | 'STOPDESK';
+  stopdeskId?: number | null;
   paymentMethod: 'COD' | 'BARIDIMOB' | 'CIB';
   promoCode?: string;
   items: { productId: string; shade?: string; quantity: number }[];
@@ -218,6 +324,9 @@ export interface OrderConfirmation {
   commune: string;
   address: string;
   deliveryType: 'HOME' | 'STOPDESK';
+  stopdeskName?: string;
+  trackingNumber?: string;
+  yalidineStatus?: string;
   paymentMethod: 'COD' | 'BARIDIMOB' | 'CIB';
   status: string;
   subtotal: number;

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { handler } from '../lib/http.js';
@@ -65,5 +66,27 @@ clientsRouter.patch(
       data: { ...patch, adminNote: patch.adminNote === undefined ? undefined : patch.adminNote || null },
     });
     res.json(s.client(updated));
+  })
+);
+
+/**
+ * Sets a new password for a customer who forgot theirs (there is no email/SMS
+ * reset yet: the shop confirms identity by phone, then sets one here).
+ */
+clientsRouter.put(
+  '/:id/password',
+  requireRole(...SALES),
+  handler(async (req, res) => {
+    const { password } = z.object({ password: z.string().min(8, 'Mot de passe : 8 caractères minimum').max(100) }).parse(req.body);
+    const client = await prisma.client.findUniqueOrThrow({ where: { id: req.params.id } });
+    await prisma.client.update({
+      where: { id: client.id },
+      data: {
+        passwordHash: await bcrypt.hash(password, 10),
+        // Setting a password turns a guest into an account holder from now on.
+        ...(client.isGuest ? { isGuest: false, registeredAt: new Date() } : {}),
+      },
+    });
+    res.status(204).end();
   })
 );

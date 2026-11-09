@@ -46,7 +46,7 @@ export async function quote(input: QuoteInput, freeShippingThreshold: number): P
     }
   } else {
     const centers = await prisma.deliveryCenter.count({ where: { wilayaCode: input.wilayaCode, isActive: true } });
-    if (centers > 0) {
+    if (centers > 0 || input.stopdeskId) {
       if (!input.stopdeskId) throw badRequest('Choisissez le bureau Yalidine où retirer votre colis');
       const center = await prisma.deliveryCenter.findUnique({ where: { id: input.stopdeskId } });
       if (!center || !center.isActive || center.wilayaCode !== input.wilayaCode) {

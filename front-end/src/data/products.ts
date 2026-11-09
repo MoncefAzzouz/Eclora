@@ -40,6 +40,15 @@ export interface Product {
   shades?: Shade[];
   category: 'maquillage' | 'parfum' | 'soin';
   subcategory?: string;
+  /** Catalogue data from the API (absent on the old demo fixtures). */
+  slug?: string;
+  stock?: number;
+  priceValue?: number;
+  brandSlug?: string;
+  brandLogoUrl?: string;
+  categorySlug?: string;
+  categoryName?: string;
+  subcategorySlug?: string;
   isBestSeller?: boolean;
   isNew?: boolean;
   description?: string;

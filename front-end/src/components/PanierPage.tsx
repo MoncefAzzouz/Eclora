@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Heart, Info, ChevronUp, ChevronDown, ChevronRight, Sparkles, ShieldCheck, Check } from 'lucide-react';
+import { Heart, Info, ChevronUp, ChevronDown, ShieldCheck, Check } from 'lucide-react';
 import { Product } from '@/data/products';
-import { useCart } from '@/lib/shop/cart';
+import { useCart, priceToNumber } from '@/lib/shop/cart';
 import { shopApi, formatDA } from '@/lib/shop/api';
 
 export interface CartItemType {
@@ -43,10 +43,7 @@ export default function PanierPage() {
   };
 
   // Helper to parse price number
-  const parsePrice = (priceStr: string) => {
-    const cleaned = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');
-    return parseFloat(cleaned) || 4400;
-  };
+  const parsePrice = (priceStr: string) => priceToNumber(priceStr);
 
   const subtotal = items.reduce(
     (sum, item) => sum + parsePrice(item.product.price) * item.quantity,
@@ -134,14 +131,6 @@ export default function PanierPage() {
               Panier
             </h1>
 
-            {/* Info Banner Alert */}
-            <div className="bg-white border border-gray-200/80 rounded-2xl p-4 flex items-center gap-3 shadow-2xs text-xs text-gray-700">
-              <Info className="w-5 h-5 text-gray-500 flex-shrink-0" />
-              <span className="font-medium">
-                Le montant de votre panier a changé depuis votre dernière visite.
-              </span>
-            </div>
-
             {/* Cart Items List */}
             {items.length > 0 ? (
               <div className="space-y-4">
@@ -199,12 +188,6 @@ export default function PanierPage() {
                               </div>
                             )}
 
-                            {/* Red Point tag */}
-                            <div className="inline-block mt-2.5">
-                              <span className="bg-[#f0f0f0] text-gray-800 text-[11px] font-medium px-3 py-1 rounded-md">
-                                Produit point rouge non éligible aux promotions
-                              </span>
-                            </div>
                           </div>
 
                           {/* Bottom Row: Quantity & Delete & Price */}
@@ -219,7 +202,7 @@ export default function PanierPage() {
                                   }
                                   className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-bold text-black appearance-none pr-7 cursor-pointer outline-none focus:border-black"
                                 >
-                                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((qty) => (
+                                  {Array.from({ length: Math.max(item.quantity, Math.min(20, item.product.stock ?? 10)) }, (_, i) => i + 1).map((qty) => (
                                     <option key={qty} value={qty}>
                                       {qty}
                                     </option>
@@ -268,39 +251,6 @@ export default function PanierPage() {
 
           {/* Right Column (Sidebar Widgets) */}
           <div className="lg:col-span-5 space-y-5">
-            {/* Widget 1: My Eclora Loyalty */}
-            <div className="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-2xs space-y-5">
-              <div className="flex items-center gap-3">
-                {/* Barcode Striped Logo */}
-                <div className="flex items-center gap-0.5 text-black">
-                  <span className="w-1.5 h-6 bg-black block" />
-                  <span className="w-0.5 h-6 bg-black block" />
-                  <span className="w-1.5 h-6 bg-black block" />
-                  <span className="w-2 h-6 bg-black block" />
-                </div>
-                <div>
-                  <div className="text-xs font-black tracking-[0.18em] uppercase text-black">
-                    MY ECLORA
-                  </div>
-                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    LE PROGRAMME DE FIDÉLITÉ
-                  </div>
-                </div>
-              </div>
-
-              <button className="w-full bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left group">
-                <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                    <Sparkles className="w-3.5 h-3.5 text-pink-400" />
-                  </div>
-                  <span className="text-xs font-bold text-black group-hover:underline">
-                    Découvrez tous les avantages fidélité
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" />
-              </button>
-            </div>
-
             {/* Widget 2: Promo Code Accordion */}
             <div className="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-2xs space-y-4">
               <button
@@ -327,7 +277,7 @@ export default function PanierPage() {
                       type="text"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="WELCOME5"
+                      placeholder="Votre code"
                       className="flex-1 bg-white border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs text-black font-semibold outline-none focus:border-black uppercase transition-all"
                     />
                     <button
@@ -368,7 +318,7 @@ export default function PanierPage() {
 
                 {promoApplied && (
                   <div className="flex items-center justify-between text-emerald-600 font-semibold">
-                    <span>Remise fidélité (-10%)</span>
+                    <span>Code {promoCode.trim().toUpperCase()}</span>
                     <span className="font-bold">- {Math.round(discount)} DA</span>
                   </div>
                 )}

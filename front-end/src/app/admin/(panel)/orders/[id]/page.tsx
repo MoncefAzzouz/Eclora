@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Phone, Mail, MapPin, Printer, User, Truck, CreditCard, Check } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, MapPin, Printer, User, Truck, CreditCard, Check, Building2, RefreshCw, Send, FileText } from 'lucide-react';
 import { api } from '@/lib/admin/api';
 import { emitDataChanged, useApi } from '@/lib/admin/useApi';
 import { formatDA, formatDateTime } from '@/lib/admin/format';
@@ -31,11 +31,25 @@ export default function OrderDetailPage() {
   const [tracking, setTracking] = useState('');
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [parcelBusy, setParcelBusy] = useState<'create' | 'refresh' | null>(null);
 
   if (loading) return <LoadingState />;
   if (error || !order) return <ErrorState message={error ?? 'Commande introuvable'} onRetry={reload} />;
 
   const adminNote = note ?? order.adminNote ?? '';
+
+  const parcel = async (kind: 'create' | 'refresh') => {
+    setParcelBusy(kind);
+    const ok = await toast.run(
+      () => (kind === 'create' ? api.yalidine.createParcel(order.id) : api.yalidine.refreshParcel(order.id)),
+      kind === 'create' ? 'Colis créé chez Yalidine' : 'Statut Yalidine mis à jour'
+    );
+    setParcelBusy(null);
+    if (ok) {
+      reload();
+      emitDataChanged();
+    }
+  };
 
   const applyStatus = async () => {
     if (!pendingStatus) return;
@@ -204,8 +218,52 @@ export default function OrderDetailPage() {
               <div className="flex items-center gap-2">
                 <Truck className="w-4 h-4 text-slate-400" />
                 {DELIVERY_TYPE[order.deliveryType]}
-                {order.trackingNumber && <span className="font-bold">· Suivi {order.trackingNumber}</span>}
               </div>
+              {order.stopdeskName && (
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-slate-400" />
+                  Bureau : <span className="font-bold">{order.stopdeskName}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-xs print:hidden">
+              <p className="font-extrabold text-slate-700">Yalidine</p>
+              {order.trackingNumber ? (
+                <>
+                  <p>
+                    Suivi : <span className="font-mono font-bold">{order.trackingNumber}</span>
+                    {order.yalidineStatus && <span className="text-slate-500"> · {order.yalidineStatus}</span>}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {order.yalidineLabel && (
+                      <a
+                        href={order.yalidineLabel}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-[11px] font-bold hover:bg-slate-100"
+                      >
+                        <FileText className="h-4 w-4" /> Bordereau
+                      </a>
+                    )}
+                    <Button size="sm" variant="secondary" icon={RefreshCw} loading={parcelBusy === 'refresh'} onClick={() => parcel('refresh')}>
+                      Actualiser
+                    </Button>
+                  </div>
+                </>
+              ) : order.status === 'CANCELLED' || order.status === 'RETURNED' ? (
+                <p className="text-slate-500">Commande annulée : pas d’expédition.</p>
+              ) : (
+                <>
+                  <p className="text-slate-500">
+                    Le client paiera {formatDA(order.paymentMethod === 'COD' && order.paymentStatus !== 'PAID' ? order.total : 0)} à la livraison.
+                    Les frais Yalidine sont à la charge de la boutique (déjà inclus dans le total).
+                  </p>
+                  <Button size="sm" icon={Send} loading={parcelBusy === 'create'} onClick={() => parcel('create')}>
+                    Créer le colis Yalidine
+                  </Button>
+                </>
+              )}
             </div>
           </Card>
 

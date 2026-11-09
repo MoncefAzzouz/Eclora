@@ -7,6 +7,7 @@ import type {
   Category,
   ClientStatus,
   ClientWithStats,
+  DeliveryCommune,
   HomeSection,
   Order,
   OrderStatus,
@@ -19,6 +20,7 @@ import type {
   ShippingRate,
   StoreSettings,
   Subcategory,
+  YalidineStatus,
 } from '@/types/admin';
 
 // Relative by default — see the note in src/lib/shop/api.ts.
@@ -216,6 +218,8 @@ const clients = {
   get: (id: string) => request<{ client: ClientWithStats; orders: Order[] }>(`/admin/clients/${id}`),
   update: (id: string, patch: { status?: ClientStatus; adminNote?: string }) =>
     request<ClientWithStats>(`/admin/clients/${id}`, { method: 'PATCH', body: patch }),
+  setPassword: (id: string, password: string) =>
+    request<void>(`/admin/clients/${id}/password`, { method: 'PUT', body: { password } }),
 };
 
 // ─── Reviews ────────────────────────────────────────────────────────────────
@@ -269,6 +273,17 @@ const shipping = {
   saveAll: (rates: ShippingRate[]) => request<void>('/admin/shipping-rates', { method: 'PUT', body: rates }),
 };
 
+// ─── Yalidine ───────────────────────────────────────────────────────────────
+const yalidine = {
+  status: () => request<YalidineStatus>('/admin/yalidine/status'),
+  sync: (applyPrices: boolean) => request<YalidineStatus['sync']>('/admin/yalidine/sync', { method: 'POST', body: { applyPrices } }),
+  communes: (wilayaCode: number) => request<DeliveryCommune[]>(`/admin/yalidine/communes/${wilayaCode}`),
+  saveCommunes: (rows: Pick<DeliveryCommune, 'id' | 'homePrice' | 'stopdeskPrice' | 'isDeliverable'>[]) =>
+    request<void>('/admin/yalidine/communes', { method: 'PUT', body: rows }),
+  createParcel: (orderId: string) => request<Order>(`/admin/yalidine/orders/${orderId}/parcel`, { method: 'POST', body: {} }),
+  refreshParcel: (orderId: string) => request<Order>(`/admin/yalidine/orders/${orderId}/refresh`, { method: 'POST', body: {} }),
+};
+
 // ─── Settings & team ────────────────────────────────────────────────────────
 const settings = {
   get: () => request<StoreSettings>('/admin/settings'),
@@ -298,6 +313,7 @@ export const api = {
   homeSections,
   promoCodes,
   shipping,
+  yalidine,
   settings,
   team,
   uploads,

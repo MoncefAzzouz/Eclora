@@ -1,27 +1,35 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { ShoppingBag, Truck, CreditCard } from 'lucide-react';
+import { formatDA, shopApi } from '@/lib/shop/api';
+import { useAsyncData } from '@/lib/useAsyncData';
 
 export default function TrustBar() {
+  const { data: settings } = useAsyncData(() => shopApi.settings());
+  const threshold = settings?.freeShippingThreshold ?? 0;
   const TRUST_ITEMS = [
     {
       icon: ShoppingBag,
-      title: 'Boutique Eclora',
-      description: 'Découvrez notre sélection de produits beauté choisis avec soin',
-      linkText: 'Découvrir la boutique',
+      title: 'Nos marques',
+      description: 'Une sélection de marques de soin, de beauté et de maquillage choisies avec soin',
+      linkText: 'Voir les marques',
+      href: '/marques',
     },
     {
       icon: Truck,
-      title: 'Livraison à domicile',
-      description: 'livraison express sur les 58 Wilayas en Algérie (offerte dès 12 000 DA)',
-      linkText: "Explorer l'offre",
+      title: 'Livraison partout en Algérie',
+      description: `À domicile ou au bureau Yalidine${threshold > 0 ? `, offerte dès ${formatDA(threshold)} d’achats` : ''}`,
+      linkText: 'Conditions de livraison',
+      href: '/aide#livraison',
     },
     {
       icon: CreditCard,
       title: 'Paiement à la livraison',
-      description: 'Paiement en espèces à la réception ou via BaridiMob',
+      description: 'Vous payez en espèces à la réception de votre colis',
       linkText: 'En savoir plus',
+      href: '/aide#paiement',
     },
   ];
 
@@ -43,9 +51,9 @@ export default function TrustBar() {
                   <p className="text-xs text-black font-semibold mt-1 leading-snug">
                     {item.description}
                   </p>
-                  <button className="text-xs font-bold text-black underline mt-1.5 hover:text-gray-600 transition-colors">
+                  <Link href={item.href} className="mt-1.5 inline-block text-xs font-bold text-black underline transition-colors hover:text-gray-600">
                     {item.linkText}
-                  </button>
+                  </Link>
                 </div>
               </div>
             );

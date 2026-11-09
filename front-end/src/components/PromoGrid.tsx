@@ -55,9 +55,7 @@ export default function PromoGrid({ onDiscover, banners }: PromoGridProps) {
               >
                 {first?.buttonText || 'Découvrir'}
               </Link>
-              <p className="text-[10px] font-normal leading-tight text-gray-500 sm:text-[11px]">
-                *Offre fidélité. Hors Point Rouge. Voir conditions <span className="underline cursor-pointer">ici</span>.
-              </p>
+
             </div>
           </div>
         </div>

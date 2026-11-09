@@ -1,80 +1,48 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
-import AnnouncementBar from '@/components/AnnouncementBar';
-import Header from '@/components/Header';
-import CategoryNav from '@/components/CategoryNav';
-import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
-import QuickViewModal from '@/components/QuickViewModal';
+import React, { Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
+import ShopShell from '@/components/ShopShell';
 import ShopPage from '@/components/ShopPage';
-import type { Product } from '@/data/products';
-import { shopApi, toProduct } from '@/lib/shop/api';
-import { useCart } from '@/lib/shop/cart';
-import { useAsyncData } from '@/lib/useAsyncData';
-import { useWishlist } from '@/lib/shop/wishlist';
+import { useCategories } from '@/lib/shop/catalog';
 
-export default function ShopCategoryPage() {
-  const { category } = useParams<{ category: string }>();
-  const cart = useCart();
-  const { wishlist, toggle: toggleWishlist } = useWishlist();
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+function CategoryListing() {
+  const { category: slug } = useParams<{ category: string }>();
+  const sub = useSearchParams().get('sub') ?? undefined;
+  const categories = useCategories();
+  const category = categories.find((c) => c.slug === slug);
+  const subcategory = category?.subcategories.find((s) => s.slug === sub);
 
-  const { data, loading, error } = useAsyncData(async () => {
-    const [products, categories, brands] = await Promise.all([
-      shopApi.products({ category, limit: 100 }),
-      shopApi.categories(),
-      shopApi.brands(),
-    ]);
-    return { products: products.map(toProduct), categories, brands };
-  }, [category]);
-
-  const categoryName = data?.categories.find((c) => c.slug === category)?.name ?? category;
-  const brandFilters = (data?.brands ?? []).map((b) => ({ name: b.name, count: b.count }));
+  const chips = category
+    ? [
+        { label: 'Tout voir', href: `/shop/${slug}`, active: !sub },
+        ...category.subcategories.map((s) => ({ label: s.name, href: `/shop/${slug}?sub=${s.slug}`, active: s.slug === sub })),
+      ]
+    : [];
 
   return (
-    <div className="min-h-screen bg-white">
-      <AnnouncementBar />
-      <Header
-        wishlistCount={wishlist.length}
-        cartCount={cart.count}
-        onOpenCart={() => cart.setOpen(true)}
-        onOpenQuickView={setQuickViewProduct}
-      />
-      <CategoryNav />
+    <ShopPage
+      title={subcategory?.name ?? category?.name ?? ''}
+      eyebrow={subcategory ? category?.name : undefined}
+      description={subcategory ? undefined : category?.description}
+      breadcrumbs={[
+        { label: 'Accueil', href: '/' },
+        ...(category ? [{ label: category.name, href: subcategory ? `/shop/${slug}` : undefined }] : []),
+        ...(subcategory ? [{ label: subcategory.name }] : []),
+      ]}
+      query={{ category: slug, subcategory: sub }}
+      chips={chips}
+      emptyMessage="Les produits de cette catégorie arrivent bientôt."
+    />
+  );
+}
 
-      {error ? (
-        <p className="max-w-7xl mx-auto px-4 py-16 text-sm text-red-700">{error}</p>
-      ) : (
-        <ShopPage
-          categoryName={String(categoryName)}
-          products={data?.products ?? []}
-          brands={brandFilters}
-          loading={loading}
-          wishlist={wishlist}
-          onToggleWishlist={toggleWishlist}
-          onAddToCart={(product) => cart.add(product)}
-        />
-      )}
-
-      <Footer />
-
-      <CartDrawer
-        isOpen={cart.isOpen}
-        onClose={() => cart.setOpen(false)}
-        items={cart.items}
-        onUpdateQuantity={(id, delta, shade) => cart.updateQuantity(id, delta, shade)}
-        onRemoveItem={(id, shade) => cart.remove(id, shade)}
-      />
-      <QuickViewModal
-        product={quickViewProduct}
-        isOpen={!!quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-        onAddToCart={(product) => cart.add(product)}
-        isWishlisted={quickViewProduct ? wishlist.includes(quickViewProduct.id) : false}
-        onToggleWishlist={toggleWishlist}
-      />
-    </div>
+export default function ShopCategoryPage() {
+  return (
+    <ShopShell>
+      <Suspense fallback={<p className="px-4 py-16 text-center text-sm text-gray-500">Chargement...</p>}>
+        <CategoryListing />
+      </Suspense>
+    </ShopShell>
   );
 }

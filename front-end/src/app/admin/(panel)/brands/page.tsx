@@ -8,8 +8,10 @@ import { initials } from '@/lib/admin/format';
 import type { Brand } from '@/types/admin';
 import { Badge, Button, Card, ConfirmDialog, EmptyState, ErrorState, Field, IconButton, Input, LoadingState, Modal, PageHeader, SearchInput, Toggle } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
+import ImagePicker from '@/components/admin/ui/ImagePicker';
+import { Textarea } from '@/components/admin/ui';
 
-type Draft = { id?: string; name: string; logoUrl: string; isFeatured: boolean };
+type Draft = { id?: string; name: string; logoUrl: string; description: string; isFeatured: boolean };
 
 export default function BrandsPage() {
   const toast = useToast();
@@ -36,7 +38,14 @@ export default function BrandsPage() {
     if (!draft?.name.trim()) return toast.error('Le nom est obligatoire');
     setBusy(true);
     const ok = await toast.run(
-      () => api.brands.save({ id: draft.id, name: draft.name.trim().toUpperCase(), logoUrl: draft.logoUrl.trim() || undefined, isFeatured: draft.isFeatured }),
+      () =>
+        api.brands.save({
+          id: draft.id,
+          name: draft.name.trim().toUpperCase(),
+          logoUrl: draft.logoUrl.trim() || undefined,
+          description: draft.description.trim() || undefined,
+          isFeatured: draft.isFeatured,
+        }),
       'Marque enregistrée'
     );
     setBusy(false);
@@ -60,7 +69,7 @@ export default function BrandsPage() {
       <PageHeader
         title="Marques"
         description="Les marques alimentent le filtre « Marque » de la boutique. Les marques vedettes sont mises en avant."
-        actions={<Button icon={Plus} onClick={() => setDraft({ name: '', logoUrl: '', isFeatured: false })}>Nouvelle marque</Button>}
+        actions={<Button icon={Plus} onClick={() => setDraft({ name: '', logoUrl: '', description: '', isFeatured: false })}>Nouvelle marque</Button>}
       />
 
       <SearchInput value={query} onChange={setQuery} placeholder="Rechercher une marque..." className="mb-4 max-w-sm" />
@@ -86,7 +95,7 @@ export default function BrandsPage() {
                 </div>
                 <div className="mt-1"><Badge>{count(b.id)} produits</Badge></div>
               </div>
-              <IconButton label="Modifier" icon={Edit2} onClick={() => setDraft({ id: b.id, name: b.name, logoUrl: b.logoUrl ?? '', isFeatured: b.isFeatured })} />
+              <IconButton label="Modifier" icon={Edit2} onClick={() => setDraft({ id: b.id, name: b.name, logoUrl: b.logoUrl ?? '', description: b.description ?? '', isFeatured: b.isFeatured })} />
               <IconButton label="Supprimer" icon={Trash2} tone="danger" onClick={() => setToDelete(b)} />
             </div>
           ))}
@@ -110,8 +119,15 @@ export default function BrandsPage() {
             <Field label="Nom *">
               <Input autoFocus value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="HUDA BEAUTY" />
             </Field>
-            <Field label="URL du logo" hint="Optionnel">
-              <Input value={draft.logoUrl} onChange={(e) => setDraft({ ...draft, logoUrl: e.target.value })} placeholder="https://..." />
+            <ImagePicker
+              label="Logo"
+              value={draft.logoUrl}
+              onChange={(url) => setDraft({ ...draft, logoUrl: url })}
+              hint="PNG à fond transparent de préférence. Stocké sur Cloudflare R2."
+              aspect="1/1"
+            />
+            <Field label="Description" hint="Affichée sur la page de la marque (optionnel)">
+              <Textarea rows={3} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
             </Field>
             <Toggle checked={draft.isFeatured} onChange={(v) => setDraft({ ...draft, isFeatured: v })} label="Marque vedette" />
           </>

@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Save, Wand2 } from 'lucide-react';
+import { MapPinned, Save, Wand2 } from 'lucide-react';
+import YalidinePanel from '@/components/admin/delivery/YalidinePanel';
+import CommunesModal from '@/components/admin/delivery/CommunesModal';
 import { api } from '@/lib/admin/api';
 import { useApi } from '@/lib/admin/useApi';
 import { WILAYAS } from '@/lib/admin/wilayas';
@@ -12,13 +14,13 @@ import { useToast } from '@/components/admin/ui/Toast';
 const ZONES = { CENTER: 'Centre', NORTH: 'Nord', HIGHLANDS: 'Hauts plateaux', SOUTH: 'Sud' } as const;
 type Zone = keyof typeof ZONES;
 
-const zoneOf = (code: number) => WILAYAS.find((w) => w.code === code)?.zone as Zone;
+const zoneOf = (code: number) => (WILAYAS.find((w) => w.code === code)?.zone ?? 'SOUTH') as Zone;
 
 export default function DeliveryPage() {
   const { data, loading, error, reload } = useApi(() => api.shipping.list());
   if (loading) return <LoadingState />;
   if (error || !data) return <ErrorState message={error ?? 'Erreur'} onRetry={reload} />;
-  return <DeliveryEditor saved={data} reload={reload} />;
+  return <DeliveryEditor key={JSON.stringify(data)} saved={data} reload={reload} />;
 }
 
 /** Holds an editable copy of the saved rates; `saved` is the last server state. */
@@ -29,6 +31,7 @@ function DeliveryEditor({ saved: data, reload }: { saved: ShippingRate[]; reload
   const [zone, setZone] = useState<'' | Zone>('');
   const [saving, setSaving] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [communesOf, setCommunesOf] = useState<ShippingRate | null>(null);
   const [bulk, setBulk] = useState({ zone: 'SOUTH' as Zone, home: '', stopdesk: '', days: '' });
 
   const dirty = useMemo(() => JSON.stringify(rates) !== JSON.stringify(data), [rates, data]);
@@ -72,7 +75,7 @@ function DeliveryEditor({ saved: data, reload }: { saved: ShippingRate[]; reload
     <div className="animate-fade-in pb-20">
       <PageHeader
         title="Livraison"
-        description={`Tarifs par wilaya, à domicile et en stop desk. ${activeCount} / ${rates.length} wilayas desservies.`}
+        description={`Tarifs Yalidine par wilaya et par commune, à domicile et au bureau. ${activeCount} / ${rates.length} wilayas desservies.`}
         actions={
           <>
             <Button variant="secondary" icon={Wand2} onClick={() => setBulkOpen(true)}>Modifier une zone</Button>
@@ -80,6 +83,8 @@ function DeliveryEditor({ saved: data, reload }: { saved: ShippingRate[]; reload
           </>
         }
       />
+
+      <YalidinePanel rates={data} onSynced={reload} />
 
       <Card padded={false}>
         <div className="flex flex-col sm:flex-row gap-2 p-4">
@@ -98,6 +103,7 @@ function DeliveryEditor({ saved: data, reload }: { saved: ShippingRate[]; reload
               <Th>Stop desk (DA)</Th>
               <Th className="hidden sm:table-cell">Délai</Th>
               <Th>Active</Th>
+              <Th><span className="sr-only">Communes</span></Th>
             </tr>
           </thead>
           <tbody>
@@ -121,6 +127,9 @@ function DeliveryEditor({ saved: data, reload }: { saved: ShippingRate[]; reload
                     onChange={(e) => update(r.wilayaCode, { deliveryDays: e.target.value })} className="!w-28 !py-1.5" aria-label={`Délai ${r.wilayaName}`} />
                 </Td>
                 <Td><Toggle checked={r.isActive} onChange={(v) => update(r.wilayaCode, { isActive: v })} /></Td>
+                <Td>
+                  <Button size="sm" variant="ghost" icon={MapPinned} onClick={() => setCommunesOf(r)}>Communes</Button>
+                </Td>
               </tr>
             ))}
           </tbody>
@@ -134,6 +143,8 @@ function DeliveryEditor({ saved: data, reload }: { saved: ShippingRate[]; reload
           <Button size="sm" className="!bg-pink-600 hover:!bg-pink-700" loading={saving} onClick={save}>Enregistrer</Button>
         </div>
       )}
+
+      {communesOf && <CommunesModal rate={communesOf} onClose={() => setCommunesOf(null)} />}
 
       <Modal
         open={bulkOpen}

@@ -11,6 +11,8 @@ interface ProductCarouselProps {
   wishlist: string[];
   onToggleWishlist: (productId: string) => void;
   onOpenQuickView: (product: Product) => void;
+  /** Where "Voir tout" leads; the button is hidden without it. */
+  seeAllHref?: string;
 }
 
 export default function ProductCarousel({
@@ -18,6 +20,7 @@ export default function ProductCarousel({
   products,
   wishlist,
   onToggleWishlist,
+  seeAllHref,
 }: ProductCarouselProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -69,9 +72,11 @@ export default function ProductCarousel({
         <h2 className="font-sans text-xl font-black tracking-tight text-black sm:text-[28px] sm:leading-tight">
           {title}
         </h2>
-        <button className="flex-shrink-0 rounded-lg border border-gray-300 px-4 py-1.5 text-xs font-bold text-black transition-colors hover:border-black sm:text-sm">
-          Voir tout
-        </button>
+        {seeAllHref && (
+          <Link href={seeAllHref} className="flex-shrink-0 rounded-lg border border-gray-300 px-4 py-1.5 text-xs font-bold text-black transition-colors hover:border-black sm:text-sm">
+            Voir tout
+          </Link>
+        )}
       </div>
 
       {/* Carousel Container with Arrows */}

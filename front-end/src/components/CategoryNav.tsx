@@ -1,353 +1,112 @@
 'use client';
 
+// Main menu. Categories and their subcategories come from the database (admin →
+// Catégories), so adding a subcategory there adds it here. Hovering a category
+// on desktop opens its panel; on phones the bar scrolls sideways and a tap
+// opens the category page, where the subcategories appear as chips.
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { useAllBrands, useCategories } from '@/lib/shop/catalog';
 
-interface MegaColumn {
-  title?: string;
-  items: { label: string; isRed?: boolean; isBold?: boolean }[];
-}
-
-interface MegaMenuData {
-  col1: { label: string; isRed?: boolean; isBold?: boolean }[];
-  col2: MegaColumn[];
-  col3: MegaColumn[];
-  col4: MegaColumn[];
-}
-
-const MEGA_MENUS: Record<string, MegaMenuData> = {
-  Parfum: {
-    col1: [
-      { label: 'Voir tout', isBold: true },
-      { label: 'Jusqu\'à -30% sur une sélection de parfums', isRed: true, isBold: true },
-      { label: 'Nouveautés', isBold: true },
-      { label: 'Meilleures ventes 🔥', isBold: true },
-      { label: 'Uniquement chez Eclora', isBold: true },
-      { label: 'Minis & formats voyage 🧳', isBold: true },
-      { label: 'Coffrets parfum', isBold: true },
-      { label: 'Coffrets parfum femme' },
-      { label: 'Coffrets parfum homme' },
-    ],
-    col2: [
-      {
-        title: 'Parfum femme',
-        items: [
-          { label: 'Eau de parfum' },
-          { label: 'Eau de toilette' },
-          { label: 'Parfum cheveux' },
-          { label: 'Parfum solide' },
-          { label: 'Soins corps parfumés' },
-        ],
-      },
-      {
-        title: 'Parfum homme',
-        items: [
-          { label: 'Eau de parfum' },
-          { label: 'Eau de toilette' },
-          { label: 'Eau de cologne' },
-          { label: 'Déodorants' },
-          { label: 'Parfum' },
-        ],
-      },
-    ],
-    col3: [
-      {
-        title: 'Notes olfactives',
-        items: [
-          { label: 'Parfum floral' },
-          { label: 'Parfum vanillé' },
-          { label: 'Parfum boisé' },
-          { label: 'Parfum sucré' },
-        ],
-      },
-      { title: 'Brume parfumée', items: [] },
-      { title: 'Parfum de niche', items: [] },
-      { title: 'Parfum enfant', items: [] },
-      { title: 'Parfum mixte', items: [] },
-      { title: 'Gravure personnalisée', items: [] },
-      { title: 'Parfums rechargeables 💛', items: [] },
-      { title: 'Bougies parfumées', items: [] },
-    ],
-    col4: [
-      {
-        title: 'Bien-être',
-        items: [
-          { label: 'Parfum d\'intérieur' },
-          { label: 'Huiles essentielles' },
-        ],
-      },
-      { title: 'Parfums à petits prix', items: [] },
-    ],
-  },
-
-  Maquillage: {
-    col1: [
-      { label: 'Voir tout le maquillage', isBold: true },
-      { label: 'Jusqu\'à -30% sur le teint', isRed: true, isBold: true },
-      { label: 'Nouveautés Maquillage', isBold: true },
-      { label: 'Meilleures ventes 🔥', isBold: true },
-      { label: 'Exclusivités web', isBold: true },
-    ],
-    col2: [
-      {
-        title: 'Teint',
-        items: [
-          { label: 'Fond de teint' },
-          { label: 'Anti-cernes & Correcteur' },
-          { label: 'Poudre libre & Baking' },
-          { label: 'Bronzer & Contour' },
-          { label: 'Blush & Enlumineur' },
-          { label: 'Base de teint & Spray fixateur' },
-        ],
-      },
-    ],
-    col3: [
-      {
-        title: 'Yeux',
-        items: [
-          { label: 'Mascara' },
-          { label: 'Palettes fards à paupières' },
-          { label: 'Eyeliner & Crayon' },
-          { label: 'Sourcils & Cire fixante' },
-        ],
-      },
-      {
-        title: 'Lèvres',
-        items: [
-          { label: 'Rouge à lèvres' },
-          { label: 'Gloss & Repulpeur' },
-          { label: 'Crayon à lèvres' },
-          { label: 'Baume à lèvres' },
-        ],
-      },
-    ],
-    col4: [
-      {
-        title: 'Pinceaux & Accessoires',
-        items: [
-          { label: 'Éponges de teint' },
-          { label: 'Pinceaux visage' },
-          { label: 'Pinceaux yeux' },
-          { label: 'Recourbe-cils' },
-        ],
-      },
-    ],
-  },
-
-  'Soin Visage': {
-    col1: [
-      { label: 'Tous les soins visage', isBold: true },
-      { label: 'Offres promos soin', isRed: true, isBold: true },
-      { label: 'Nouveautés Soin', isBold: true },
-      { label: 'Top Ventes Soin 🔥', isBold: true },
-    ],
-    col2: [
-      {
-        title: 'Nettoyant & Démaquillant',
-        items: [
-          { label: 'Eau micellaire' },
-          { label: 'Huile démaquillante' },
-          { label: 'Gel nettoyant' },
-          { label: 'Gommage visage' },
-        ],
-      },
-    ],
-    col3: [
-      {
-        title: 'Hydratation & Traitement',
-        items: [
-          { label: 'Sérum & Concentré' },
-          { label: 'Crème de jour' },
-          { label: 'Crème de nuit' },
-          { label: 'Contour des yeux' },
-          { label: 'Protection solaire SPF' },
-        ],
-      },
-    ],
-    col4: [
-      {
-        title: 'Masques & Soins ciblés',
-        items: [
-          { label: 'Masque en tissu' },
-          { label: 'Masque purifiant' },
-          { label: 'Patchs anti-imperfections' },
-        ],
-      },
-    ],
-  },
-};
+const BRANDS_KEY = '__brands';
 
 export default function CategoryNav() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const categories = useCategories();
+  const brands = useAllBrands();
+  const [active, setActive] = useState<string | null>(null);
 
-  const categories = [
-    { name: 'Maquillage', slug: 'maquillage' },
-    { name: 'Parfum', slug: 'parfum' },
-    { name: 'Soin Visage', slug: 'soin-visage' },
-    { name: 'Corps & Bain', slug: 'corps-bain' },
-    { name: 'Cheveux', slug: 'cheveux' },
-    { name: 'Nouveautés & Tendances', slug: 'nouveautes' },
-    { name: 'Marques', slug: 'marques' },
-    { name: 'Eclora Collection', slug: 'eclora-collection', color: 'pink' },
-    { name: 'Bons plans & Cadeaux', slug: 'bons-plans' },
-    { name: 'ECLORA edit', slug: 'eclora-edit' },
-    { name: 'Dernière chance -40%', slug: 'derniere-chance', color: 'red' },
-  ];
-
-  const currentMegaData = activeCategory ? MEGA_MENUS[activeCategory] || MEGA_MENUS['Maquillage'] : null;
+  const activeCategory = categories.find((c) => c.slug === active);
+  const close = () => setActive(null);
 
   return (
-    <nav
-      className="bg-white border-b border-gray-200 relative z-30 shadow-2xs"
-      onMouseLeave={() => setActiveCategory(null)}
-    >
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center space-x-6 lg:space-x-8 overflow-x-auto no-scrollbar py-3.5 text-[14px] text-black whitespace-nowrap font-avantgarde font-medium">
-          {categories.map((cat) => {
-            const isPink = cat.color === 'pink';
-            const isRed = cat.color === 'red';
-            const isActive = activeCategory === cat.name;
-
-            return (
-              <div
-                key={cat.name}
-                className="relative py-1 cursor-pointer group"
-                onMouseEnter={() => setActiveCategory(cat.name)}
+    <nav className="relative z-30 border-b border-gray-200 bg-white shadow-2xs" onMouseLeave={close}>
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+        <ul className="no-scrollbar flex items-center gap-6 overflow-x-auto whitespace-nowrap py-3.5 text-[14px] font-medium text-black lg:gap-8">
+          {categories.map((cat) => (
+            <li key={cat.id} onMouseEnter={() => setActive(cat.slug)}>
+              <Link
+                href={`/shop/${cat.slug}`}
+                onClick={close}
+                className={`inline-block border-b-2 pb-1 uppercase tracking-[0.04em] transition-colors ${
+                  active === cat.slug ? 'border-black' : 'border-transparent hover:text-gray-600'
+                } ${cat.badgeColor === 'PINK' ? 'text-[#d80075]' : cat.badgeColor === 'RED' ? 'text-[#d32f2f]' : ''}`}
+                style={{ fontFamily: 'var(--font-avantgarde)', fontWeight: 500 }}
               >
-                <Link
-                  href={`/shop/${cat.slug}`}
-                  className={`inline-block pb-1 tracking-[0.01em] transition-all ${
-                    isActive
-                      ? 'text-black border-b-2 border-black'
-                      : isPink
-                      ? 'text-[#d80075] hover:text-[#b0005e]'
-                      : isRed
-                      ? 'text-[#d32f2f] hover:text-[#a02020]'
-                      : 'hover:text-gray-600'
-                  }`}
-                  style={{
-                    fontFamily: 'var(--font-avantgarde)',
-                    fontWeight: 500,
-                  }}
-                >
-                  {cat.name}
-                </Link>
-              </div>
-            );
-          })}
-        </div>
+                {cat.name}
+              </Link>
+            </li>
+          ))}
+          <li onMouseEnter={() => setActive(BRANDS_KEY)}>
+            <Link
+              href="/marques"
+              onClick={close}
+              className={`inline-block border-b-2 pb-1 uppercase tracking-[0.04em] transition-colors ${
+                active === BRANDS_KEY ? 'border-black' : 'border-transparent hover:text-gray-600'
+              }`}
+              style={{ fontFamily: 'var(--font-avantgarde)', fontWeight: 500 }}
+            >
+              Nos Marques
+            </Link>
+          </li>
+        </ul>
       </div>
 
-      {/* Full-width Mega Menu Dropdown Banner */}
-      {activeCategory && currentMegaData && (
-        <div
-          className="absolute left-0 right-0 top-full bg-white border-b border-gray-200 shadow-2xl z-50 animate-fade-in py-8"
-          onMouseEnter={() => setActiveCategory(activeCategory)}
-          onMouseLeave={() => setActiveCategory(null)}
-        >
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-xs">
-              {/* Column 1: Quick Links */}
-              <div className="space-y-3.5 border-r border-gray-100 pr-6">
-                {currentMegaData.col1.map((item, idx) => (
-                  <div key={idx}>
-                    <Link
-                      href={`/shop/${categories.find((c) => c.name === activeCategory)?.slug || 'maquillage'}`}
-                      className={`block hover:underline transition-colors ${
-                        item.isRed
-                          ? 'text-[#d32f2f] font-extrabold text-sm leading-snug'
-                          : item.isBold
-                          ? 'text-black font-extrabold text-xs'
-                          : 'text-gray-700 font-medium'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-
-              {/* Column 2 */}
-              <div className="space-y-6">
-                {currentMegaData.col2.map((sec, idx) => (
-                  <div key={idx} className="space-y-2">
-                    {sec.title && (
-                      <h4 className="font-extrabold text-black text-xs uppercase tracking-wide">
-                        {sec.title}
-                      </h4>
-                    )}
-                    {sec.items.length > 0 && (
-                      <ul className="space-y-2 text-gray-700 font-normal">
-                        {sec.items.map((item, i) => (
-                          <li key={i}>
-                            <Link
-                              href={`/shop/${categories.find((c) => c.name === activeCategory)?.slug || 'maquillage'}`}
-                              className="hover:text-black hover:underline transition-colors"
-                            >
-                              {item.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Column 3 */}
-              <div className="space-y-4">
-                {currentMegaData.col3.map((sec, idx) => (
-                  <div key={idx} className="space-y-2">
-                    {sec.title && (
-                      <h4 className="font-extrabold text-black text-xs uppercase tracking-wide hover:underline cursor-pointer">
-                        {sec.title}
-                      </h4>
-                    )}
-                    {sec.items.length > 0 && (
-                      <ul className="space-y-2 text-gray-700 font-normal">
-                        {sec.items.map((item, i) => (
-                          <li key={i}>
-                            <Link
-                              href={`/shop/${categories.find((c) => c.name === activeCategory)?.slug || 'maquillage'}`}
-                              className="hover:text-black hover:underline transition-colors"
-                            >
-                              {item.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Column 4 */}
-              <div className="space-y-6">
-                {currentMegaData.col4.map((sec, idx) => (
-                  <div key={idx} className="space-y-2">
-                    {sec.title && (
-                      <h4 className="font-extrabold text-black text-xs uppercase tracking-wide hover:underline cursor-pointer">
-                        {sec.title}
-                      </h4>
-                    )}
-                    {sec.items.length > 0 && (
-                      <ul className="space-y-2 text-gray-700 font-normal">
-                        {sec.items.map((item, i) => (
-                          <li key={i}>
-                            <Link
-                              href={`/shop/${categories.find((c) => c.name === activeCategory)?.slug || 'maquillage'}`}
-                              className="hover:text-black hover:underline transition-colors"
-                            >
-                              {item.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
+      {activeCategory && (
+        <div className="absolute inset-x-0 top-full z-50 hidden animate-fade-in border-b border-gray-200 bg-white py-8 shadow-2xl md:block">
+          <div className="mx-auto grid max-w-[1440px] grid-cols-12 gap-8 px-4 sm:px-6 lg:px-8">
+            <div className="col-span-3 border-r border-gray-100 pr-6">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">{activeCategory.description}</p>
+              <h3 className="mt-1 text-2xl font-black">{activeCategory.name}</h3>
+              <Link
+                href={`/shop/${activeCategory.slug}`}
+                onClick={close}
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-xs font-bold text-white transition hover:bg-neutral-800"
+              >
+                Voir tout <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
+            <ul className="col-span-9 grid grid-cols-3 content-start gap-x-8 gap-y-3 text-sm">
+              {activeCategory.subcategories.map((sub) => (
+                <li key={sub.id}>
+                  <Link
+                    href={`/shop/${activeCategory.slug}?sub=${sub.slug}`}
+                    onClick={close}
+                    className="text-gray-700 transition-colors hover:text-black hover:underline"
+                  >
+                    {sub.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {active === BRANDS_KEY && brands.length > 0 && (
+        <div className="absolute inset-x-0 top-full z-50 hidden animate-fade-in border-b border-gray-200 bg-white py-8 shadow-2xl md:block">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-5 gap-3 lg:grid-cols-9">
+              {brands.map((b) => (
+                <Link
+                  key={b.id}
+                  href={`/marques/${b.slug}`}
+                  onClick={close}
+                  title={b.name}
+                  className="flex h-20 items-center justify-center rounded-xl border border-gray-100 p-3 transition hover:border-gray-300 hover:shadow-sm"
+                >
+                  {b.logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={b.logoUrl} alt={b.name} className="max-h-full max-w-full object-contain" loading="lazy" />
+                  ) : (
+                    <span className="text-center text-xs font-black tracking-wide">{b.name}</span>
+                  )}
+                </Link>
+              ))}
+            </div>
+            <Link href="/marques" onClick={close} className="mt-5 inline-flex items-center gap-2 text-sm font-bold hover:underline">
+              Toutes nos marques <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       )}
