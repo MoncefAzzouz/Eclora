@@ -38,6 +38,8 @@ export async function requireAdmin(req: Request, _res: Response, next: NextFunct
     } catch {
       throw unauthorized('Session expirée');
     }
+    // Customer tokens are signed with the same secret; they never open the admin.
+    if (payload.typ === 'client') throw unauthorized();
 
     const user = await prisma.adminUser.findUnique({ where: { id: String(payload.sub) } });
     if (!user || !user.isActive) throw unauthorized('Compte désactivé ou inexistant');

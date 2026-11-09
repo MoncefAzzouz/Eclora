@@ -9,6 +9,9 @@ import { prisma } from '../lib/prisma.js';
 import { badRequest, handler, notFound, param } from '../lib/http.js';
 import * as s from '../lib/serialize.js';
 import { getSettings } from './settings.js';
+import { quote } from '../lib/delivery.js';
+import { optionalCustomer } from '../middleware/customer.js';
+import { normalizePhone } from './account.js';
 
 export const shopRouter = Router();
 
@@ -47,15 +50,32 @@ shopRouter.get(
   })
 );
 
+/**
+ * Brands. By default only those with products on sale (for filters); with
+ * ?all=1 every brand, for the "Nos Marques" page.
+ */
 shopRouter.get(
   '/brands',
-  handler(async (_req, res) => {
+  handler(async (req, res) => {
+    const all = req.query.all === '1';
     const brands = await prisma.brand.findMany({
-      where: { products: { some: activeProduct } },
+      where: all ? {} : { products: { some: activeProduct } },
       include: { _count: { select: { products: { where: activeProduct } } } },
-      orderBy: { name: 'asc' },
+      orderBy: [{ position: 'asc' }, { name: 'asc' }],
     });
     res.json(brands.map((b) => ({ ...s.brand(b), count: b._count.products })));
+  })
+);
+
+shopRouter.get(
+  '/brands/:slug',
+  handler(async (req, res) => {
+    const brand = await prisma.brand.findUnique({
+      where: { slug: param(req, 'slug') },
+      include: { _count: { select: { products: { where: activeProduct } } } },
+    });
+    if (!brand) throw notFound('Marque introuvable');
+    res.json({ ...s.brand(brand), count: brand._count.products });
   })
 );
 
@@ -111,42 +131,91 @@ shopRouter.get(
   })
 );
 
+/** Lowercase without accents or apostrophes: "L'Oréal Crème" → "loreal creme". */
+const fold = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’`]/g, '').toLowerCase();
+
+const listItem = (p: Prisma.ProductGetPayload<{ include: typeof listInclude }>) => ({
+  ...s.product(p),
+  brandName: p.brand.name,
+  brandSlug: p.brand.slug,
+  categorySlug: p.category.slug,
+  categoryName: p.category.name,
+  subcategorySlug: p.subcategory?.slug,
+  subcategoryName: p.subcategory?.name,
+});
+const listInclude = { shades: true, brand: true, category: true, subcategory: true } satisfies Prisma.ProductInclude;
+
+/**
+ * Catalogue search. Every filter is optional and they combine:
+ * category, subcategory, brand (comma-separated slugs), q (text), minPrice,
+ * maxPrice, inStock=1, sort. Returns { total, products }.
+ */
 shopRouter.get(
   '/products',
   handler(async (req, res) => {
-    const { category, subcategory, brand, q, sort, limit } = z
+    const query = z
       .object({
         category: z.string().optional(),
         subcategory: z.string().optional(),
         brand: z.string().optional(),
-        q: z.string().optional(),
-        sort: z.enum(['new', 'price-asc', 'price-desc', 'rating']).optional(),
-        limit: z.coerce.number().int().positive().max(100).optional(),
+        q: z.string().trim().max(100).optional(),
+        minPrice: z.coerce.number().int().min(0).optional(),
+        maxPrice: z.coerce.number().int().min(0).optional(),
+        inStock: z.enum(['1', 'true']).optional(),
+        sort: z.enum(['new', 'price-asc', 'price-desc', 'rating', 'name']).optional(),
+        limit: z.coerce.number().int().positive().max(500).optional(),
       })
       .parse(req.query);
 
     const orderBy: Prisma.ProductOrderByWithRelationInput =
-      sort === 'price-asc' ? { price: 'asc' }
-      : sort === 'price-desc' ? { price: 'desc' }
-      : sort === 'rating' ? { rating: 'desc' }
+      query.sort === 'price-asc' ? { price: 'asc' }
+      : query.sort === 'price-desc' ? { price: 'desc' }
+      : query.sort === 'rating' ? { rating: 'desc' }
+      : query.sort === 'name' ? { name: 'asc' }
       : { createdAt: 'desc' };
 
-    const products = await prisma.product.findMany({
-      where: {
-        ...activeProduct,
-        ...(category ? { category: { slug: category } } : {}),
-        ...(subcategory ? { subcategory: { slug: subcategory } } : {}),
-        ...(brand ? { brand: { slug: brand } } : {}),
-        ...(q ? { OR: [{ name: { contains: q, mode: 'insensitive' } }, { brand: { name: { contains: q, mode: 'insensitive' } } }] } : {}),
-      },
-      include: { shades: true, brand: true, category: true },
-      orderBy,
-      take: limit ?? 60,
-    });
+    const brands = query.brand?.split(',').map((b) => b.trim()).filter(Boolean);
 
-    res.json(
-      products.map((p) => ({ ...s.product(p), brandName: p.brand.name, categorySlug: p.category.slug }))
-    );
+    const where: Prisma.ProductWhereInput = {
+      ...activeProduct,
+      ...(query.category ? { category: { slug: query.category } } : {}),
+      ...(query.subcategory ? { subcategory: { slug: query.subcategory } } : {}),
+      ...(brands?.length ? { brand: { slug: { in: brands } } } : {}),
+      ...(query.inStock ? { stock: { gt: 0 } } : {}),
+      ...(query.minPrice !== undefined || query.maxPrice !== undefined
+        ? { price: { ...(query.minPrice !== undefined ? { gte: query.minPrice } : {}), ...(query.maxPrice !== undefined ? { lte: query.maxPrice } : {}) } }
+        : {}),
+    };
+
+    // Text search ignores accents and case ("creme" finds "Crème"), and every
+    // word must match somewhere: "creme nivea" finds NIVEA creams. Postgres
+    // ILIKE is accent-sensitive, so match in memory over the candidates' text —
+    // a beauty catalogue is a few thousand rows at most.
+    if (query.q) {
+      const words = fold(query.q).split(/\s+/).filter(Boolean).slice(0, 6);
+      const candidates = await prisma.product.findMany({
+        where,
+        select: {
+          id: true, name: true, sku: true, tags: true,
+          brand: { select: { name: true } },
+          category: { select: { name: true, description: true } },
+          subcategory: { select: { name: true } },
+        },
+      });
+      const ids = candidates
+        .filter((p) => {
+          const text = fold([p.name, p.sku, p.brand.name, p.category.name, p.category.description ?? '', p.subcategory?.name ?? '', ...p.tags].join(' '));
+          return words.every((w) => text.includes(w));
+        })
+        .map((p) => p.id);
+      where.id = { in: ids };
+    }
+
+    const [total, products] = await Promise.all([
+      prisma.product.count({ where }),
+      prisma.product.findMany({ where, include: listInclude, orderBy, take: query.limit ?? 200 }),
+    ]);
+    res.json({ total, products: products.map(listItem) });
   })
 );
 
@@ -156,7 +225,7 @@ shopRouter.get(
     const key = req.params.idOrSlug;
     const product = await prisma.product.findFirst({
       where: { OR: [{ id: key }, { slug: key }], status: 'ACTIVE' },
-      include: { shades: true, brand: true, category: true, subcategory: true },
+      include: listInclude,
     });
     if (!product) throw notFound('Produit introuvable');
 
@@ -166,14 +235,7 @@ shopRouter.get(
       take: 20,
     });
 
-    res.json({
-      ...s.product(product),
-      brandName: product.brand.name,
-      categorySlug: product.category.slug,
-      categoryName: product.category.name,
-      subcategoryName: product.subcategory?.name,
-      reviews: reviews.map(s.review),
-    });
+    res.json({ ...listItem(product), brandLogoUrl: product.brand.logoUrl ?? undefined, reviews: reviews.map(s.review) });
   })
 );
 
@@ -204,6 +266,72 @@ shopRouter.get(
   handler(async (_req, res) => {
     const rates = await prisma.shippingRate.findMany({ where: { isActive: true }, orderBy: { wilayaCode: 'asc' } });
     res.json(rates.map(s.shippingRate));
+  })
+);
+
+/** Wilayas we deliver to, with their base prices and whether offices exist. */
+shopRouter.get(
+  '/delivery/wilayas',
+  handler(async (_req, res) => {
+    const [rates, centers] = await Promise.all([
+      prisma.shippingRate.findMany({ where: { isActive: true }, orderBy: { wilayaCode: 'asc' } }),
+      prisma.deliveryCenter.groupBy({ by: ['wilayaCode'], where: { isActive: true }, _count: true }),
+    ]);
+    const withCenters = new Set(centers.map((c) => c.wilayaCode));
+    res.json(rates.map((r) => ({ ...s.shippingRate(r), hasStopdesk: withCenters.has(r.wilayaCode) })));
+  })
+);
+
+/** Communes and Yalidine offices of one wilaya, each with its effective price. */
+shopRouter.get(
+  '/delivery/wilayas/:code',
+  handler(async (req, res) => {
+    const code = z.coerce.number().int().min(1).max(99).parse(req.params.code);
+    const rate = await prisma.shippingRate.findUnique({ where: { wilayaCode: code } });
+    if (!rate || !rate.isActive) throw notFound('Nous ne livrons pas encore dans cette wilaya');
+
+    const [communes, centers] = await Promise.all([
+      prisma.deliveryCommune.findMany({ where: { wilayaCode: code }, orderBy: { name: 'asc' } }),
+      prisma.deliveryCenter.findMany({ where: { wilayaCode: code, isActive: true }, orderBy: { name: 'asc' } }),
+    ]);
+    const byId = new Map(communes.map((c) => [c.id, c]));
+    res.json({
+      rate: s.shippingRate(rate),
+      communes: communes.map((c) => ({
+        id: c.id,
+        name: c.name,
+        isDeliverable: c.isDeliverable,
+        hasStopDesk: c.hasStopDesk,
+        homePrice: c.homePrice ?? rate.homePrice,
+        deliveryDays: c.deliveryDays ?? rate.deliveryDays,
+      })),
+      centers: centers.map((c) => ({
+        id: c.id,
+        name: c.name,
+        address: c.address,
+        communeId: c.communeId,
+        communeName: c.communeName,
+        price: byId.get(c.communeId)?.stopdeskPrice ?? rate.stopdeskPrice,
+      })),
+    });
+  })
+);
+
+/** The exact fee the order will be charged; the checkout shows this before confirming. */
+shopRouter.post(
+  '/delivery/quote',
+  handler(async (req, res) => {
+    const input = z
+      .object({
+        wilayaCode: z.number().int().min(1).max(99),
+        communeId: z.number().int().nullish(),
+        deliveryType: z.enum(['HOME', 'STOPDESK']),
+        stopdeskId: z.number().int().nullish(),
+        subtotal: z.number().int().min(0),
+      })
+      .parse(req.body);
+    const settings = await getSettings();
+    res.json(await quote(input, settings.freeShippingThreshold));
   })
 );
 
@@ -246,12 +374,15 @@ const checkoutSchema = z.object({
   customerName: z.string().min(2, 'Votre nom complet est requis'),
   customerPhone: z
     .string()
-    .regex(/^(0|\+213)[5-7]\d{8}$/.source ? /^[0-9+\s]{9,20}$/ : /.*/, 'Numéro de téléphone invalide'),
+    .transform(normalizePhone)
+    .refine((p) => /^0[5-7]\d{8}$/.test(p) || /^0[2-4]\d{7}$/.test(p), 'Numéro de téléphone invalide (ex. 0550 12 34 56)'),
   customerEmail: z.string().email('Email invalide').optional().or(z.literal('')),
-  wilayaCode: z.number().int().min(1).max(58),
-  commune: z.string().min(2, 'La commune est requise'),
-  address: z.string().min(5, 'L’adresse est requise'),
+  wilayaCode: z.number().int().min(1).max(99),
+  commune: z.string().trim().optional().default(''),
+  communeId: z.number().int().nullish(),
+  address: z.string().trim().optional().default(''),
   deliveryType: z.enum(['HOME', 'STOPDESK']),
+  stopdeskId: z.number().int().nullish(),
   paymentMethod: z.enum(['COD', 'BARIDIMOB', 'CIB']),
   promoCode: z.string().optional(),
   items: z
@@ -289,17 +420,15 @@ async function withUniqueNumber<T>(create: () => Promise<T>): Promise<T> {
 
 shopRouter.post(
   '/orders',
+  optionalCustomer,
   handler(async (req, res) => {
     const input = checkoutSchema.parse(req.body);
+    if (input.deliveryType === 'HOME' && input.address.length < 5) throw badRequest('L’adresse de livraison est requise');
     const settings = await getSettings();
 
     // Payment method must be one the store currently offers.
     const enabled = { COD: settings.payCod, BARIDIMOB: settings.payBaridimob, CIB: settings.payCib };
     if (!enabled[input.paymentMethod]) throw badRequest('Ce moyen de paiement n’est pas disponible');
-
-    // Delivery must be available for that wilaya.
-    const rate = await prisma.shippingRate.findUnique({ where: { wilayaCode: input.wilayaCode } });
-    if (!rate || !rate.isActive) throw badRequest('Nous ne livrons pas encore dans cette wilaya');
 
     // Price from the database, never from the browser.
     const products = await prisma.product.findMany({
@@ -325,8 +454,10 @@ shopRouter.post(
     });
 
     const subtotal = lines.reduce((sum, l) => sum + l.unitPrice * l.quantity, 0);
-    let shippingFee = input.deliveryType === 'HOME' ? rate.homePrice : rate.stopdeskPrice;
-    if (settings.freeShippingThreshold > 0 && subtotal >= settings.freeShippingThreshold) shippingFee = 0;
+    const delivery = await quote({ ...input, subtotal }, settings.freeShippingThreshold);
+    let shippingFee = delivery.fee;
+    const commune = delivery.communeName ?? input.commune;
+    if (commune.length < 2) throw badRequest('La commune est requise');
 
     let discount = 0;
     let promo: PromoCode | null = null;
@@ -339,22 +470,26 @@ shopRouter.post(
       if (applied.freeShipping) shippingFee = 0;
     }
 
-    const phone = input.customerPhone.replace(/\s/g, '');
-    const existing = await prisma.client.findUnique({ where: { phone } });
+    const phone = input.customerPhone;
+    // Logged in: the order belongs to the account. Otherwise match on phone.
+    const existing = req.customer ?? (await prisma.client.findUnique({ where: { phone } }));
     if (existing?.status === 'BLOCKED') {
       throw badRequest('Commande impossible. Merci de nous contacter par téléphone.');
     }
+    // A guest checkout must not rewrite a registered customer's saved details.
+    const mayUpdate = existing && (existing.isGuest || req.customer?.id === existing.id);
 
     const order = await withUniqueNumber(() => prisma.$transaction(async (tx) => {
-      // Guest checkout: reuse the client matched on phone, or create one.
-      const client = existing
+      const client = existing && !mayUpdate
+        ? existing
+        : existing
         ? await tx.client.update({
             where: { id: existing.id },
             data: {
               name: input.customerName,
               email: input.customerEmail || existing.email,
               wilayaCode: input.wilayaCode,
-              address: input.address,
+              address: input.address || existing.address,
             },
           })
         : await tx.client.create({
@@ -363,7 +498,7 @@ shopRouter.post(
               phone,
               email: input.customerEmail || null,
               wilayaCode: input.wilayaCode,
-              address: input.address,
+              address: input.address || null,
               isGuest: true,
             },
           });
@@ -380,9 +515,12 @@ shopRouter.post(
           customerPhone: phone,
           customerEmail: input.customerEmail || null,
           wilayaCode: input.wilayaCode,
-          commune: input.commune,
-          address: input.address,
+          commune,
+          communeId: delivery.stopdesk?.communeId ?? input.communeId ?? null,
+          address: input.address || (delivery.stopdesk ? `Retrait au bureau : ${delivery.stopdesk.name}` : ''),
           deliveryType: input.deliveryType,
+          stopdeskId: delivery.stopdesk?.id ?? null,
+          stopdeskName: delivery.stopdesk?.name ?? null,
           subtotal,
           shippingFee,
           discount,
@@ -410,10 +548,10 @@ shopRouter.get(
       .parse(req.query);
 
     const order = await prisma.order.findFirst({
-      where: { number: number.trim().toUpperCase(), customerPhone: phone.replace(/\s/g, '') },
+      where: { number: number.trim().toUpperCase(), customerPhone: normalizePhone(phone) },
       include: { items: true, history: true },
     });
     if (!order) throw notFound('Aucune commande ne correspond à ce numéro et ce téléphone');
-    res.json(s.order(order));
+    res.json({ ...s.order(order), adminNote: undefined });
   })
 );

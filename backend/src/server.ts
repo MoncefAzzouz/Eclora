@@ -15,8 +15,13 @@ import { settingsRouter, teamRouter } from './routes/settings.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { shopRouter } from './routes/storefront.js';
 import { uploadImagesRouter, uploadsRouter, UPLOAD_DIR } from './routes/uploads.js';
+import { accountRouter } from './routes/account.js';
+import { yalidineRouter } from './routes/yalidine.js';
 
 const app = express();
+// nginx on the same host is the only proxy: trust it so req.ip is the visitor's
+// address (the login rate limit counts per IP).
+app.set('trust proxy', 'loopback');
 
 app.use(cors({ origin: env.corsOrigins, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
@@ -30,6 +35,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 // Public storefront API — browsing and guest checkout, no account needed.
+app.use('/api/shop/account', accountRouter);
 app.use('/api/shop', shopRouter);
 
 // Admin API — everything below requires a valid admin token.
@@ -48,6 +54,7 @@ app.use('/api/admin/shipping-rates', requireAdmin, shippingRouter);
 app.use('/api/admin/settings', requireAdmin, settingsRouter);
 app.use('/api/admin/users', requireAdmin, teamRouter);
 app.use('/api/admin/uploads', requireAdmin, uploadsRouter);
+app.use('/api/admin/yalidine', requireAdmin, yalidineRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

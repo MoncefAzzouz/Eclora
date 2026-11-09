@@ -91,7 +91,7 @@ promoCodesRouter.delete(
 export const shippingRouter = Router();
 
 const rateSchema = z.object({
-  wilayaCode: z.number().int().min(1).max(58),
+  wilayaCode: z.number().int().min(1).max(99),
   wilayaName: z.string().min(1),
   homePrice: z.number().int().min(0),
   stopdeskPrice: z.number().int().min(0),

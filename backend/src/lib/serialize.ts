@@ -67,6 +67,7 @@ export function category(c: Category & { subcategories: Subcategory[] }) {
     isVisible: c.isVisible,
     isHighlighted: c.isHighlighted,
     badgeColor: opt(c.badgeColor),
+    description: opt(c.description),
     subcategories: [...c.subcategories]
       .sort((a, b) => a.position - b.position)
       .map((s) => ({ id: s.id, name: s.name, slug: s.slug, position: s.position })),
@@ -74,7 +75,15 @@ export function category(c: Category & { subcategories: Subcategory[] }) {
 }
 
 export function brand(b: Brand) {
-  return { id: b.id, name: b.name, slug: b.slug, logoUrl: opt(b.logoUrl), isFeatured: b.isFeatured };
+  return {
+    id: b.id,
+    name: b.name,
+    slug: b.slug,
+    logoUrl: opt(b.logoUrl),
+    description: opt(b.description),
+    isFeatured: b.isFeatured,
+    position: b.position,
+  };
 }
 
 export type OrderWithRelations = Order & { items: OrderItem[]; history: OrderEvent[] };
@@ -89,8 +98,11 @@ export function order(o: OrderWithRelations) {
     customerEmail: opt(o.customerEmail),
     wilayaCode: o.wilayaCode,
     commune: o.commune,
+    communeId: opt(o.communeId),
     address: o.address,
     deliveryType: o.deliveryType,
+    stopdeskId: opt(o.stopdeskId),
+    stopdeskName: opt(o.stopdeskName),
     items: o.items.map((i) => ({
       productId: i.productId ?? '',
       name: i.name,
@@ -109,6 +121,8 @@ export function order(o: OrderWithRelations) {
     paymentStatus: o.paymentStatus,
     status: o.status,
     trackingNumber: opt(o.trackingNumber),
+    yalidineLabel: opt(o.yalidineLabel),
+    yalidineStatus: opt(o.yalidineStatus),
     adminNote: opt(o.adminNote),
     history: [...o.history]
       .sort((a, b) => a.at.getTime() - b.at.getTime())
@@ -218,6 +232,11 @@ export function settings(s: StoreSettings) {
     payments: { COD: s.payCod, BARIDIMOB: s.payBaridimob, CIB: s.payCib },
     socials: { instagram: s.instagram, facebook: s.facebook, tiktok: s.tiktok },
     maintenanceMode: s.maintenanceMode,
+    yalidine: {
+      fromWilaya: s.yalidineFromWilaya,
+      parcel: { length: s.parcelLength, width: s.parcelWidth, height: s.parcelHeight, weight: s.parcelWeight },
+      lastSync: iso(s.yalidineLastSync),
+    },
   };
 }
 

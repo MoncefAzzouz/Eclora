@@ -19,6 +19,7 @@ const categorySchema = z.object({
   isVisible: z.boolean().default(true),
   isHighlighted: z.boolean().default(false),
   badgeColor: z.enum(['PINK', 'RED']).nullish(),
+  description: z.string().trim().max(300).nullish(),
 });
 
 const withSubs = { subcategories: { orderBy: { position: 'asc' } } } as const;
@@ -44,6 +45,7 @@ categoriesRouter.post(
         isVisible: input.isVisible,
         isHighlighted: input.isHighlighted,
         badgeColor: input.badgeColor ?? null,
+        description: input.description || null,
         position: count + 1,
       },
       include: withSubs,
@@ -65,6 +67,7 @@ categoriesRouter.put(
         isVisible: input.isVisible,
         isHighlighted: input.isHighlighted,
         badgeColor: input.badgeColor ?? null,
+        description: input.description || null,
       },
       include: withSubs,
     });
@@ -147,16 +150,31 @@ categoriesRouter.delete(
 
 export const brandsRouter = Router();
 
+// Uploaded logos are relative (/uploads/...), so accept a site path as well as a URL.
+const logoSchema = z
+  .string()
+  .trim()
+  .refine((v) => v === '' || v.startsWith('/') || /^https:\/\//.test(v), 'Lien du logo invalide')
+  .nullish();
+
 const brandSchema = z.object({
-  name: z.string().min(1, 'Le nom est obligatoire'),
-  logoUrl: z.string().url('URL invalide').nullish().or(z.literal('')),
+  name: z.string().trim().min(1, 'Le nom est obligatoire'),
+  logoUrl: logoSchema,
+  description: z.string().trim().max(1000).nullish(),
   isFeatured: z.boolean().default(false),
+});
+
+const brandData = (input: z.infer<typeof brandSchema>) => ({
+  name: input.name,
+  logoUrl: input.logoUrl || null,
+  description: input.description || null,
+  isFeatured: input.isFeatured,
 });
 
 brandsRouter.get(
   '/',
   handler(async (_req, res) => {
-    const brands = await prisma.brand.findMany({ orderBy: { name: 'asc' } });
+    const brands = await prisma.brand.findMany({ orderBy: [{ position: 'asc' }, { name: 'asc' }] });
     res.json(brands.map(s.brand));
   })
 );
@@ -167,7 +185,7 @@ brandsRouter.post(
   handler(async (req, res) => {
     const input = brandSchema.parse(req.body);
     const created = await prisma.brand.create({
-      data: { name: input.name, slug: slugify(input.name), logoUrl: input.logoUrl || null, isFeatured: input.isFeatured },
+      data: { ...brandData(input), slug: slugify(input.name) },
     });
     res.status(201).json(s.brand(created));
   })
@@ -180,7 +198,8 @@ brandsRouter.put(
     const input = brandSchema.parse(req.body);
     const updated = await prisma.brand.update({
       where: { id: req.params.id },
-      data: { name: input.name, slug: slugify(input.name), logoUrl: input.logoUrl || null, isFeatured: input.isFeatured },
+      // The slug is the public URL (/marques/<slug>), so renaming keeps it stable.
+      data: brandData(input),
     });
     res.json(s.brand(updated));
   })

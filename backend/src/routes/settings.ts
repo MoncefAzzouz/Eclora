@@ -22,6 +22,18 @@ const settingsSchema = z.object({
   payments: z.object({ COD: z.boolean(), BARIDIMOB: z.boolean(), CIB: z.boolean() }),
   socials: z.object({ instagram: z.string(), facebook: z.string(), tiktok: z.string() }),
   maintenanceMode: z.boolean(),
+  yalidine: z
+    .object({
+      fromWilaya: z.number().int().min(1).max(99),
+      parcel: z.object({
+        length: z.number().int().min(0).max(300),
+        width: z.number().int().min(0).max(300),
+        height: z.number().int().min(0).max(300),
+        weight: z.number().int().min(0).max(100),
+      }),
+    })
+    .partial()
+    .optional(),
 });
 
 /** There is exactly one settings row, id = 1. */
@@ -54,6 +66,7 @@ settingsRouter.put(
         ...input.socials,
         payments: undefined,
         socials: undefined,
+        yalidine: undefined,
       } as never,
       update: {
         storeName: input.storeName,
@@ -70,6 +83,15 @@ settingsRouter.put(
         facebook: input.socials.facebook,
         tiktok: input.socials.tiktok,
         maintenanceMode: input.maintenanceMode,
+        ...(input.yalidine?.fromWilaya ? { yalidineFromWilaya: input.yalidine.fromWilaya } : {}),
+        ...(input.yalidine?.parcel
+          ? {
+              parcelLength: input.yalidine.parcel.length,
+              parcelWidth: input.yalidine.parcel.width,
+              parcelHeight: input.yalidine.parcel.height,
+              parcelWeight: input.yalidine.parcel.weight,
+            }
+          : {}),
       },
     });
     res.json(s.settings(updated));

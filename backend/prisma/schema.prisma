@@ -22,6 +22,8 @@ model Category {
   isVisible     Boolean       @default(true)
   isHighlighted Boolean       @default(false)
   badgeColor    BadgeColor?
+  /// Shown under the title on the category page, e.g. "Soins du visage".
+  description   String?
   subcategories Subcategory[]
   products      Product[]
   createdAt     DateTime      @default(now())
@@ -43,9 +45,11 @@ model Brand {
   id         String    @id @default(cuid())
   name       String
   slug       String    @unique
-  logoUrl    String?
-  isFeatured Boolean   @default(false)
-  products   Product[]
+  logoUrl     String?
+  description String?
+  isFeatured  Boolean   @default(false)
+  position    Int       @default(0)
+  products    Product[]
 }
 
 model Product {
@@ -130,6 +134,10 @@ model Client {
   adminNote    String?
   /// Created by a guest checkout, never signed up. Set false once they register.
   isGuest      Boolean      @default(true)
+  /// When the customer created a password. Their account history starts here:
+  /// guest orders placed before it stay reachable through /suivi only, because
+  /// nothing proves the person registering is the one who placed them.
+  registeredAt DateTime?
   orders       Order[]
   reviews      Review[]
   createdAt    DateTime     @default(now())
@@ -145,8 +153,13 @@ model Order {
   customerEmail String?
   wilayaCode    Int
   commune       String
+  /// Yalidine commune id, when the customer picked from the synced list.
+  communeId     Int?
   address       String
   deliveryType  DeliveryType
+  /// Yalidine stop-desk (center) id and name for STOPDESK orders.
+  stopdeskId    Int?
+  stopdeskName  String?
   items         OrderItem[]
 
   subtotal    Int
@@ -159,6 +172,9 @@ model Order {
   paymentStatus  PaymentStatus @default(PENDING)
   status         OrderStatus   @default(PENDING)
   trackingNumber String?
+  /// Set once the parcel exists at Yalidine.
+  yalidineLabel  String?
+  yalidineStatus String?
   adminNote      String?
 
   history   OrderEvent[]
@@ -254,6 +270,35 @@ model ShippingRate {
   isActive      Boolean @default(true)
 }
 
+/// A commune as Yalidine knows it (id = Yalidine commune id). Filled by the
+/// Yalidine sync. A null price means "use the wilaya's price".
+model DeliveryCommune {
+  id            Int     @id
+  name          String
+  wilayaCode    Int
+  hasStopDesk   Boolean @default(false)
+  isDeliverable Boolean @default(true)
+  homePrice     Int?
+  stopdeskPrice Int?
+  deliveryDays  String?
+
+  @@index([wilayaCode])
+}
+
+/// A Yalidine office where customers can collect a parcel (id = center_id).
+model DeliveryCenter {
+  id          Int     @id
+  name        String
+  address     String  @default("")
+  gps         String?
+  communeId   Int
+  communeName String
+  wilayaCode  Int
+  isActive    Boolean @default(true)
+
+  @@index([wilayaCode])
+}
+
 // ─── Settings & staff ───────────────────────────────────────────────────────
 
 model StoreSettings {
@@ -272,6 +317,14 @@ model StoreSettings {
   facebook              String   @default("")
   tiktok                String   @default("")
   maintenanceMode       Boolean  @default(false)
+  /// Yalidine: the wilaya parcels leave from, and the default parcel size the
+  /// parcel API requires (cm / kg).
+  yalidineFromWilaya    Int      @default(19)
+  parcelLength          Int      @default(20)
+  parcelWidth           Int      @default(15)
+  parcelHeight          Int      @default(10)
+  parcelWeight          Int      @default(1)
+  yalidineLastSync      DateTime?
   updatedAt             DateTime @updatedAt @default(now())
 }
 
