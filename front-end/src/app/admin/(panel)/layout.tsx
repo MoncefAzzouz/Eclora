@@ -9,10 +9,16 @@ import { canAccess, titleFor } from '@/components/admin/layout/nav';
 import { LoadingState } from '@/components/admin/ui';
 import { useAuth } from '@/lib/admin/auth';
 import { api } from '@/lib/admin/api';
+import { registerWilayaNames } from '@/lib/admin/wilayas';
 
 type Alerts = Awaited<ReturnType<typeof api.dashboard.alerts>>;
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Wilayas added by Yalidine beyond the fixed 58 get their real names in the admin.
+  useEffect(() => {
+    api.shipping.list().then(registerWilayaNames, () => undefined);
+  }, []);
+
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();

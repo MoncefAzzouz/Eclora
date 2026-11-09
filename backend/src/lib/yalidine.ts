@@ -145,10 +145,12 @@ export function startSync(applyPrices: boolean): SyncStatus {
               homePrice: 0,
               stopdeskPrice: 0,
               isActive: false, // priced below; never sell delivery at 0 DA by accident
+              disabledByYalidine: !Number(w.is_deliverable),
             },
             update: {
               wilayaName: w.name,
-              ...(Boolean(Number(w.is_deliverable)) ? {} : { isActive: false }),
+              // Yalidine stopped delivering there: switch it off, and remember why.
+              ...(Number(w.is_deliverable) ? {} : { isActive: false, disabledByYalidine: true }),
             },
           })
         )
@@ -189,6 +191,7 @@ export function startSync(applyPrices: boolean): SyncStatus {
       ]);
 
       let pricedWilayas = 0;
+      const before = new Map((await prisma.shippingRate.findMany()).map((r) => [r.wilayaCode, r]));
       if (applyPrices) {
         const deliverable = wilayas.filter((w) => Boolean(Number(w.is_deliverable)));
         for (const [i, w] of deliverable.entries()) {
@@ -204,7 +207,15 @@ export function startSync(applyPrices: boolean): SyncStatus {
               where: { wilayaCode: w.id },
               // The delay shown to customers stays the admin's text: Yalidine's
               // delivery_time_parcel reads like a worst case (5-25 days).
-              data: { homePrice: home, stopdeskPrice: desk ?? home, isActive: true },
+              data: {
+                homePrice: home,
+                stopdeskPrice: desk ?? home,
+                // Switch on a wilaya that is new, or that Yalidine itself had
+                // switched off; one the admin turned off stays off.
+                ...(before.get(w.id)?.homePrice === 0 || before.get(w.id)?.disabledByYalidine
+                  ? { isActive: true, disabledByYalidine: false }
+                  : {}),
+              },
             }),
             // Communes priced above the wilaya base keep their own price.
             ...rows.map((r) =>
@@ -222,6 +233,7 @@ export function startSync(applyPrices: boolean): SyncStatus {
       }
 
       await prisma.storeSettings.update({ where: { id: 1 }, data: { yalidineLastSync: new Date() } });
+      console.log(`[yalidine] sync done: ${wilayas.length} wilayas, ${communes.length} communes, ${centers.length} offices, ${pricedWilayas} priced`);
       status = {
         running: false,
         step: 'Terminé',
@@ -230,6 +242,7 @@ export function startSync(applyPrices: boolean): SyncStatus {
         summary: { wilayas: wilayas.length, communes: communes.length, centers: centers.length, pricedWilayas },
       };
     } catch (e) {
+      console.error('[yalidine] sync failed:', e instanceof Error ? e.message : e);
       status = {
         running: false,
         step: 'Échec',
@@ -241,6 +254,40 @@ export function startSync(applyPrices: boolean): SyncStatus {
   })();
 
   return status;
+}
+
+// ─── Nightly automatic sync ─────────────────────────────────────────────────
+
+const HOUR = 60 * 60 * 1000;
+let lastAutoAttempt = 0;
+
+/** Hour of day in Algeria (UTC+1, no daylight saving). */
+const algiersHour = () => (new Date().getUTCHours() + 1) % 24;
+
+/**
+ * Checks every 30 minutes; syncs (prices included) once a day between 3 and 6 AM
+ * Algeria time, or at any hour if the last sync is over two days old. Failed
+ * attempts wait 6 hours, so a Yalidine outage never hammers the API.
+ */
+export function startAutoSync() {
+  const tick = async () => {
+    try {
+      if (!yalidineConfigured() || status.running) return;
+      const settings = await prisma.storeSettings.findUnique({ where: { id: 1 } });
+      if (settings && !settings.yalidineAutoSync) return;
+      const age = Date.now() - (settings?.yalidineLastSync?.getTime() ?? 0);
+      const nightly = algiersHour() >= 3 && algiersHour() < 6 && age > 20 * HOUR;
+      if (!(nightly || age > 48 * HOUR)) return;
+      if (Date.now() - lastAutoAttempt < 6 * HOUR) return;
+      lastAutoAttempt = Date.now();
+      console.log('[yalidine] automatic sync started');
+      startSync(true);
+    } catch (e) {
+      console.error('[yalidine] automatic sync check failed', e);
+    }
+  };
+  setInterval(tick, HOUR / 2).unref();
+  setTimeout(tick, 60_000).unref();
 }
 
 // ─── Parcels ────────────────────────────────────────────────────────────────

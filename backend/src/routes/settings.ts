@@ -25,6 +25,7 @@ const settingsSchema = z.object({
   yalidine: z
     .object({
       fromWilaya: z.number().int().min(1).max(99),
+      autoSync: z.boolean(),
       parcel: z.object({
         length: z.number().int().min(0).max(300),
         width: z.number().int().min(0).max(300),
@@ -84,6 +85,7 @@ settingsRouter.put(
         tiktok: input.socials.tiktok,
         maintenanceMode: input.maintenanceMode,
         ...(input.yalidine?.fromWilaya ? { yalidineFromWilaya: input.yalidine.fromWilaya } : {}),
+        ...(input.yalidine?.autoSync !== undefined ? { yalidineAutoSync: input.yalidine.autoSync } : {}),
         ...(input.yalidine?.parcel
           ? {
               parcelLength: input.yalidine.parcel.length,

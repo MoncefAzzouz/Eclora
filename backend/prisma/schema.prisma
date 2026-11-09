@@ -268,6 +268,9 @@ model ShippingRate {
   stopdeskPrice Int
   deliveryDays  String  @default("2-3 jours")
   isActive      Boolean @default(true)
+  /// Set when the Yalidine sync switched the wilaya off (not deliverable), so a
+  /// later sync can switch it back on. A wilaya the admin turned off stays off.
+  disabledByYalidine Boolean @default(false)
 }
 
 /// A commune as Yalidine knows it (id = Yalidine commune id). Filled by the
@@ -325,6 +328,8 @@ model StoreSettings {
   parcelHeight          Int      @default(10)
   parcelWeight          Int      @default(1)
   yalidineLastSync      DateTime?
+  /// Nightly automatic sync of communes, offices and tariffs.
+  yalidineAutoSync      Boolean  @default(true)
   updatedAt             DateTime @updatedAt @default(now())
 }
 

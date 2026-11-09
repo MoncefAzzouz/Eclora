@@ -17,6 +17,7 @@ import { shopRouter } from './routes/storefront.js';
 import { uploadImagesRouter, uploadsRouter, UPLOAD_DIR } from './routes/uploads.js';
 import { accountRouter } from './routes/account.js';
 import { yalidineRouter } from './routes/yalidine.js';
+import { startAutoSync } from './lib/yalidine.js';
 
 const app = express();
 // nginx on the same host is the only proxy: trust it so req.ip is the visitor's
@@ -58,6 +59,8 @@ app.use('/api/admin/yalidine', requireAdmin, yalidineRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+startAutoSync();
 
 app.listen(env.port, () => {
   console.log(`▲ Eclora API  http://localhost:${env.port}`);

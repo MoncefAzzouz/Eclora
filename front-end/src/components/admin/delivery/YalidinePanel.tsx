@@ -103,13 +103,21 @@ export default function YalidinePanel({ rates, onSynced }: { rates: ShippingRate
           </Button>
           <label className="flex items-center gap-2 text-[11px] font-semibold text-slate-600">
             <Toggle checked={applyPrices} onChange={setApplyPrices} />
-            Remplacer les tarifs par ceux de Yalidine
+            Appliquer les tarifs Yalidine
           </label>
         </div>
       </div>
 
       {form && yal && (
         <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="sm:col-span-2 lg:col-span-4">
+            <Toggle
+              checked={yal.autoSync}
+              onChange={(v) => setYal({ autoSync: v })}
+              label="Synchronisation automatique chaque nuit"
+              description="Tarifs, communes et bureaux mis à jour depuis Yalidine vers 3 h du matin. Les tarifs modifiés à la main sont alors remplacés."
+            />
+          </div>
           <Field label="Wilaya d’expédition" hint="Les tarifs Yalidine dépendent du départ.">
             <Select value={yal.fromWilaya} onChange={(e) => setYal({ fromWilaya: Number(e.target.value) })}>
               {rates.map((r) => (

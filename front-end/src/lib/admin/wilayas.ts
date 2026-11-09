@@ -65,7 +65,13 @@ export const WILAYAS: Wilaya[] = [
   { code: 58, name: 'El Meniaa', zone: 'SOUTH' },
 ];
 
+/** Names learned from the delivery list (Yalidine), for wilayas beyond this fixed list. */
+const extraNames = new Map<number, string>();
+export function registerWilayaNames(rows: { wilayaCode: number; wilayaName: string }[]) {
+  for (const r of rows) if (!WILAYAS.some((w) => w.code === r.wilayaCode)) extraNames.set(r.wilayaCode, r.wilayaName);
+}
+
 export function wilayaName(code: number): string {
-  const w = WILAYAS.find((x) => x.code === code);
-  return w ? `${String(code).padStart(2, '0')} - ${w.name}` : `Wilaya ${code}`;
+  const name = WILAYAS.find((x) => x.code === code)?.name ?? extraNames.get(code);
+  return name ? `${String(code).padStart(2, '0')} - ${name}` : `Wilaya ${code}`;
 }

@@ -236,6 +236,7 @@ export function settings(s: StoreSettings) {
       fromWilaya: s.yalidineFromWilaya,
       parcel: { length: s.parcelLength, width: s.parcelWidth, height: s.parcelHeight, weight: s.parcelWeight },
       lastSync: iso(s.yalidineLastSync),
+      autoSync: s.yalidineAutoSync,
     },
   };
 }

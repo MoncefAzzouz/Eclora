@@ -246,6 +246,7 @@ export interface StoreSettings {
     fromWilaya: number;
     parcel: { length: number; width: number; height: number; weight: number };
     lastSync?: string;
+    autoSync: boolean;
   };
 }
 

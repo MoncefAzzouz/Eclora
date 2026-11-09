@@ -115,9 +115,16 @@ shippingRouter.put(
     const rates = z.array(rateSchema).min(1).parse(req.body);
     if (rates.some((r) => r.homePrice < 0 || r.stopdeskPrice < 0)) throw badRequest('Tarif négatif impossible');
 
+    const current = new Map((await prisma.shippingRate.findMany()).map((r) => [r.wilayaCode, r]));
     await prisma.$transaction(
       rates.map((r) =>
-        prisma.shippingRate.upsert({ where: { wilayaCode: r.wilayaCode }, create: r, update: r })
+        prisma.shippingRate.upsert({
+          where: { wilayaCode: r.wilayaCode },
+          create: r,
+          // Switching a wilaya on or off here makes it the admin's choice; the
+          // Yalidine sync will no longer override it.
+          update: { ...r, ...(current.get(r.wilayaCode)?.isActive !== r.isActive ? { disabledByYalidine: false } : {}) },
+        })
       )
     );
     res.status(204).end();
