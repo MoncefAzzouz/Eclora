@@ -20,9 +20,9 @@
 
 set -euo pipefail
 
-HOST="${ECLORA_HOST:-5.196.177.52}"
+HOST="${ECLORA_HOST:-5.196.139.179}"
 USER="${ECLORA_USER:-root}"
-DOMAIN="${ECLORA_DOMAIN:-vps4q6x82.oct-xpd1.xyz}"
+DOMAIN="${ECLORA_DOMAIN:-www.ecloraalgerie.com}"
 APP_DIR="${ECLORA_APP_DIR:-/var/www/Eclora}"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

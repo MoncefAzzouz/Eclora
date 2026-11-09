@@ -18,10 +18,10 @@
 
 set -euo pipefail
 
-HOST="${ECLORA_HOST:-5.196.177.52}"
+HOST="${ECLORA_HOST:-5.196.139.179}"
 USER="${ECLORA_USER:-root}"
 APP_DIR="${ECLORA_APP_DIR:-/var/www/Eclora}"
-OLD_DOMAIN="${ECLORA_DOMAIN:-vps4q6x82.oct-xpd1.xyz}"
+OLD_DOMAIN="${ECLORA_DOMAIN:-www.ecloraalgerie.com}"
 EMAIL="${ECLORA_LE_EMAIL:-admin@eclora.dz}"
 
 DOMAIN=""

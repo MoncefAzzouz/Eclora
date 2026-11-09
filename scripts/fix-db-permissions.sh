@@ -17,9 +17,9 @@
 
 set -euo pipefail
 
-HOST="${ECLORA_HOST:-5.196.177.52}"
+HOST="${ECLORA_HOST:-5.196.139.179}"
 USER="${ECLORA_USER:-root}"
-DOMAIN="${ECLORA_DOMAIN:-vps4q6x82.oct-xpd1.xyz}"
+DOMAIN="${ECLORA_DOMAIN:-www.ecloraalgerie.com}"
 DB="${ECLORA_REMOTE_DB:-eclora}"
 ROLE="${ECLORA_DB_ROLE:-eclora}"
 
