@@ -21,7 +21,8 @@ import type {
   Subcategory,
 } from '@/types/admin';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+// Relative by default — see the note in src/lib/shop/api.ts.
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? '/api';
 const TOKEN_KEY = 'eclora-admin-token';
 
 export class ApiError extends Error {

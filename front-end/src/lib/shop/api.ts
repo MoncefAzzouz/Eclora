@@ -2,7 +2,11 @@
 // and maps rows into the `Product` shape the existing components already use.
 import type { Product, Shade } from '@/data/products';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+// Relative by default, and deliberately so: NEXT_PUBLIC_* values are inlined
+// into the browser bundle at build time, so an absolute URL here would hard-code
+// one domain and need a rebuild every time the site moves. Every caller is a
+// client component, so a same-origin path is always resolvable.
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? '/api';
 
 export function formatDA(amount: number): string {
   return `${new Intl.NumberFormat('fr-DZ', { maximumFractionDigits: 0 }).format(amount).replace(/ | /g, ' ')} DA`;
