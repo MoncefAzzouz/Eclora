@@ -70,7 +70,7 @@ function Editor({ rate, saved, onClose }: { rate: ShippingRate; saved: DeliveryC
               <tr key={c.id}>
                 <Td className="font-semibold">
                   {c.name} {c.hasStopDesk && <Badge tone="blue">bureau</Badge>}
-                  {c.deliveryDays && <span className="block text-[11px] text-slate-400">{c.deliveryDays}</span>}
+                  {c.deliveryDays && <span className="block text-[11px] text-slate-400">Délai Yalidine : {c.deliveryDays}</span>}
                 </Td>
                 <Td>
                   <Input

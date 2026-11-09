@@ -135,8 +135,6 @@ export function startSync(applyPrices: boolean): SyncStatus {
       status.step = 'Bureaux (stop desks)';
       const centers = await listAll<YCenter>('/centers/');
 
-      // Keep admin-set prices for wilayas that already exist.
-      const existing = new Map((await prisma.shippingRate.findMany()).map((r) => [r.wilayaCode, r]));
       await prisma.$transaction(
         wilayas.map((w) =>
           prisma.shippingRate.upsert({
@@ -201,15 +199,12 @@ export function startSync(applyPrices: boolean): SyncStatus {
           const desk = min(rows.map((r) => r.express_desk));
           if (home === null) continue;
 
-          const wilayaCommunes = communes.filter((c) => c.wilaya_id === w.id);
-          const slowest = Math.max(0, ...wilayaCommunes.map((c) => c.delivery_time_parcel ?? 0));
-          const fastest = Math.min(...wilayaCommunes.map((c) => c.delivery_time_parcel ?? 99));
-          const range = slowest && fastest < 99 ? (fastest === slowest ? `${fastest} jours` : `${fastest}-${slowest} jours`) : existing.get(w.id)?.deliveryDays ?? '2-5 jours';
-
           await prisma.$transaction([
             prisma.shippingRate.update({
               where: { wilayaCode: w.id },
-              data: { homePrice: home, stopdeskPrice: desk ?? home, deliveryDays: range, isActive: true },
+              // The delay shown to customers stays the admin's text: Yalidine's
+              // delivery_time_parcel reads like a worst case (5-25 days).
+              data: { homePrice: home, stopdeskPrice: desk ?? home, isActive: true },
             }),
             // Communes priced above the wilaya base keep their own price.
             ...rows.map((r) =>

@@ -303,7 +303,7 @@ shopRouter.get(
         isDeliverable: c.isDeliverable,
         hasStopDesk: c.hasStopDesk,
         homePrice: c.homePrice ?? rate.homePrice,
-        deliveryDays: c.deliveryDays ?? rate.deliveryDays,
+        deliveryDays: rate.deliveryDays,
       })),
       centers: centers.map((c) => ({
         id: c.id,

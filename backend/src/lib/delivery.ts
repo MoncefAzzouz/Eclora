@@ -73,7 +73,8 @@ export async function quote(input: QuoteInput, freeShippingThreshold: number): P
     fee: freeShipping ? 0 : baseFee,
     baseFee,
     freeShipping,
-    deliveryDays: commune?.deliveryDays ?? rate.deliveryDays,
+    // The admin's per-wilaya delay, not Yalidine's per-commune worst case.
+    deliveryDays: rate.deliveryDays,
     communeName: stopdesk?.communeName ?? commune?.name,
     stopdesk,
   };

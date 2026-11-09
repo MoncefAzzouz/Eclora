@@ -14,6 +14,12 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     return;
   }
 
+  // Malformed JSON body (express.json): the client's fault, not ours.
+  if ((err as { type?: string }).type === 'entity.parse.failed') {
+    res.status(400).json({ error: 'Requête invalide (JSON mal formé)' });
+    return;
+  }
+
   if (err instanceof MulterError) {
     const message =
       err.code === 'LIMIT_FILE_SIZE'
