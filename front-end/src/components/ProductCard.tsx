@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import StoreImage from '@/components/StoreImage';
 import { Check, Heart, Star } from 'lucide-react';
 import type { Product } from '@/data/products';
 
@@ -58,11 +59,12 @@ export default function ProductCard({ product, isWishlisted, onToggleWishlist, o
         </div>
 
         <Link href={href} className="relative mb-2 flex h-[170px] w-full items-center justify-center overflow-hidden bg-white sm:h-[230px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <StoreImage
             src={product.image}
             alt={product.title}
             loading="lazy"
+            fill
+            sizes="(min-width: 1280px) 260px, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw"
             className={`h-full w-full object-contain transition-transform duration-200 group-hover:scale-105 ${soldOut ? 'opacity-50' : ''}`}
           />
         </Link>

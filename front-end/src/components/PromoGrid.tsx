@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import StoreImage from '@/components/StoreImage';
 import type { ApiBanner } from '@/lib/shop/api';
 
 interface PromoGridProps {
@@ -22,10 +23,11 @@ export default function PromoGrid({ onDiscover, banners }: PromoGridProps) {
         <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-sm sm:h-[210px] sm:flex-row">
           {/* Left Image (~44%) */}
           <div className="relative h-[180px] w-full flex-shrink-0 overflow-hidden bg-gradient-to-br from-pink-400 via-orange-300 to-amber-300 sm:h-full sm:w-[45%]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <StoreImage
               src={first?.imageUrl || '/images/image copy 12.png'}
               alt={first?.title || 'Exclusivité web'}
+              fill
+              sizes="(min-width: 1440px) 305px, (min-width: 768px) 22vw, (min-width: 640px) 43vw, calc(100vw - 32px)"
               className="w-full h-full object-cover object-[70%_center] group-hover:scale-105 transition-transform duration-300"
             />
           </div>
@@ -64,10 +66,11 @@ export default function PromoGrid({ onDiscover, banners }: PromoGridProps) {
         <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-sm sm:h-[210px] sm:flex-row">
           {/* Left Image (~44%) */}
           <div className="relative h-[180px] w-full flex-shrink-0 overflow-hidden bg-[#e8ded4] sm:h-full sm:w-[45%]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <StoreImage
               src={second?.imageUrl || '/images/image copy 11.png'}
               alt={second?.title || 'Nouveautés soin'}
+              fill
+              sizes="(min-width: 1440px) 305px, (min-width: 768px) 22vw, (min-width: 640px) 43vw, calc(100vw - 32px)"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>

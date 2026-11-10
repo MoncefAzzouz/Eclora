@@ -135,7 +135,7 @@ export default function Header({ wishlistCount, cartCount, onOpenCart }: HeaderP
             </button>
             <Link href="/" className="block flex-shrink-0 transition-opacity hover:opacity-80">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/svg/Eclora Horizontal.svg" alt="ECLORA" className="h-8 w-auto sm:h-10" />
+              <img src="/svg/Eclora Horizontal.svg" alt="ECLORA" width={260} height={80} className="h-8 w-auto sm:h-10" />
             </Link>
           </div>
 

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import StoreImage from '@/components/StoreImage';
 import type { ApiBanner } from '@/lib/shop/api';
 
 interface MiddleBannerProps {
@@ -22,10 +23,11 @@ export default function MiddleBanner({ onDiscover, banners }: MiddleBannerProps)
         <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-sm sm:h-[210px] sm:flex-row">
           {/* Left Image (~44%) */}
           <div className="relative h-[180px] w-full flex-shrink-0 overflow-hidden bg-neutral-900 sm:h-full sm:w-[45%]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <StoreImage
               src={first?.imageUrl || '/images/image copy 13.png'}
               alt={first?.title || "Plus qu'un parfum, une émotion"}
+              fill
+              sizes="(min-width: 1440px) 305px, (min-width: 768px) 22vw, (min-width: 640px) 43vw, calc(100vw - 32px)"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
@@ -56,10 +58,11 @@ export default function MiddleBanner({ onDiscover, banners }: MiddleBannerProps)
         <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-sm sm:h-[210px] sm:flex-row">
           {/* Left Image (~44%) */}
           <div className="relative h-[180px] w-full flex-shrink-0 overflow-hidden bg-gradient-to-br from-orange-300 via-amber-200 to-orange-400 sm:h-full sm:w-[45%]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <StoreImage
               src={second?.imageUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=85'}
               alt={second?.title || 'Avant-première'}
+              fill
+              sizes="(min-width: 1440px) 305px, (min-width: 768px) 22vw, (min-width: 640px) 43vw, calc(100vw - 32px)"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>

@@ -97,6 +97,14 @@ storage while the VPS continues to handle image traffic.
 Leave all four R2 variables empty for local disk storage. If only some are set,
 the API refuses to start to avoid silently storing production images on disk.
 
+The homepage fetches current public content on the Next.js server before rendering
+the first banner, products, and category navigation. `API_INTERNAL_URL` defaults
+to `http://127.0.0.1:4000`; set it when the API runs on a different host. Homepage
+data uses `no-store`, so an admin edit is reflected on the next page request.
+Storefront image components resize local/R2 images through Next.js, which caches
+WebP variants and serves the appropriate width for the screen. The original R2
+files are retained. Other pasted external image URLs remain supported directly.
+
 ### Existing media deployment scripts
 
 Product and banner images are files in `backend/uploads/`; the titles and the rows that

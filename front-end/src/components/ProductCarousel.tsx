@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import StoreImage from '@/components/StoreImage';
 import { ChevronLeft, ChevronRight, Heart, Star } from 'lucide-react';
 import { Product } from '@/data/products';
 
@@ -154,10 +155,11 @@ export default function ProductCarousel({
                     href={`/product/${product.id}`}
                     className="relative my-1.5 flex h-[180px] w-full cursor-pointer items-center justify-center overflow-hidden bg-white sm:h-[210px]"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <StoreImage
                       src={product.image}
                       alt={product.title}
+                      fill
+                      sizes="(min-width: 768px) 280px, (min-width: 640px) 255px, 235px"
                       className="h-full w-full scale-[1.3] object-contain transition-transform duration-300 group-hover/card:scale-[1.36]"
                     />
                   </Link>

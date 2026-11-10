@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+import StoreImage from '@/components/StoreImage';
 import Link from 'next/link';
 import type { ApiBanner } from '@/lib/shop/api';
 
@@ -35,11 +35,8 @@ const FALLBACK_BANNERS: ApiBanner[] = [
 export default function HeroBanner({ onDiscover, banners }: HeroBannerProps) {
   const slides = banners?.length ? banners : FALLBACK_BANNERS;
   const [activeIndex, setActiveIndex] = useState(0);
-  const banner = slides[activeIndex] ?? slides[0]!;
-
-  useEffect(() => {
-    if (activeIndex >= slides.length) setActiveIndex(0);
-  }, [activeIndex, slides.length]);
+  const currentIndex = activeIndex % slides.length;
+  const banner = slides[currentIndex]!;
 
   useEffect(() => {
     if (slides.length < 2) return;
@@ -70,14 +67,15 @@ export default function HeroBanner({ onDiscover, banners }: HeroBannerProps) {
       {/* Mobile crops to the model; from sm up the container matches the artwork's
           native 2172x724 so the full composition stays uncropped. */}
       <div className="relative isolate flex min-h-[420px] overflow-hidden rounded-2xl bg-[#1d6f72] shadow-[0_24px_70px_rgba(16,64,66,0.22)] sm:min-h-0 sm:aspect-[2172/724] sm:rounded-3xl">
-        <Image
+        <StoreImage
           key={banner.id}
           src={banner.imageUrl}
           alt={banner.title}
           fill
-          preload
-          sizes="(max-width: 1440px) 100vw, 1376px"
-          quality={90}
+          loading="eager"
+          fetchPriority={currentIndex === 0 ? 'high' : 'auto'}
+          sizes="(max-width: 639px) 1260px, (max-width: 1440px) 100vw, 1376px"
+          quality={75}
           className="object-cover object-[22%_center] sm:object-center"
         />
 
@@ -116,8 +114,8 @@ export default function HeroBanner({ onDiscover, banners }: HeroBannerProps) {
                 type="button"
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Afficher la bannière ${index + 1}`}
-                aria-current={index === activeIndex}
-                className={`h-2 rounded-full shadow-sm transition-all ${index === activeIndex ? 'w-7 bg-white' : 'w-2 bg-white/55 hover:bg-white/80'}`}
+                aria-current={index === currentIndex}
+                className={`h-2 rounded-full shadow-sm transition-all ${index === currentIndex ? 'w-7 bg-white' : 'w-2 bg-white/55 hover:bg-white/80'}`}
               />
             ))}
           </div>
