@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Loader2, Search, X, Inbox, AlertTriangle, ImageOff } from 'lucide-react';
 import type { Tone } from '@/lib/admin/constants';
@@ -153,7 +154,7 @@ export function Card({
 // ─── Form controls ──────────────────────────────────────────────────────────
 
 const CONTROL =
-  'w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-black font-semibold outline-none focus:ring-2 focus:ring-[#f05b2a] focus:bg-white transition disabled:opacity-60';
+  'min-w-0 w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-black font-semibold outline-none focus:ring-2 focus:ring-[#f05b2a] focus:bg-white transition disabled:opacity-60';
 
 export function Field({
   label,
@@ -169,7 +170,7 @@ export function Field({
   className?: string;
 }) {
   return (
-    <label className={`block text-xs ${className}`}>
+    <label className={`block min-w-0 text-xs ${className}`}>
       <span className="font-bold text-slate-700 block mb-1.5">{label}</span>
       {children}
       {error ? (
@@ -403,29 +404,85 @@ export function Modal({
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
 }) {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+
+  useEffect(() => {
+    closeRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    const previousPadding = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${parseFloat(getComputedStyle(document.body).paddingRight) + scrollbarWidth}px`;
+    }
+    document.body.style.overflow = 'hidden';
+    dialogRef.current?.focus({ preventScroll: true });
 
-  if (!open) return null;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeRef.current();
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )).filter((element) => element.getClientRects().length > 0);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) {
+        e.preventDefault();
+        dialogRef.current.focus();
+      } else if (e.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPadding;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus({ preventScroll: true });
+      }
+    };
+  }, [open]);
+
+  if (!open || typeof document === 'undefined') return null;
+  const portalRoot = document.getElementById('admin-overlays');
+  if (!portalRoot) return null;
   const width = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-3xl' }[size];
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/50 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/50 p-3 backdrop-blur-xs sm:p-6"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div role="dialog" aria-modal="true" aria-label={title} className={`bg-white w-full ${width} rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[92vh]`}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <h3 className="text-base font-black text-slate-900">{title}</h3>
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={`flex max-h-[calc(100dvh-1.5rem)] w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl outline-none sm:max-h-[calc(100dvh-3rem)] ${width}`}
+      >
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5 sm:py-4">
+          <h3 id={titleId} className="min-w-0 text-base font-black text-slate-900">{title}</h3>
           <IconButton label="Fermer" icon={X} onClick={onClose} />
         </div>
-        <div className="p-5 overflow-y-auto space-y-4">{children}</div>
-        {footer && <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">{footer}</div>}
+        <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4 sm:p-5">{children}</div>
+        {footer && <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-slate-100 px-4 py-3 sm:px-5 sm:py-4">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    portalRoot,
   );
 }
 

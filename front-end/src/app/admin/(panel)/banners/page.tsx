@@ -139,7 +139,7 @@ export default function BannersPage() {
         }
       >
         {draft && (
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-4">
               <Field label="Emplacement">
                 <Select value={draft.placement} onChange={(e) => setDraft({ ...draft, placement: e.target.value as BannerPlacement })}>
@@ -149,7 +149,7 @@ export default function BannersPage() {
               <Field label="Titre *"><Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></Field>
               <Field label="Sous-titre"><Input value={draft.subtitle ?? ''} onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })} /></Field>
               <Field label="Description"><Textarea rows={3} value={draft.description ?? ''} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></Field>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Field label="Texte du bouton"><Input value={draft.buttonText} onChange={(e) => setDraft({ ...draft, buttonText: e.target.value })} /></Field>
                 <Field label="Badge"><Input value={draft.badge ?? ''} onChange={(e) => setDraft({ ...draft, badge: e.target.value })} placeholder="Nouveau" /></Field>
               </div>
@@ -165,7 +165,7 @@ export default function BannersPage() {
               <Field label="Lien" hint="Ex : /shop/parfum ou /product/dior-sauvage">
                 <Input value={draft.link} onChange={(e) => setDraft({ ...draft, link: e.target.value })} />
               </Field>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Field label="Début (optionnel)"><Input type="date" value={toDateInput(draft.startsAt)} onChange={(e) => setDraft({ ...draft, startsAt: fromDateInput(e.target.value) })} /></Field>
                 <Field label="Fin (optionnel)"><Input type="date" value={toDateInput(draft.endsAt)} onChange={(e) => setDraft({ ...draft, endsAt: fromDateInput(e.target.value) })} /></Field>
               </div>

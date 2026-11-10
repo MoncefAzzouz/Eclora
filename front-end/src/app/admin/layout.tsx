@@ -16,6 +16,9 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   return (
     <div className="eclora-admin min-h-screen">
       <Providers>{children}</Providers>
+      {/* Dialogs must sit outside animated page containers, while retaining
+          the admin theme inherited from this layout. */}
+      <div id="admin-overlays" />
     </div>
   );
 }

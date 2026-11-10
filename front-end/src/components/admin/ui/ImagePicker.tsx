@@ -113,7 +113,7 @@ export default function ImagePicker({ label, value, onChange, hint, aspect = '16
         )}
       </div>
 
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"
