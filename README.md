@@ -70,10 +70,14 @@ link, delete and pagination). They are not automatically sent by email. The
 public endpoint `/api/shop/contact` validates fields, uses a honeypot and limits
 submissions per IP. The inbox requires a manager account.
 
-Configure the form headings, labels, confirmation, visibility and floating
-message menu in **Paramètres → Pages du site → Contact**. WhatsApp takes an
-international phone number; Viber takes a `viber://` or HTTPS link. Empty channels
-are omitted. The website header typography matches the category navigation.
+Configure the form headings, labels, confirmation and visibility in **Paramètres
+→ Pages du site → Contact**. Configure the floating message button in **Paramètres
+→ Messages**: WhatsApp, telephone and Viber each take their own international
+number (for example `+213 555 12 34 56`). The button opens a compact list of the
+configured channels; blank channels are hidden. If all three are blank, or the
+button is disabled, it stays hidden. Numbers use the existing `StoreSettings.pages`
+JSON through `/api/admin/settings/messaging`, without a new database migration.
+Saving page copy preserves numbers configured in Messages.
 
 Apply `backend/prisma/migrations/20261114220000_contact_messages/migration.sql`
 and regenerate Prisma before deploying the contact API. This only adds the

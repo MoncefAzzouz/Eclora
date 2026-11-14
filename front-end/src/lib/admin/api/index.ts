@@ -288,6 +288,9 @@ const yalidine = {
 const settings = {
   get: () => request<StoreSettings>('/admin/settings'),
   save: (value: StoreSettings) => request<StoreSettings>('/admin/settings', { method: 'PUT', body: value }),
+  messaging: () => request<import('@/lib/contact-channels').MessagingSettings>('/admin/settings/messaging'),
+  saveMessaging: (value: import('@/lib/contact-channels').MessagingSettings) =>
+    request<import('@/lib/contact-channels').MessagingSettings>('/admin/settings/messaging', { method: 'PUT', body: value }),
   savePages: (value: { pages: import('@/lib/site-pages').SitePages; contactEmail: string; contactPhone: string; address: string }) =>
     request<StoreSettings>('/admin/settings/pages', { method: 'PUT', body: value }),
   messages: (page = 1, filter: 'all' | 'unread' = 'all') =>

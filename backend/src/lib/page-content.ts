@@ -2,6 +2,17 @@ import { z } from 'zod';
 
 const title = z.string().trim().min(1).max(180);
 const text = z.string().trim().max(10000);
+export const messagingPhone = z.string().trim().max(40).refine((value) =>
+  !value || (/^\+?[1-9][\d\s().-]+$/.test(value) && /^[1-9]\d{6,14}$/.test(value.replace(/\D/g, ''))),
+  'Utilisez le format international, par exemple +213 555 12 34 56'
+);
+
+export const messagingSettingsSchema = z.object({
+  chatEnabled: z.boolean(),
+  whatsappNumber: messagingPhone,
+  chatPhoneNumber: messagingPhone,
+  viberNumber: messagingPhone,
+});
 const image = z.string().trim().max(2048).refine(
   (value) => {
     if (value === '') return true;
@@ -29,6 +40,7 @@ export const pagesSchema = z.object({
     nameLabel: title.optional(), emailFieldLabel: title.optional(), phoneFieldLabel: title.optional(), messageLabel: title.optional(),
     emailLabel: title.optional(), phoneLabel: title.optional(), addressLabel: title.optional(), hoursLabel: title.optional(),
     chatTitle: title.optional(), chatIntro: text.optional(),
+    chatPhoneNumber: messagingPhone.optional(), viberNumber: messagingPhone.optional(),
     whatsappNumber: z.string().trim().max(40).refine((value) => !value || /^\+?[1-9][\d\s().-]{6,38}$/.test(value), 'Utilisez le format international, par exemple +213…').optional(),
     viberUrl: z.string().trim().max(2048).refine((value) => {
       if (!value) return true;

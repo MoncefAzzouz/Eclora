@@ -6,6 +6,7 @@ import ScrollReveal from '@/components/content/ScrollReveal';
 import ContactForm from '@/components/contact/ContactForm';
 import { resolvePages } from '@/lib/site-pages';
 import { loadPublicSettings } from '@/lib/shop/public-settings';
+import { viberLink } from '@/lib/contact-channels';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Contact | Eclora Algérie', description: 'Une question sur un produit ou une commande ? Écrivez à l’équipe Eclora.' };
@@ -13,6 +14,7 @@ export const metadata = { title: 'Contact | Eclora Algérie', description: 'Une 
 export default async function ContactPage() {
   const settings = await loadPublicSettings();
   const { contact } = resolvePages(settings?.pages);
+  const viber = viberLink(contact);
   const phone = settings?.contactPhone?.trim();
   const email = settings?.contactEmail?.trim();
   const address = settings?.address?.trim();
@@ -34,9 +36,9 @@ export default async function ContactPage() {
             {address && <div><MapPin className="h-5 w-5 text-orange-200" /><h2 className="mt-4 text-sm font-semibold">{contact.addressLabel}</h2><p className="mt-2 whitespace-pre-line text-sm leading-7 text-white/75">{address}</p></div>}
             {contact.hours && <div><Clock3 className="h-5 w-5 text-orange-200" /><h2 className="mt-4 text-sm font-semibold">{contact.hoursLabel}</h2><p className="mt-2 whitespace-pre-line text-sm leading-7 text-white/75">{contact.hours}</p></div>}
           </div>
-          {(contact.whatsappNumber || contact.viberUrl) && <div className="mt-7 flex flex-wrap gap-3">
+          {(contact.whatsappNumber || viber) && <div className="mt-7 flex flex-wrap gap-3">
             {contact.whatsappNumber && <a href={`https://wa.me/${contact.whatsappNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 rounded-full border border-white/25 px-5 py-3 text-xs font-semibold hover:bg-white/10">WhatsApp<ArrowUpRight className="h-4 w-4" /></a>}
-            {contact.viberUrl && <a href={contact.viberUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 rounded-full border border-white/25 px-5 py-3 text-xs font-semibold hover:bg-white/10">Viber<ArrowUpRight className="h-4 w-4" /></a>}
+            {viber && <a href={viber} className="inline-flex items-center gap-3 rounded-full border border-white/25 px-5 py-3 text-xs font-semibold hover:bg-white/10">Viber<ArrowUpRight className="h-4 w-4" /></a>}
           </div>}
           {contact.note && <p className="mt-8 max-w-lg whitespace-pre-line border-l-2 border-[#f05b2a] pl-4 text-xs leading-7 text-white/70">{contact.note}</p>}
           {socials.length > 0 && <div className="mt-8 flex flex-wrap gap-5">{socials.map(([name, url]) => <a key={name} href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold capitalize text-white/80 hover:text-white">{name}<ArrowUpRight className="h-3.5 w-3.5" /></a>)}</div>}

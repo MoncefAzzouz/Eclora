@@ -25,7 +25,7 @@ const ICONS: Record<'instagram' | 'facebook' | 'tiktok', React.ReactNode> = {
   ),
 };
 
-const LINK = 'text-white/85 transition-colors hover:text-white hover:underline';
+const LINK = 'text-white font-medium leading-7 transition-colors hover:underline underline-offset-4';
 
 export default function Footer() {
   const categories = useCategories();
@@ -36,17 +36,17 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-gradient-to-r from-[#f05b2a] to-[#faae3c] pb-12 pt-12 text-white">
+    <footer className="relative bg-gradient-to-r from-[#f05b2a] to-[#faae3c] pb-10 pt-12 text-white font-avantgarde sm:pt-14">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 border-b border-white/25 pb-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-10 border-b border-white/25 pb-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="mb-4 text-sm font-black uppercase tracking-wider">Boutique</h3>
-            <ul className="space-y-2.5 text-[13px]">
+            <h3 className="mb-5 text-base font-bold uppercase tracking-[0.08em] sm:text-lg">Boutique</h3>
+            <ul className="space-y-3 text-[15px] leading-7 sm:text-base">
               {categories.map((c) => (
                 <li key={c.id}>
-                  <Link href={`/shop/${c.slug}`} className={LINK}>
-                    {c.name}
-                    {c.description ? ` · ${c.description}` : ''}
+                  <Link href={`/shop/${c.slug}`} className={`${LINK} block`}>
+                    <span>{c.name}</span>
+                    {c.description && <span className="mt-0.5 block text-sm font-normal leading-6 text-white/90">{c.description}</span>}
                   </Link>
                 </li>
               ))}
@@ -57,8 +57,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-black uppercase tracking-wider">Mon ECLORA</h3>
-            <ul className="space-y-2.5 text-[13px]">
+            <h3 className="mb-5 text-base font-bold uppercase tracking-[0.08em] sm:text-lg">Mon ECLORA</h3>
+            <ul className="space-y-3 text-[15px] leading-7 sm:text-base">
               <li><Link href="/compte" className={LINK}>Mon compte</Link></li>
               <li><Link href="/a-propos" className={LINK}>À propos d’Eclora</Link></li>
               <li><Link href="/suivi" className={LINK}>Suivre ma commande</Link></li>
@@ -67,8 +67,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-black uppercase tracking-wider">Aide</h3>
-            <ul className="space-y-2.5 text-[13px]">
+            <h3 className="mb-5 text-base font-bold uppercase tracking-[0.08em] sm:text-lg">Aide</h3>
+            <ul className="space-y-3 text-[15px] leading-7 sm:text-base">
               <li><Link href="/aide#livraison" className={LINK}>Livraison</Link></li>
               <li><Link href="/aide#paiement" className={LINK}>Paiement</Link></li>
               <li><Link href="/aide#retours" className={LINK}>Retours</Link></li>
@@ -77,8 +77,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-black uppercase tracking-wider">Contact</h3>
-            <ul className="space-y-2.5 text-[13px] text-white/90">
+            <h3 className="mb-5 text-base font-bold uppercase tracking-[0.08em] sm:text-lg">Contact</h3>
+            <ul className="space-y-3 text-[15px] leading-7 text-white sm:text-base">
               {settings?.contactPhone && (
                 <li><a href={`tel:${settings.contactPhone.replace(/\s/g, '')}`} className={LINK}>{settings.contactPhone}</a></li>
               )}
@@ -106,11 +106,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-6 pt-6 text-[12px] text-white/85">
+        <div className="flex items-center justify-between gap-5 pr-20 pt-7 text-[13px] leading-6 text-white/90 sm:text-sm">
           <p>© {new Date().getFullYear()} ECLORA Algérie. Tous droits réservés.</p>
           <button
             onClick={scrollToTop}
-            className="rounded-xl border border-white/50 p-3 transition-colors hover:bg-white hover:text-[#f05b2a]"
+            className="shrink-0 rounded-xl border border-white/50 p-3 transition-colors hover:bg-white hover:text-[#f05b2a]"
             aria-label="Revenir en haut"
           >
             <ChevronUp className="h-5 w-5" />

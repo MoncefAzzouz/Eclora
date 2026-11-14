@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Save, Plus, Edit2, Trash2 } from 'lucide-react';
 import { api } from '@/lib/admin/api';
 import { useApi } from '@/lib/admin/useApi';
@@ -12,11 +12,15 @@ import { Badge, Button, Card, ConfirmDialog, ErrorState, Field, IconButton, Inpu
 import { useToast } from '@/components/admin/ui/Toast';
 import PageSettings from '@/components/admin/settings/PageSettings';
 import ContactInbox from '@/components/admin/settings/ContactInbox';
+import MessagingSettingsCard from '@/components/admin/settings/MessagingSettings';
 
 type Tab = 'store' | 'pages' | 'messages' | 'payments' | 'team';
 
 export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('store');
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('tab') === 'messages') setTab('messages');
+  }, []);
   return (
     <div className="animate-fade-in">
       <PageHeader title="Paramètres" description="Informations de la boutique, moyens de paiement et accès de l’équipe." />
@@ -31,7 +35,7 @@ export default function SettingsPage() {
         value={tab}
         onChange={setTab}
       />
-      {tab === 'team' ? <TeamTab /> : tab === 'pages' ? <PageSettings /> : tab === 'messages' ? <ContactInbox /> : <StoreTab section={tab} />}
+      {tab === 'team' ? <TeamTab /> : tab === 'pages' ? <PageSettings /> : tab === 'messages' ? <div className="max-w-6xl space-y-6"><MessagingSettingsCard /><ContactInbox /></div> : <StoreTab section={tab} />}
     </div>
   );
 }

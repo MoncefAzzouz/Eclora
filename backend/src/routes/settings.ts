@@ -6,7 +6,7 @@ import { prisma } from '../lib/prisma.js';
 import { badRequest, forbidden, handler } from '../lib/http.js';
 import * as s from '../lib/serialize.js';
 import { MANAGERS, requireRole } from '../middleware/auth.js';
-import { pageSettingsSchema } from '../lib/page-content.js';
+import { messagingSettingsSchema, pageSettingsSchema } from '../lib/page-content.js';
 import { contactInboxRouter } from './contact.js';
 
 // ─── Settings ───────────────────────────────────────────────────────────────
@@ -52,13 +52,45 @@ settingsRouter.get(
   })
 );
 
+type PublicPages = { contact?: Record<string, unknown>; [key: string]: unknown };
+const messagingKeys = ['chatEnabled', 'whatsappNumber', 'chatPhoneNumber', 'viberNumber'] as const;
+function messagingValues(pages: PublicPages | null, phone = '') {
+  const contact = pages?.contact;
+  let legacyViber = '';
+  try { legacyViber = new URL(String(contact?.viberUrl ?? '')).searchParams.get('number') ?? ''; } catch { /* no legacy number */ }
+  return {
+    chatEnabled: contact?.chatEnabled !== false,
+    whatsappNumber: String(contact?.whatsappNumber ?? ''),
+    chatPhoneNumber: String(contact?.chatPhoneNumber ?? phone),
+    viberNumber: String(contact?.viberNumber ?? legacyViber),
+  };
+}
+
+settingsRouter.get('/messaging', requireRole(...MANAGERS), handler(async (_req, res) => {
+  const settings = await getSettings();
+  res.json(messagingValues(settings.pages as PublicPages | null, settings.contactPhone));
+}));
+
+// Change channel numbers without touching page copy, orders or store settings.
+settingsRouter.put('/messaging', requireRole(...MANAGERS), handler(async (req, res) => {
+  const input = messagingSettingsSchema.parse(req.body);
+  const previous = await prisma.storeSettings.findUnique({ where: { id: 1 }, select: { pages: true } });
+  const previousPages = previous?.pages as PublicPages | null;
+  const pages = { ...previousPages, contact: { ...previousPages?.contact, ...input } } as import('@prisma/client').Prisma.InputJsonObject;
+  const updated = await prisma.storeSettings.upsert({ where: { id: 1 }, create: { id: 1, pages }, update: { pages } });
+  res.json(messagingValues(updated.pages as PublicPages | null));
+}));
+
 // Save public page content separately so payment, delivery and team settings
 // cannot be overwritten by an older page editor tab.
 settingsRouter.put('/pages', requireRole(...MANAGERS), handler(async (req, res) => {
   const input = pageSettingsSchema.parse(req.body);
   const previous = await prisma.storeSettings.findUnique({ where: { id: 1 }, select: { pages: true } });
   const previousPages = previous?.pages as { contact?: Record<string, string | boolean> } | undefined;
-  const data = { ...input, pages: { ...input.pages, contact: { ...previousPages?.contact, ...input.pages.contact } } };
+  const pageContact = { ...input.pages.contact };
+  // An older page-editor tab must not replace numbers saved from Messages.
+  for (const key of messagingKeys) delete pageContact[key];
+  const data = { ...input, pages: { ...input.pages, contact: { ...previousPages?.contact, ...pageContact } } };
   const updated = await prisma.storeSettings.upsert({
     where: { id: 1 },
     create: { id: 1, ...data },

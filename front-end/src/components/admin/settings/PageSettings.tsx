@@ -139,15 +139,9 @@ function PageContentForm({ initial }: { initial: StoreSettings }) {
           </div>
           <Field label="Confirmation après envoi"><Textarea value={contact.successMessage} maxLength={10000} rows={3} onChange={(event) => setContact('successMessage', event.target.value)} /></Field>
         </div></Card>
-        <Card title="Bouton de messagerie" description="Affiché en bas de la boutique. Renseignez les canaux à proposer aux visiteurs."><div className="space-y-4">
-          <Toggle checked={contact.chatEnabled} onChange={(value) => setContact('chatEnabled', value)} label="Afficher le bouton de contact" />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Titre du menu de contact"><Input value={contact.chatTitle} required maxLength={180} onChange={(event) => setContact('chatTitle', event.target.value)} /></Field>
-            <Field label="Numéro WhatsApp" hint="Format international : +213…"><Input type="tel" value={contact.whatsappNumber} maxLength={40} onChange={(event) => setContact('whatsappNumber', event.target.value)} /></Field>
-            <Field label="Lien Viber" hint="Votre lien Viber (viber://… ou https://…)"><Input value={contact.viberUrl} maxLength={2048} onChange={(event) => setContact('viberUrl', event.target.value)} /></Field>
-          </div>
-          <Field label="Introduction du menu de contact"><Textarea value={contact.chatIntro} maxLength={10000} rows={3} onChange={(event) => setContact('chatIntro', event.target.value)} /></Field>
-        </div></Card>
+        <Card title="Bouton de messagerie" description="Les numéros WhatsApp, téléphone et Viber se règlent dans Paramètres → Messages.">
+          <Link href="/admin/settings?tab=messages" className="inline-flex items-center gap-2 text-sm font-semibold text-orange-700">Configurer les numéros<ArrowUpRight className="h-4 w-4" /></Link>
+        </Card>
         <Card title="Informations complémentaires"><Field label="Note de contact"><Textarea value={contact.note} maxLength={10000} rows={4} onChange={(event) => setContact('note', event.target.value)} /></Field></Card>
       </>}
     </fieldset>

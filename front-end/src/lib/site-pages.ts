@@ -13,6 +13,7 @@ export interface SitePages {
     nameLabel: string; emailFieldLabel: string; phoneFieldLabel: string; messageLabel: string;
     emailLabel: string; phoneLabel: string; addressLabel: string; hoursLabel: string;
     chatTitle: string; chatIntro: string; whatsappNumber: string; viberUrl: string;
+    chatPhoneNumber?: string; viberNumber?: string;
   };
 }
 
