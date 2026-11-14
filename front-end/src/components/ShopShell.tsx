@@ -8,6 +8,7 @@ import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import CategoryNav from '@/components/CategoryNav';
 import Footer from '@/components/Footer';
+import ContactWidget from '@/components/contact/ContactWidget';
 import type { Product } from '@/data/products';
 import { useCart } from '@/lib/shop/cart';
 import { useWishlist } from '@/lib/shop/wishlist';
@@ -31,6 +32,7 @@ export default function ShopShell({ children, announcement }: { children: React.
       <CategoryNav />
       <main className="flex-1">{children}</main>
       <Footer />
+      <ContactWidget />
       {cart.isOpen && <CartDrawer
         isOpen={cart.isOpen}
         onClose={() => cart.setOpen(false)}

@@ -38,3 +38,12 @@ test('invalid contact email, blank titles, and excessive values are rejected', (
   const values = content(); values.pages.about.values = Array(7).fill({ title: 'Valeur', text: '' });
   assert.equal(pageSettingsSchema.safeParse(values).success, false);
 });
+
+test('contact controls accept legacy content and reject unsafe messaging links', () => {
+  assert.equal(pageSettingsSchema.safeParse(content()).success, true);
+  const input = content();
+  input.pages.contact = { ...input.pages.contact, formEnabled: true, chatEnabled: true, whatsappNumber: '+213 555 11 22 33', viberUrl: 'viber://chat?number=%2B213555112233' };
+  assert.equal(pageSettingsSchema.safeParse(input).success, true);
+  input.pages.contact.viberUrl = 'javascript:alert(1)';
+  assert.equal(pageSettingsSchema.safeParse(input).success, false);
+});

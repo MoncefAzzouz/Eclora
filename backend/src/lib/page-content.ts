@@ -22,7 +22,19 @@ export const pagesSchema = z.object({
     values: z.array(z.object({ title, text })).min(1).max(6),
     closingTitle: title, closingText: text,
   }),
-  contact: z.object({ title, intro: text, image, hours: text, note: text }),
+  contact: z.object({
+    title, intro: text, image, hours: text, note: text,
+    formEnabled: z.boolean().optional(), chatEnabled: z.boolean().optional(),
+    formTitle: title.optional(), formIntro: text.optional(), submitLabel: title.optional(), successMessage: text.optional(),
+    nameLabel: title.optional(), emailFieldLabel: title.optional(), phoneFieldLabel: title.optional(), messageLabel: title.optional(),
+    emailLabel: title.optional(), phoneLabel: title.optional(), addressLabel: title.optional(), hoursLabel: title.optional(),
+    chatTitle: title.optional(), chatIntro: text.optional(),
+    whatsappNumber: z.string().trim().max(40).refine((value) => !value || /^\+?[1-9][\d\s().-]{6,38}$/.test(value), 'Utilisez le format international, par exemple +213…').optional(),
+    viberUrl: z.string().trim().max(2048).refine((value) => {
+      if (!value) return true;
+      try { return ['viber:', 'https:'].includes(new URL(value).protocol); } catch { return false; }
+    }, 'Lien Viber invalide (viber://… ou https://…)').optional(),
+  }),
 });
 
 export const pageSettingsSchema = z.object({

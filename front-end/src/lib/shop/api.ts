@@ -225,6 +225,8 @@ export interface HomePayload {
 export const shopApi = {
   home: () => request<HomePayload>('/shop/home'),
   settings: () => request<ShopSettings>('/shop/settings'),
+  contact: (body: { name: string; email: string; phone: string; message: string; website: string }) =>
+    request<{ ok: boolean }>('/shop/contact', { method: 'POST', body: JSON.stringify(body) }),
   categories: () => request<ApiCategory[]>('/shop/categories'),
   brands: (all = false) => request<ApiBrand[]>(`/shop/brands${all ? '?all=1' : ''}`),
   brand: (slug: string) => request<ApiBrand>(`/shop/brands/${encodeURIComponent(slug)}`),

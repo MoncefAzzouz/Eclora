@@ -290,6 +290,10 @@ const settings = {
   save: (value: StoreSettings) => request<StoreSettings>('/admin/settings', { method: 'PUT', body: value }),
   savePages: (value: { pages: import('@/lib/site-pages').SitePages; contactEmail: string; contactPhone: string; address: string }) =>
     request<StoreSettings>('/admin/settings/pages', { method: 'PUT', body: value }),
+  messages: (page = 1, filter: 'all' | 'unread' = 'all') =>
+    request<{ items: import('@/types/admin').ContactMessage[]; total: number; unread: number; page: number; pages: number }>(`/admin/settings/messages?page=${page}&filter=${filter}`),
+  markMessage: (id: string, isRead: boolean) => request<import('@/types/admin').ContactMessage>(`/admin/settings/messages/${encodeURIComponent(id)}`, { method: 'PATCH', body: { isRead } }),
+  removeMessage: (id: string) => request<void>(`/admin/settings/messages/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 };
 
 const team = {

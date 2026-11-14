@@ -7,7 +7,7 @@ import { api } from '@/lib/admin/api';
 import { useApi } from '@/lib/admin/useApi';
 import { resolvePages, type SitePages } from '@/lib/site-pages';
 import type { StoreSettings } from '@/types/admin';
-import { Button, Card, ErrorState, Field, IconButton, Input, LoadingState, Tabs, Textarea } from '@/components/admin/ui';
+import { Button, Card, ErrorState, Field, IconButton, Input, LoadingState, Tabs, Textarea, Toggle } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
 
 function PageImage({ label, value, onChange, onBusy }: { label: string; value: string; onChange: (url: string) => void; onBusy: (delta: number) => void }) {
@@ -126,6 +126,27 @@ function PageContentForm({ initial }: { initial: StoreSettings }) {
           <Field label="Téléphone"><Input value={values.contactPhone} maxLength={100} onChange={(event) => setValues((current) => ({ ...current, contactPhone: event.target.value }))} /></Field>
           <Field label="Adresse"><Textarea value={values.address} maxLength={2000} rows={3} onChange={(event) => setValues((current) => ({ ...current, address: event.target.value }))} /></Field>
           <Field label="Horaires" hint="Laissez vide pour masquer les horaires"><Textarea value={contact.hours} maxLength={10000} rows={3} onChange={(event) => setContact('hours', event.target.value)} placeholder="Dimanche – jeudi : 9h – 18h" /></Field>
+        </div></Card>
+        <Card title="Libellés des coordonnées"><div className="grid gap-4 sm:grid-cols-2">
+          {([['emailLabel', 'Libellé email'], ['phoneLabel', 'Libellé téléphone'], ['addressLabel', 'Libellé adresse'], ['hoursLabel', 'Libellé horaires']] as const).map(([key, label]) => <Field key={key} label={label}><Input value={contact[key]} required maxLength={180} onChange={(event) => setContact(key, event.target.value)} /></Field>)}
+        </div></Card>
+        <Card title="Formulaire de contact" description="Les demandes reçues sont disponibles dans Paramètres → Messages."><div className="space-y-4">
+          <Toggle checked={contact.formEnabled} onChange={(value) => setContact('formEnabled', value)} label="Afficher le formulaire" />
+          <Field label="Titre du formulaire"><Textarea value={contact.formTitle} required maxLength={180} rows={2} onChange={(event) => setContact('formTitle', event.target.value)} /></Field>
+          <Field label="Introduction du formulaire"><Textarea value={contact.formIntro} maxLength={10000} rows={3} onChange={(event) => setContact('formIntro', event.target.value)} /></Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {([['nameLabel', 'Libellé nom et prénom'], ['emailFieldLabel', 'Libellé champ email'], ['phoneFieldLabel', 'Libellé champ téléphone'], ['messageLabel', 'Libellé message'], ['submitLabel', 'Texte du bouton d’envoi']] as const).map(([key, label]) => <Field key={key} label={label}><Input value={contact[key]} required maxLength={180} onChange={(event) => setContact(key, event.target.value)} /></Field>)}
+          </div>
+          <Field label="Confirmation après envoi"><Textarea value={contact.successMessage} maxLength={10000} rows={3} onChange={(event) => setContact('successMessage', event.target.value)} /></Field>
+        </div></Card>
+        <Card title="Bouton de messagerie" description="Affiché en bas de la boutique. Renseignez les canaux à proposer aux visiteurs."><div className="space-y-4">
+          <Toggle checked={contact.chatEnabled} onChange={(value) => setContact('chatEnabled', value)} label="Afficher le bouton de contact" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Titre du menu de contact"><Input value={contact.chatTitle} required maxLength={180} onChange={(event) => setContact('chatTitle', event.target.value)} /></Field>
+            <Field label="Numéro WhatsApp" hint="Format international : +213…"><Input type="tel" value={contact.whatsappNumber} maxLength={40} onChange={(event) => setContact('whatsappNumber', event.target.value)} /></Field>
+            <Field label="Lien Viber" hint="Votre lien Viber (viber://… ou https://…)"><Input value={contact.viberUrl} maxLength={2048} onChange={(event) => setContact('viberUrl', event.target.value)} /></Field>
+          </div>
+          <Field label="Introduction du menu de contact"><Textarea value={contact.chatIntro} maxLength={10000} rows={3} onChange={(event) => setContact('chatIntro', event.target.value)} /></Field>
         </div></Card>
         <Card title="Informations complémentaires"><Field label="Note de contact"><Textarea value={contact.note} maxLength={10000} rows={4} onChange={(event) => setContact('note', event.target.value)} /></Field></Card>
       </>}

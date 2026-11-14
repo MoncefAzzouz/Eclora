@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
+import ContactWidget from '@/components/contact/ContactWidget';
 import CategoryNav from '@/components/CategoryNav';
 import HeroBanner from '@/components/HeroBanner';
 import PromoGrid from '@/components/PromoGrid';
@@ -88,6 +89,7 @@ export default function HomePage({ initialData }: { initialData: HomePayload | n
       </main>
 
       <Footer />
+      <ContactWidget />
 
       {cart.isOpen && <CartDrawer
         isOpen={cart.isOpen}

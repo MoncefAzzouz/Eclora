@@ -7,10 +7,12 @@ import { badRequest, forbidden, handler } from '../lib/http.js';
 import * as s from '../lib/serialize.js';
 import { MANAGERS, requireRole } from '../middleware/auth.js';
 import { pageSettingsSchema } from '../lib/page-content.js';
+import { contactInboxRouter } from './contact.js';
 
 // ─── Settings ───────────────────────────────────────────────────────────────
 
 export const settingsRouter = Router();
+settingsRouter.use('/messages', requireRole(...MANAGERS), contactInboxRouter);
 
 const settingsSchema = z.object({
   storeName: z.string().min(1),
@@ -54,10 +56,13 @@ settingsRouter.get(
 // cannot be overwritten by an older page editor tab.
 settingsRouter.put('/pages', requireRole(...MANAGERS), handler(async (req, res) => {
   const input = pageSettingsSchema.parse(req.body);
+  const previous = await prisma.storeSettings.findUnique({ where: { id: 1 }, select: { pages: true } });
+  const previousPages = previous?.pages as { contact?: Record<string, string | boolean> } | undefined;
+  const data = { ...input, pages: { ...input.pages, contact: { ...previousPages?.contact, ...input.pages.contact } } };
   const updated = await prisma.storeSettings.upsert({
     where: { id: 1 },
-    create: { id: 1, ...input },
-    update: input,
+    create: { id: 1, ...data },
+    update: data,
   });
   res.json(s.settings(updated));
 }));

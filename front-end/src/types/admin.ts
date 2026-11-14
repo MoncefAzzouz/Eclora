@@ -252,6 +252,10 @@ export interface StoreSettings {
   };
 }
 
+export interface ContactMessage {
+  id: string; name: string; email: string; phone: string; message: string; isRead: boolean; createdAt: string;
+}
+
 export interface DeliveryCommune {
   id: number;
   name: string;

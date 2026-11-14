@@ -58,10 +58,7 @@
 .editorial-page h1 { overflow-wrap: anywhere; }
 .editorial-page [data-reveal] { transition: opacity 800ms ease, transform 800ms cubic-bezier(.2,.7,.2,1); }
 .editorial-page .reveal-pending { opacity: 0; transform: translateY(28px); }
-.editorial-spark { animation: editorial-turn 24s linear infinite; }
-@keyframes editorial-turn { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
   .editorial-page [data-reveal] { transition: none; opacity: 1; transform: none; }
-  .editorial-spark { animation: none; }
   .editorial-button { transition: none; }
 }

@@ -18,6 +18,7 @@ import { uploadImagesRouter, uploadsRouter, UPLOAD_DIR } from './routes/uploads.
 import { accountRouter } from './routes/account.js';
 import { yalidineRouter } from './routes/yalidine.js';
 import { startAutoSync } from './lib/yalidine.js';
+import { publicContactRouter } from './routes/contact.js';
 
 const app = express();
 // nginx on the same host is the only proxy: trust it so req.ip is the visitor's
@@ -37,6 +38,7 @@ app.get('/api/health', (_req, res) => {
 
 // Public storefront API — browsing and guest checkout, no account needed.
 app.use('/api/shop/account', accountRouter);
+app.use('/api/shop/contact', publicContactRouter);
 app.use('/api/shop', shopRouter);
 
 // Admin API — everything below requires a valid admin token.

@@ -6,7 +6,14 @@ export interface SitePages {
     valuesTitle: string; values: { title: string; text: string }[];
     closingTitle: string; closingText: string;
   };
-  contact: { title: string; intro: string; image: string; hours: string; note: string };
+  contact: {
+    title: string; intro: string; image: string; hours: string; note: string;
+    formEnabled: boolean; chatEnabled: boolean;
+    formTitle: string; formIntro: string; submitLabel: string; successMessage: string;
+    nameLabel: string; emailFieldLabel: string; phoneFieldLabel: string; messageLabel: string;
+    emailLabel: string; phoneLabel: string; addressLabel: string; hoursLabel: string;
+    chatTitle: string; chatIntro: string; whatsappNumber: string; viberUrl: string;
+  };
 }
 
 export type PageContent = { [K in keyof SitePages]?: Partial<SitePages[K]> };
@@ -35,6 +42,13 @@ export const DEFAULT_PAGES: SitePages = {
     intro: 'Un conseil, une question sur un produit ou votre commande ? Nous sommes à votre écoute.',
     image: '/images/eclora-contact-campaign-v1.webp', hours: '',
     note: 'Pour une question concernant une commande, pensez à nous communiquer votre numéro de commande afin de faciliter nos échanges.',
+    formEnabled: true, chatEnabled: true,
+    formTitle: 'Un message,\net on en parle.',
+    formIntro: 'Laissez-nous vos coordonnées et votre question. Notre équipe vous recontactera.',
+    submitLabel: 'Envoyer mon message', successMessage: 'Merci ! Votre message a bien été reçu. Notre équipe vous recontactera avec les coordonnées indiquées.',
+    nameLabel: 'Nom et prénom', emailFieldLabel: 'Adresse email', phoneFieldLabel: 'Téléphone', messageLabel: 'Votre message',
+    emailLabel: 'Écrivez-nous', phoneLabel: 'Appelez-nous', addressLabel: 'Notre adresse', hoursLabel: 'Nos horaires',
+    chatTitle: 'Parlons ensemble', chatIntro: 'Choisissez le moyen qui vous convient.', whatsappNumber: '', viberUrl: '',
   },
 };
 

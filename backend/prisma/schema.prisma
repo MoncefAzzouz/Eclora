@@ -335,6 +335,18 @@ model StoreSettings {
   updatedAt             DateTime @updatedAt @default(now())
 }
 
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+}
+
 model AdminUser {
   id           String    @id @default(cuid())
   name         String

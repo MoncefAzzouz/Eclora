@@ -64,6 +64,23 @@ the original generated PNGs and final prompts are in `output/imagegen/`.
 The About and Contact pages use white, neutral grey, black and Eclora orange.
 Images can still be replaced from the page editor at any time.
 
+The Contact page includes a real message form. Requests are saved privately in
+PostgreSQL and managed under **Paramètres → Messages** (read/unread, email reply
+link, delete and pagination). They are not automatically sent by email. The
+public endpoint `/api/shop/contact` validates fields, uses a honeypot and limits
+submissions per IP. The inbox requires a manager account.
+
+Configure the form headings, labels, confirmation, visibility and floating
+message menu in **Paramètres → Pages du site → Contact**. WhatsApp takes an
+international phone number; Viber takes a `viber://` or HTTPS link. Empty channels
+are omitted. The website header typography matches the category navigation.
+
+Apply `backend/prisma/migrations/20261114220000_contact_messages/migration.sql`
+and regenerate Prisma before deploying the contact API. This only adds the
+message table and its index; existing page content and catalogue data remain.
+Channel links follow [WhatsApp click-to-chat](https://faq.whatsapp.com/5913398998672934)
+and [Viber deep links](https://developers.viber.com/tools/deep-links/index.html).
+
 ## Ordering without an account
 
 Product variants are shown as **Référence** in the admin and storefront. Each

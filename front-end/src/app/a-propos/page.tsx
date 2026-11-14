@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowDown, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import ShopShell from '@/components/ShopShell';
 import StoreImage from '@/components/StoreImage';
 import ScrollReveal from '@/components/content/ScrollReveal';
@@ -27,7 +27,6 @@ export default async function AboutPage() {
           <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-neutral-100">
             <StoreImage src={about.heroImage} alt="Campagne beauté Eclora et soins capillaires Gracias" fill priority sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
           </div>
-          <span aria-hidden="true" className="absolute -left-5 bottom-8 flex h-24 w-24 items-center justify-center rounded-full bg-[#f05b2a] text-white shadow-lg sm:-left-9 sm:h-28 sm:w-28"><Sparkles className="editorial-spark h-12 w-12 stroke-[1]" /></span>
           <p className="mt-4 text-right text-[10px] uppercase tracking-[0.25em] text-neutral-500">Des essentiels. Des envies. Vous.</p>
         </div>
       </div>
@@ -55,7 +54,6 @@ export default async function AboutPage() {
         <div data-reveal>
           <h2 className="editorial-heading max-w-3xl">{about.missionTitle}</h2>
           <p className="mt-8 max-w-2xl whitespace-pre-line text-base leading-8 text-neutral-300 sm:text-lg">{about.missionText}</p>
-          <Sparkles aria-hidden="true" className="mt-10 h-9 w-9 stroke-[1] text-[#f05b2a]" />
         </div>
       </div>
     </section>
