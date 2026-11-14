@@ -45,6 +45,19 @@ user `eclora`, password `eclora`.
 
 ## Ordering without an account
 
+Product variants are shown as **Référence** in the admin and storefront. Each
+reference has its own name, stock, and optional image gallery uploaded through
+the existing R2 upload endpoint. Choosing a reference switches the product gallery
+and preserves its first image and name in the cart and order. References without
+images use the general product gallery. Existing color values remain compatible
+internally but are no longer displayed or required in the editor.
+
+For an existing database created with `prisma db push`, apply the additive
+`backend/prisma/migrations/20261114170000_reference_images/migration.sql` using
+`prisma db execute --file ... --schema prisma/schema.prisma`, then regenerate the
+Prisma client and rebuild the API. Do not reset or seed a live database. Run
+`npm test` in `backend` for reference selection and checkout image checks.
+
 Customers order as guests: cart → `/commande` (name, phone, wilaya, commune, address, delivery
 type, payment) → confirmation with an order number → `/suivi` to track it using the number plus
 the phone number. A `Client` record is created or reused, matched on phone, and flagged

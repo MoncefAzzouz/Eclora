@@ -41,7 +41,7 @@ export function product(p: ProductWithRelations) {
     lowStockThreshold: p.lowStockThreshold,
     volume: opt(p.volume),
     images: p.images,
-    shades: p.shades.map((s) => ({ id: s.id, name: s.name, hex: s.hex, stock: s.stock })),
+    shades: p.shades.map((s) => ({ id: s.id, name: s.name, hex: s.hex, stock: s.stock, images: s.images })),
     badge: opt(p.badge),
     badgeType: opt(p.badgeType),
     tags: p.tags,

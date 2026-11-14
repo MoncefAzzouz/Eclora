@@ -2,6 +2,7 @@
 // order as a guest. Prices, shipping and discounts are always recomputed here —
 // whatever the browser sends is treated as a request, not as fact.
 import { Router } from 'express';
+import { resolveProductReference } from '../lib/product-reference.js';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import type { PromoCode } from '@prisma/client';
@@ -439,15 +440,18 @@ shopRouter.post(
     const lines = input.items.map((item) => {
       const product = products.find((p) => p.id === item.productId);
       if (!product) throw badRequest('Un produit de votre panier n’est plus disponible');
-      if (product.stock < item.quantity) {
+      const productQuantity = input.items.filter((line) => line.productId === item.productId).reduce((sum, line) => sum + line.quantity, 0);
+      const referenceQuantity = input.items.filter((line) => line.productId === item.productId && line.shade === item.shade).reduce((sum, line) => sum + line.quantity, 0);
+      if (product.stock < productQuantity) {
         throw badRequest(`Stock insuffisant pour « ${product.name} » (${product.stock} restant)`);
       }
+      const selection = resolveProductReference(product, item.shade, referenceQuantity);
       return {
         productId: product.id,
         name: product.name,
         brand: product.brand.name,
-        image: product.images[0] ?? '',
-        shade: item.shade ?? null,
+        image: selection.image,
+        shade: selection.shade,
         unitPrice: product.price,
         quantity: item.quantity,
       };

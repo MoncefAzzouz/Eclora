@@ -74,7 +74,7 @@ export interface ApiProduct {
   stock: number;
   volume?: string;
   images: string[];
-  shades: { id: string; name: string; hex: string; stock: number }[];
+  shades: { id: string; name: string; hex?: string; stock: number; images?: string[] }[];
   badge?: string;
   badgeType?: 'BLACK' | 'PINK' | 'RED' | 'GOLD';
   tags: string[];
@@ -160,6 +160,8 @@ export function toProduct(p: ApiProduct): Product {
     id: s.id,
     name: s.name,
     hex: s.hex,
+    images: s.images ?? [],
+    stock: s.stock,
     volume: p.volume ?? '',
   }));
 
@@ -178,7 +180,7 @@ export function toProduct(p: ApiProduct): Product {
     image: p.images[0] ?? '',
     images: p.images,
     shades: shades.length ? shades : undefined,
-    shadeInfo: shades.length ? `${shades.length} teintes` : undefined,
+    shadeInfo: shades.length ? `${shades.length} référence${shades.length > 1 ? 's' : ''}` : undefined,
     category: toCategory(p.categorySlug),
     subcategory: p.subcategoryName,
     slug: p.slug,

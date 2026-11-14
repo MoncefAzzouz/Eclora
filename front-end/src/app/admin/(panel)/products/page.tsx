@@ -110,7 +110,7 @@ export default function ProductsPage() {
     <div className="animate-fade-in">
       <PageHeader
         title="Produits"
-        description={`${data.products.length} produits au catalogue. Gérez les prix, le stock, les teintes et la visibilité en boutique.`}
+        description={`${data.products.length} produits au catalogue. Gérez les prix, le stock, les références et la visibilité en boutique.`}
         actions={
           <ButtonLink href="/admin/products/new" icon={Plus}>Nouveau produit</ButtonLink>
         }
@@ -189,7 +189,7 @@ export default function ProductsPage() {
                       <span className="min-w-0">
                         <span className="block text-[10px] font-black uppercase text-slate-500">{brandName(p.brandId)}</span>
                         <span className="block font-bold text-slate-900 group-hover:underline line-clamp-1">{p.name}</span>
-                        <span className="block text-[10px] text-slate-400">{p.sku}{p.shades.length > 0 && ` · ${p.shades.length} teintes`}</span>
+                        <span className="block text-[10px] text-slate-400">{p.sku}{p.shades.length > 0 && ` · ${p.shades.length} références`}</span>
                       </span>
                     </Link>
                   </Td>

@@ -7,7 +7,6 @@ import {
   Heart,
   ShoppingBag,
   ChevronDown,
-  ChevronRight,
   Truck,
   MapPin,
   Check,
@@ -16,6 +15,7 @@ import { Product } from '@/data/products';
 import { STOCK_TONE, stockLabel } from '@/components/ProductCard';
 import ProductCarousel from '@/components/ProductCarousel';
 import ProductReviews from '@/components/ProductReviews';
+import StoreImage from '@/components/StoreImage';
 
 interface ProductDetailPageProps {
   product: Product;
@@ -35,16 +35,15 @@ export default function ProductDetailPage({
 }: ProductDetailPageProps) {
   const isWishlisted = wishlist.includes(product.id);
 
-  // Gallery state
-  const galleryImages = product.images && product.images.length > 0 ? product.images : [product.image];
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
-  // Shade state
-  // Real shades only; most care products have none.
   const shades = product.shades ?? [];
   const hasShades = shades.length > 0;
-  const [selectedShade, setSelectedShade] = useState(shades[0] ?? { id: '', name: '', hex: '#fff', volume: '' });
-  const stock = stockLabel(product.stock);
+  const [selectedReferenceId, setSelectedReferenceId] = useState((shades.find((s) => s.stock === undefined || s.stock > 0) ?? shades[0])?.id);
+  const selectedReference = shades.find((s) => s.id === selectedReferenceId) ?? shades[0];
+  const generalGallery = product.images?.length ? product.images : [product.image];
+  const galleryImages = selectedReference?.images?.length ? selectedReference.images : generalGallery;
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const selectedStock = hasShades ? selectedReference?.stock ?? product.stock : product.stock;
+  const stock = stockLabel(selectedStock);
   const soldOut = stock.tone === 'out';
 
   // Accordion open states
@@ -64,9 +63,15 @@ export default function ProductDetailPage({
 
   const handleAddToCartClick = () => {
     if (soldOut) return;
-    onAddToCart(product, hasShades ? selectedShade.name : undefined);
+    onAddToCart(hasShades ? { ...product, image: galleryImages[0] ?? product.image, images: galleryImages, stock: selectedStock } : product, selectedReference?.name);
     setAddedSuccess(true);
     setTimeout(() => setAddedSuccess(false), 2000);
+  };
+
+  const selectReference = (id: string) => {
+    setSelectedReferenceId(id);
+    setSelectedImageIndex(0);
+    setAddedSuccess(false);
   };
 
   return (
@@ -106,6 +111,7 @@ export default function ProductDetailPage({
               {galleryImages.map((img, idx) => (
                 <button
                   key={idx}
+                  aria-label={`Afficher l’image ${idx + 1}`}
                   onClick={() => setSelectedImageIndex(idx)}
                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
                     selectedImageIndex === idx
@@ -129,8 +135,9 @@ export default function ProductDetailPage({
               )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={galleryImages[selectedImageIndex]}
-                alt={product.title}
+                src={galleryImages[selectedImageIndex] ?? galleryImages[0]}
+                alt={`${product.title}${selectedReference ? ` — Référence ${selectedReference.name}` : ''}`}
+                data-testid="product-main-image"
                 className="max-h-[480px] w-auto object-contain transition-all duration-300"
               />
             </div>
@@ -193,47 +200,21 @@ export default function ProductDetailPage({
                 Paiement en espèces à la livraison, partout en Algérie.
               </p>
 
-              {/* Shade Selector Section */}
               {hasShades && (
-              <div className="mt-8">
-                <label className="text-xs font-extrabold text-black block mb-3">
-                  Ce produit existe en plusieurs teintes :
-                </label>
-
-                {/* Dropdown Display Button */}
-                <div className="w-full bg-white border border-gray-300 rounded-xl p-3.5 flex items-center justify-between shadow-2xs mb-4">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="w-5 h-5 rounded-full border border-gray-300 shadow-2xs"
-                      style={{ backgroundColor: selectedShade.hex }}
-                    />
-                    <span className="text-xs font-bold text-black">{selectedShade.name}</span>
+                <fieldset className="mt-8">
+                  <legend className="mb-3 text-xs font-extrabold text-black">Référence : {selectedReference?.name}</legend>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {shades.map((reference) => (
+                      <button type="button" key={reference.id} onClick={() => selectReference(reference.id)}
+                        aria-pressed={selectedReference?.id === reference.id}
+                        className={`flex min-w-0 items-center gap-3 rounded-xl border-2 p-2.5 text-left transition-colors ${selectedReference?.id === reference.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-400'}`}>
+                        {reference.images?.[0] && <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white"><StoreImage src={reference.images[0]} alt="" fill sizes="48px" className="object-contain" /></span>}
+                        <span className="min-w-0 flex-1 break-words text-xs font-bold">{reference.name}{reference.stock === 0 && <span className="mt-1 block text-[10px] font-medium text-red-600">Rupture de stock</span>}</span>
+                        {selectedReference?.id === reference.id && <Check aria-hidden="true" className="h-4 w-4 shrink-0" />}
+                      </button>
+                    ))}
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                </div>
-
-                {/* Color Swatch Circles Palette */}
-                <div className="flex flex-wrap gap-2.5">
-                  {shades.map((shade) => (
-                    <button
-                      key={shade.id}
-                      onClick={() => setSelectedShade(shade)}
-                      title={shade.name}
-                      className={`w-7 h-7 rounded-full transition-all relative flex items-center justify-center ${
-                        selectedShade.id === shade.id
-                          ? 'ring-2 ring-black ring-offset-2 scale-110'
-                          : 'hover:scale-105 border border-gray-300'
-                      }`}
-                      style={{ backgroundColor: shade.hex }}
-                    >
-                      {selectedShade.id === shade.id && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-black/40" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
+                </fieldset>
               )}
 
               {/* Add to Cart & Wishlist Buttons */}
@@ -436,12 +417,7 @@ export default function ProductDetailPage({
             {/* Shade dropdown selector in sticky bar */}
             {hasShades && (
             <div className="hidden md:flex items-center gap-2 border border-gray-300 rounded-xl px-3 py-2 bg-white">
-              <span
-                className="w-3.5 h-3.5 rounded-full border border-gray-300"
-                style={{ backgroundColor: selectedShade.hex }}
-              />
-              <span className="text-xs font-bold text-black">{selectedShade.name}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+              <span className="text-xs font-bold text-black">Référence : {selectedReference?.name}</span>
             </div>
             )}
 

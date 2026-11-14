@@ -61,8 +61,20 @@ ordersRouter.patch(
       if (delta !== 0) {
         for (const item of order.items) {
           if (!item.productId) continue;
-          const product = await tx.product.findUnique({ where: { id: item.productId } });
+          const product = await tx.product.findUnique({ where: { id: item.productId }, include: { shades: true } });
           if (!product) continue;
+          const reference = product.shades.find((entry) => entry.name === item.shade);
+          if (reference) {
+            if (delta < 0) {
+              const reserved = await tx.shade.updateMany({ where: { id: reference.id, stock: { gte: item.quantity } }, data: { stock: { decrement: item.quantity } } });
+              if (!reserved.count) throw badRequest(`Stock insuffisant pour la référence « ${reference.name} »`);
+            } else {
+              await tx.shade.update({ where: { id: reference.id }, data: { stock: { increment: item.quantity } } });
+            }
+            const total = await tx.shade.aggregate({ where: { productId: product.id }, _sum: { stock: true } });
+            await tx.product.update({ where: { id: product.id }, data: { stock: total._sum.stock ?? 0 } });
+            continue;
+          }
           await tx.product.update({
             where: { id: item.productId },
             data: { stock: Math.max(0, product.stock + delta * item.quantity) },

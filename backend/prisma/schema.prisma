@@ -98,7 +98,8 @@ model Product {
 model Shade {
   id        String  @id @default(cuid())
   name      String
-  hex       String
+  hex       String  @default("#ffffff")
+  images    String[] @default([])
   stock     Int     @default(0)
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)

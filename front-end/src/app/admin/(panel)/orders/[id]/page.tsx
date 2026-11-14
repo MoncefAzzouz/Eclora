@@ -127,7 +127,7 @@ export default function OrderDetailPage() {
                     <Link href={`/admin/products/${it.productId}`} className="font-bold text-slate-900 hover:underline line-clamp-1">
                       {it.name}
                     </Link>
-                    {it.shade && <div className="text-[11px] text-slate-500">Teinte : {it.shade}</div>}
+                    {it.shade && <div className="text-[11px] text-slate-500">Référence : {it.shade}</div>}
                   </div>
                   <div className="text-right tabular-nums">
                     <div className="text-slate-500">

@@ -1,7 +1,9 @@
 export interface Shade {
   id: string;
   name: string;
-  hex: string;
+  hex?: string;
+  images?: string[];
+  stock?: number;
   volume: string;
 }
 
@@ -91,7 +93,7 @@ export const HUDA_EASY_BAKE_PRODUCT: Product = {
   reviewsCount: 12805,
   badge: 'Nouveauté',
   badgeType: 'black',
-  shadeInfo: 'Ce produit existe en plusieurs teintes',
+  shadeInfo: 'Ce produit existe en plusieurs références',
   category: 'maquillage',
   subcategory: 'Teint',
   isBestSeller: true,
@@ -186,7 +188,7 @@ export const SHOP_PRODUCTS: Product[] = [
     rating: 5,
     reviewsCount: 1328,
     badge: 'Nouveauté',
-    shadeInfo: 'Existe en 2 teintes',
+    shadeInfo: 'Existe en 2 références',
     category: 'maquillage',
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80',
   },
@@ -201,7 +203,7 @@ export const SHOP_PRODUCTS: Product[] = [
     rating: 5,
     reviewsCount: 230,
     badge: 'Nouveauté',
-    shadeInfo: 'Existe en 5 teintes',
+    shadeInfo: 'Existe en 5 références',
     category: 'maquillage',
     image: 'https://images.unsplash.com/photo-1608248597349-4c6328318182?auto=format&fit=crop&w=600&q=80',
   },
@@ -216,7 +218,7 @@ export const SHOP_PRODUCTS: Product[] = [
     rating: 5,
     reviewsCount: 44,
     badge: 'Nouveauté',
-    shadeInfo: 'Existe en 6 teintes',
+    shadeInfo: 'Existe en 6 références',
     category: 'maquillage',
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
   },
@@ -231,7 +233,7 @@ export const SHOP_PRODUCTS: Product[] = [
     rating: 5,
     reviewsCount: 59,
     badge: 'Nouveauté',
-    shadeInfo: 'Existe en 5 teintes',
+    shadeInfo: 'Existe en 5 références',
     category: 'maquillage',
     image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80',
   },
@@ -246,7 +248,7 @@ export const SHOP_PRODUCTS: Product[] = [
     rating: 5,
     reviewsCount: 20,
     badge: 'Nouveauté',
-    shadeInfo: 'Existe en 3 teintes',
+    shadeInfo: 'Existe en 3 références',
     category: 'maquillage',
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=80',
   },

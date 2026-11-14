@@ -9,8 +9,10 @@ export const productsRouter = Router();
 
 const shadeSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, 'Nom de teinte requis'),
-  hex: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Couleur invalide'),
+  name: z.string().trim().min(1, 'Référence requise'),
+  // Retain the old field so existing clients/data remain compatible.
+  hex: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#ffffff'),
+  images: z.array(z.string().refine((v) => /^https?:\/\//.test(v) || v.startsWith('/'), 'URL d’image invalide')).default([]),
   stock: z.number().int().min(0).default(0),
 });
 
@@ -47,6 +49,8 @@ const slugify = (v: string) =>
   v.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 function validateBusinessRules(input: z.infer<typeof productSchema>) {
+  const names = input.shades.map((reference) => reference.name.toLocaleLowerCase('fr'));
+  if (new Set(names).size !== names.length) throw badRequest('Chaque référence doit avoir un nom différent');
   if (input.compareAtPrice && input.compareAtPrice <= input.price) {
     throw badRequest('Le prix barré doit être supérieur au prix de vente');
   }
@@ -98,7 +102,7 @@ productsRouter.post(
         ingredients: input.ingredients || null,
         // With shades, total stock is the sum of shade stock.
         stock: input.shades.length ? input.shades.reduce((t, sh) => t + sh.stock, 0) : input.stock,
-        shades: { create: input.shades.map(({ name, hex, stock }) => ({ name, hex, stock })) },
+        shades: { create: input.shades.map(({ name, hex, stock, images }) => ({ name, hex, stock, images })) },
       },
       include: { shades: true },
     });
@@ -130,7 +134,7 @@ productsRouter.put(
           usageTips: input.usageTips || null,
           ingredients: input.ingredients || null,
           stock: input.shades.length ? input.shades.reduce((t, sh) => t + sh.stock, 0) : input.stock,
-          shades: { create: input.shades.map(({ name, hex, stock }) => ({ name, hex, stock })) },
+          shades: { create: input.shades.map(({ name, hex, stock, images }) => ({ name, hex, stock, images })) },
         },
         include: { shades: true },
       });

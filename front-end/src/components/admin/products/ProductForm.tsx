@@ -11,6 +11,7 @@ import { PRODUCT_STATUS } from '@/lib/admin/constants';
 import type { BadgeType, Brand, Category, Product, ProductInput, ProductStatus, Shade } from '@/types/admin';
 import { Button, ButtonLink, Card, Field, IconButton, Input, Select, Textarea, Thumb, Toggle } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
+import ReferenceEditor from './ReferenceEditor';
 
 const EMPTY: ProductInput = {
   slug: '',
@@ -37,7 +38,7 @@ const EMPTY: ProductInput = {
   ingredients: '',
 };
 
-type Errors = Partial<Record<'name' | 'brandId' | 'categoryId' | 'sku' | 'price' | 'compareAtPrice' | 'images', string>>;
+type Errors = Partial<Record<'name' | 'brandId' | 'categoryId' | 'sku' | 'price' | 'compareAtPrice' | 'images' | 'references', string>>;
 
 function validate(v: ProductInput): Errors {
   const e: Errors = {};
@@ -48,6 +49,9 @@ function validate(v: ProductInput): Errors {
   if (!v.price || v.price <= 0) e.price = 'Le prix doit être supérieur à 0';
   if (v.compareAtPrice && v.compareAtPrice <= v.price) e.compareAtPrice = 'Doit être supérieur au prix de vente';
   if (v.status === 'ACTIVE' && v.images.length === 0) e.images = 'Ajoutez au moins une image pour mettre en ligne';
+  if (v.shades.some((s) => !s.name.trim())) e.references = 'Donnez un nom à chaque référence';
+  const names = v.shades.map((s) => s.name.trim().toLocaleLowerCase('fr'));
+  if (new Set(names).size !== names.length) e.references = 'Chaque référence doit avoir un nom différent';
   return e;
 }
 
@@ -72,6 +76,7 @@ export default function ProductForm({
   const [tagInput, setTagInput] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingReferences, setUploadingReferences] = useState(0);
   const [saving, setSaving] = useState(false);
 
   const set = <K extends keyof ProductInput>(key: K, value: ProductInput[K]) => setValues((v) => ({ ...v, [key]: value }));
@@ -110,7 +115,7 @@ export default function ProductForm({
   };
 
   const updateShade = (id: string, patch: Partial<Shade>) =>
-    set('shades', values.shades.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+    setValues((v) => ({ ...v, shades: v.shades.map((s) => (s.id === id ? { ...s, ...patch } : s)) }));
 
   const addTag = () => {
     const t = tagInput.trim();
@@ -120,6 +125,7 @@ export default function ProductForm({
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploading || uploadingReferences > 0) return toast.error('Attendez la fin de l’import des images');
     const payload: ProductInput = {
       ...values,
       slug: values.slug || slugify(values.name),
@@ -158,7 +164,7 @@ export default function ProductForm({
         </div>
         <div className="flex gap-2">
           <ButtonLink href="/admin/products" variant="secondary">Annuler</ButtonLink>
-          <Button type="submit" loading={saving}>{product ? 'Enregistrer' : 'Créer le produit'}</Button>
+          <Button type="submit" loading={saving} disabled={uploading || uploadingReferences > 0}>{product ? 'Enregistrer' : 'Créer le produit'}</Button>
         </div>
       </div>
 
@@ -257,27 +263,26 @@ export default function ProductForm({
           </Card>
 
           <Card
-            title="Teintes / variantes"
-            description="Laissez vide si le produit n’a pas de teintes. Le stock total devient la somme des teintes."
+            title="Référence"
+            description="Ajoutez les références du produit et leurs images. Le stock total est la somme des stocks des références. Laissez vide si le produit n’a pas de références."
             actions={
               <Button type="button" size="sm" variant="secondary" icon={Plus}
-                onClick={() => set('shades', [...values.shades, { id: uid('sh'), name: '', hex: '#d8b4a0', stock: 0 }])}>
-                Teinte
+                onClick={() => setValues((v) => ({ ...v, shades: [...v.shades, { id: uid('sh'), name: '', images: [], stock: 0 }] }))}>
+                Ajouter une référence
               </Button>
             }
           >
+            {errors.references && <p role="alert" className="mb-3 text-xs font-semibold text-red-600">{errors.references}</p>}
             {values.shades.length === 0 ? (
-              <p className="text-xs text-slate-500">Aucune teinte.</p>
+              <p className="text-xs text-slate-500">Aucune référence.</p>
             ) : (
               <ul className="space-y-2">
-                {values.shades.map((sh) => (
-                  <li key={sh.id} className="flex items-center gap-2">
-                    <input type="color" value={sh.hex} onChange={(e) => updateShade(sh.id, { hex: e.target.value })}
-                      className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer bg-white p-1" aria-label="Couleur" />
-                    <Input value={sh.name} onChange={(e) => updateShade(sh.id, { name: e.target.value })} placeholder="Nom de la teinte" />
-                    <Input type="number" min={0} value={sh.stock} onChange={(e) => updateShade(sh.id, { stock: Math.max(0, Number(e.target.value)) })}
-                      className="!w-24" aria-label="Stock" />
-                    <IconButton type="button" label="Retirer" icon={Trash2} tone="danger" onClick={() => set('shades', values.shades.filter((s) => s.id !== sh.id))} />
+                {values.shades.map((sh, index) => (
+                  <li key={sh.id}>
+                    <ReferenceEditor reference={sh} index={index} onChange={(patch) => updateShade(sh.id, patch)}
+                      onAddImage={(url) => setValues((v) => ({ ...v, shades: v.shades.map((s) => s.id === sh.id ? { ...s, images: [...(s.images ?? []), url] } : s) }))}
+                      onRemove={() => setValues((v) => ({ ...v, shades: v.shades.filter((s) => s.id !== sh.id) }))}
+                      onUploading={(delta) => setUploadingReferences((count) => count + delta)} />
                   </li>
                 ))}
               </ul>
@@ -313,7 +318,7 @@ export default function ProductForm({
               <Field label="SKU *" error={errors.sku}>
                 <Input value={values.sku} onChange={(e) => set('sku', e.target.value.toUpperCase())} />
               </Field>
-              <Field label="Quantité en stock" hint={values.shades.length ? 'Calculé à partir des teintes' : undefined}>
+              <Field label="Quantité en stock" hint={values.shades.length ? 'Calculé à partir des références' : undefined}>
                 <Input type="number" min={0} value={values.shades.length ? shadesStock : values.stock}
                   disabled={values.shades.length > 0} onChange={(e) => set('stock', Math.max(0, Number(e.target.value)))} />
               </Field>

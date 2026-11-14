@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { X, Star, Heart, ShoppingBag, Check } from 'lucide-react';
 import { Product } from '@/data/products';
 
@@ -21,11 +22,13 @@ export default function QuickViewModal({
   isWishlisted,
   onToggleWishlist,
 }: QuickViewModalProps) {
+  const router = useRouter();
   const [addedSuccess, setAddedSuccess] = useState(false);
 
   if (!isOpen || !product) return null;
 
   const handleAdd = () => {
+    if (product.shades?.length) { onClose(); router.push(`/product/${product.slug ?? product.id}`); return; }
     onAddToCart(product);
     setAddedSuccess(true);
     setTimeout(() => setAddedSuccess(false), 2000);
@@ -126,7 +129,7 @@ export default function QuickViewModal({
                 ) : (
                   <>
                     <ShoppingBag className="w-4 h-4" />
-                    <span>Ajouter au panier</span>
+                    <span>{product.shades?.length ? 'Choisir une référence' : 'Ajouter au panier'}</span>
                   </>
                 )}
               </button>

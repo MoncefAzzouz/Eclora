@@ -489,7 +489,7 @@ export default function CheckoutPage() {
                     <p className="text-[10px] font-black uppercase text-gray-500">{line.product.brand}</p>
                     <p className="line-clamp-2 font-bold">{line.product.title}</p>
                     {line.product.volume && <p className="text-gray-500">{line.product.volume}</p>}
-                    {line.shade && <p className="text-gray-500">Teinte : {line.shade}</p>}
+                    {line.shade && <p className="text-gray-500">Référence : {line.shade}</p>}
                     <p className="text-gray-500">Quantité : {line.quantity}</p>
                   </div>
                   <span className="whitespace-nowrap text-xs font-black">{formatDA(priceToNumber(line.product.price) * line.quantity)}</span>

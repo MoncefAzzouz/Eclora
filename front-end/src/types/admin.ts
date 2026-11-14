@@ -12,7 +12,8 @@ export type BadgeType = 'BLACK' | 'PINK' | 'RED' | 'GOLD';
 export interface Shade {
   id: ID;
   name: string;
-  hex: string;
+  hex?: string;
+  images?: string[];
   stock: number;
 }
 

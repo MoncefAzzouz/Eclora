@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import StoreImage from '@/components/StoreImage';
 import { Check, Heart, Star } from 'lucide-react';
 import type { Product } from '@/data/products';
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export default function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart }: Props) {
+  const router = useRouter();
   const [added, setAdded] = useState(false);
   const href = `/product/${product.slug ?? product.id}`;
   const stock = stockLabel(product.stock);
@@ -35,6 +37,7 @@ export default function ProductCard({ product, isWishlisted, onToggleWishlist, o
   const badge = product.badge ?? (product.isNew ? 'Nouveauté' : product.isBestSeller ? 'Best-seller' : null);
 
   const add = () => {
+    if (product.shades?.length) { router.push(href); return; }
     onAddToCart(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
@@ -112,7 +115,7 @@ export default function ProductCard({ product, isWishlisted, onToggleWishlist, o
             : 'border-black bg-white text-black hover:bg-black hover:text-white'
         }`}
       >
-        {soldOut ? 'Indisponible' : added ? (<><Check className="h-4 w-4" /> Ajouté</>) : 'Ajouter au panier'}
+        {soldOut ? 'Indisponible' : product.shades?.length ? 'Choisir une référence' : added ? (<><Check className="h-4 w-4" /> Ajouté</>) : 'Ajouter au panier'}
       </button>
     </div>
   );
