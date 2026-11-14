@@ -15,10 +15,10 @@ export const DEFAULT_PAGES: SitePages = {
   about: {
     title: 'La beauté,\nà votre façon.',
     intro: 'Des découvertes, des essentiels et ce petit plaisir de prendre soin de soi. Bienvenue dans l’univers Eclora.',
-    heroImage: '/images/about-beauty.jpg',
+    heroImage: '/images/eclora-about-campaign-v1.webp',
     storyTitle: 'Un univers beauté.\nLe vôtre.',
     storyText: 'Eclora réunit les soins, le maquillage et les essentiels qui accompagnent vos envies de beauté.\n\nNotre idée est simple : vous aider à composer une routine qui vous ressemble, à votre rythme, avec des produits à découvrir et à aimer au quotidien.',
-    storyImage: '/images/about-ritual.jpg',
+    storyImage: '/images/eclora-about-products-v1.webp',
     missionTitle: 'Faire de chaque jour\nun moment pour vous.',
     missionText: 'Un soin que l’on aime appliquer. Une couleur que l’on ose enfin. Un nouveau rituel, juste pour soi. Nous croyons aux petits gestes qui font du bien et à une beauté qui laisse à chacun la liberté d’être soi.',
     valuesTitle: 'Ce qui nous anime.',
@@ -33,7 +33,7 @@ export const DEFAULT_PAGES: SitePages = {
   contact: {
     title: 'Parlons beauté.\nEt de vous.',
     intro: 'Un conseil, une question sur un produit ou votre commande ? Nous sommes à votre écoute.',
-    image: '/images/about-ritual.jpg', hours: '',
+    image: '/images/eclora-contact-campaign-v1.webp', hours: '',
     note: 'Pour une question concernant une commande, pensez à nous communiquer votre numéro de commande afin de faciliter nos échanges.',
   },
 };

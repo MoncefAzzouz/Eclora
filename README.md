@@ -58,10 +58,11 @@ with `prisma db execute --file ... --schema prisma/schema.prisma` on an existing
 database, then regenerate Prisma and rebuild both services. This adds only the
 JSON page-content column and preserves the current settings and catalogue.
 
-Default editorial imagery: [serum](https://images.unsplash.com/photo-1608571423902-eed4a5ad8108)
-and [skincare ritual](https://images.unsplash.com/photo-1570172619644-dfd03ed5d881)
-from Unsplash, stored locally and resized by Next Image. Replace them from the
-page editor with your own photography at any time.
+Default campaign imagery uses the supplied Eclora/Gracias campaign and product
+photos as references. Optimized WebP files live in `front-end/public/images/`;
+the original generated PNGs and final prompts are in `output/imagegen/`.
+The About and Contact pages use white, neutral grey, black and Eclora orange.
+Images can still be replaced from the page editor at any time.
 
 ## Ordering without an account
 

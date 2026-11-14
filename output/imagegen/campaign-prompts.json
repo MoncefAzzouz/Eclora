@@ -1,0 +1,37 @@
+[
+  {
+    "asset": "aboutCampaign",
+    "filename": "eclora-about-campaign-v1",
+    "mode": "built-in image_gen",
+    "references": [
+      "../../front-end/public/images/2.png",
+      "../../front-end/public/images/image copy 6.png"
+    ],
+    "prompt": "Use case: ads-marketing. Create one new exceptionally high-quality photorealistic beauty campaign photograph for ECLORA Algerie About page, portrait 3:4 composition, at least 1536x2048 if supported. Image 1 is a reference ONLY for its luxury glossy advertising quality, cyan water reflections and detailed skin/hair, do not copy its face or composition. Image 2 is the exact product packaging reference: the turquoise GRACIAS bi-phase hair conditioner spray, clear cylindrical bottle, turquoise trigger, white upper liquid and turquoise lower liquid, label and brand GRACIAS preserved accurately. Subject: a beautiful adult North African woman with rich flowing chestnut hair, fresh natural makeup, luminous realistic skin with fine pores, confident relaxed expression, modest white blouse visible at shoulders. She holds the CLOSED upright referenced conditioner bottle beside her hair at shoulder height, the whole bottle visible in lower central half, both face and product within the central 70% for responsive cropping. Haircare campaign, NO applying haircare to the skin. Backdrop crystalline turquoise studio water with elegant suspended droplets and subtle water ribbon behind the product; polished but restrained, crisp high-end editorial retouching, soft key light and clean rim highlights, convincing bottle refraction, anatomically correct hand. Carefully balanced portrait, not a collage or advertisement layout. No beige scene, no typography, captions, slogans, borders or watermarks; only authentic product packaging text. Preserve reference bottle identity and proportions; avoid invented packaging, exaggerated skin smoothing, duplicate products or extra fingers. Photo must fill the entire canvas."
+  },
+  {
+    "asset": "aboutProducts",
+    "filename": "eclora-about-products-v1",
+    "mode": "built-in image_gen",
+    "references": [
+      "../../front-end/public/images/3.png",
+      "../../front-end/public/images/image copy 3.png",
+      "../../front-end/public/images/image copy 4.png",
+      "../../front-end/public/images/image copy 5.png"
+    ],
+    "prompt": "Use case: ads-marketing. Generate one new ultra-premium photorealistic cosmetics campaign still life, portrait 4:5 composition, highly detailed at 1536x1920 or larger if supported, for ECLORA About story section. Image 1 is visual quality/reference mood ONLY: glossy premium studio advertising, convincing material texture and composition, NOT something to reproduce unchanged. Images 2-4 are the three exact product references to stage: GRACIAS pink collagen hair mask jar with brushed silver lid; GRACIAS deep green avocado hair mask jar with metallic gold lid; GRACIAS black Black Garlic shampoo tube with gold flip cap. Reproduce these packaging forms, label designs, brand GRACIAS and colours faithfully. New art direction: luminous white seamless studio, sculptural clear glass plinths, a crisp coral-orange translucent acrylic accent at one side, small flowing water arcs and a few rose petals as styling echoes from the reference. Pink jar central foreground, green jar behind at a complementary height, black tube standing behind with natural perspective, all three entire packages visible in central 75% with elegant breathing room and authentic relative sizes. White background remains clean; colour comes mostly from the products, coral glass and delicate pink reflections, not beige walls. Dramatic luxury softbox illumination, microtexture, clean readable product labels, sharp specular highlights, convincing contact shadows and reflections, 100mm commercial product photography. No models. No advertising typography, slogans, extra logos, watermarks or frames; only the original package text. No added products, invented claims or warped labels. Cohesive single photograph, not a collage."
+  },
+  {
+    "asset": "contactCampaign",
+    "filename": "eclora-contact-campaign-v1",
+    "mode": "built-in image_gen",
+    "references": [
+      "../../front-end/public/images/2.png",
+      "../../front-end/public/images/3.png",
+      "../../front-end/public/images/image copy 6.png",
+      "../../front-end/public/images/image copy 7.png",
+      "../../front-end/public/images/image copy 8.png"
+    ],
+    "prompt": "Use case: ads-marketing. Create a distinct new high-end ECLORA cosmetics campaign photograph for a Contact page, portrait 4:5 composition, very sharp photorealism, at least 1536x1920 if supported. Images 1-2 provide ONLY the glossy premium beauty-ad photography quality, glass reflections and controlled water detail. Images 3-5 are exact products to reproduce faithfully: GRACIAS turquoise two-phase hair conditioner spray with trigger; medicube white ZERO PORE PAD jar with cobalt-blue lid; erborian CENTELLA CLEANSING OIL clear bottle with red collar and white pump. Arrange these actual packages as an elegant beauty discovery trio on staggered clear lucite blocks on a white reflective surface, with clean aqueous turquoise reflections and one subtle coral orange light accent. Hero conditioner upright slightly behind; medicube jar front left; Erborian bottle right, all fully visible within central 75%, realistic relative sizes and sharp package identities. Fresh bright white studio environment, a graceful transparent water splash framing without obscuring any label. Modern beauty editorial lighting, glossy photographic depth, very high material fidelity, realistic shadows, premium 100mm product-photography finish. Reserve a modest clean lower area for web text overlay, but do not draw any text there. No beige, peach wall, spa, model, telephone, envelope, UI, captions, slogans, watermark or external logos. Preserve only existing package logos and wording, do not invent product names. This is a single newly art-directed photograph, not a contact sheet."
+  }
+]
