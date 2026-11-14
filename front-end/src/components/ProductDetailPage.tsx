@@ -41,7 +41,8 @@ export default function ProductDetailPage({
   const needsReference = hasShades && !selectedReference;
   const generalGallery = product.images?.length ? product.images : [product.image];
   const galleryImages = selectedReference?.images?.length ? selectedReference.images : generalGallery;
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const mainImage = previewImage ?? galleryImages[0];
   const selectedStock = hasShades ? selectedReference?.stock ?? product.stock : product.stock;
   const stock = stockLabel(selectedStock);
   const soldOut = stock.tone === 'out';
@@ -71,7 +72,7 @@ export default function ProductDetailPage({
 
   const selectReference = (id: string) => {
     setSelectedReferenceId(id);
-    setSelectedImageIndex(0);
+    setPreviewImage(null);
     setAddedSuccess(false);
   };
 
@@ -109,13 +110,14 @@ export default function ProductDetailPage({
           <div className="lg:col-span-7 flex flex-col-reverse sm:flex-row gap-4">
             {/* Vertical Thumbnails List */}
             <div className="flex sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto max-h-[500px] no-scrollbar">
-              {galleryImages.map((img, idx) => (
+              {generalGallery.map((img, idx) => (
                 <button
                   key={idx}
                   aria-label={`Afficher l’image ${idx + 1}`}
-                  onClick={() => setSelectedImageIndex(idx)}
+                  onClick={() => setPreviewImage(img)}
+                  aria-pressed={mainImage === img}
                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
-                    selectedImageIndex === idx
+                    mainImage === img
                       ? 'border-black ring-2 ring-black/10'
                       : 'border-gray-200 opacity-70 hover:opacity-100'
                   }`}
@@ -136,8 +138,8 @@ export default function ProductDetailPage({
               )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={galleryImages[selectedImageIndex] ?? galleryImages[0]}
-                alt={`${product.title}${selectedReference ? ` — Référence ${selectedReference.name}` : ''}`}
+                src={mainImage}
+                alt={`${product.title}${!previewImage && selectedReference?.images?.length ? ` — Référence ${selectedReference.name}` : ''}`}
                 data-testid="product-main-image"
                 className="max-h-[480px] w-auto object-contain transition-all duration-300"
               />
@@ -411,7 +413,7 @@ export default function ProductDetailPage({
           <div className="flex items-center gap-3 min-w-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={selectedImageIndex < galleryImages.length ? galleryImages[selectedImageIndex] : product.image}
+              src={mainImage}
               alt={product.title}
               className="w-10 h-10 object-cover rounded-lg border border-gray-200 hidden sm:block"
             />

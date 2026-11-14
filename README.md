@@ -49,8 +49,10 @@ Product variants are shown as **Référence** in the admin and storefront. Each
 reference has its own name, stock, and optional image gallery uploaded through
 the existing R2 upload endpoint. Product pages initially show the general gallery
 with a **Choisir une option** reference dropdown; a reference must be selected
-before adding to the cart. Choosing a reference switches the product gallery
-and preserves its first image and name in the cart and order. References without
+before adding to the cart. Choosing a reference changes the main image while
+the thumbnails continue to show the general product images. Its first image
+and name are preserved in the cart and order. General images support multiple
+file uploads in one selection. References without
 images use the general product gallery. Existing color values remain compatible
 internally but are no longer displayed or required in the editor.
 

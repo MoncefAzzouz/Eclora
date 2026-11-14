@@ -88,20 +88,27 @@ export default function ProductForm({
     if (!/^https?:\/\//.test(url) && !url.startsWith('/')) {
       return toast.error('Saisissez une URL d’image valide (https://... ou /uploads/...)');
     }
-    set('images', [...values.images, url]);
+    setValues((v) => ({ ...v, images: [...v.images, url] }));
     setImageUrl('');
   };
 
-  /** Uploads a file from the admin's computer and appends it to the gallery. */
-  const uploadImage = async (file: File) => {
-    if (file.size > 5 * 1024 * 1024) return toast.error('Fichier trop volumineux (5 Mo maximum).');
+  /** Uploads the selected files in order, preserving edits made during upload. */
+  const uploadImages = async (files: FileList | null) => {
+    if (!files?.length) return;
     setUploading(true);
+    let imported = 0;
     try {
-      const { url } = await api.uploads.image(file);
-      set('images', [...values.images, url]);
-      toast.success('Image importée');
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Envoi impossible');
+      for (const file of Array.from(files)) {
+        try {
+          if (file.size > 5 * 1024 * 1024) throw new Error('Fichier trop volumineux (5 Mo maximum).');
+          const { url } = await api.uploads.image(file);
+          setValues((v) => ({ ...v, images: [...v.images, url] }));
+          imported++;
+        } catch (e) {
+          toast.error(`${file.name} : ${e instanceof Error ? e.message : 'Envoi impossible'}`);
+        }
+      }
+      if (imported) toast.success(imported === 1 ? 'Image importée' : `${imported} images importées`);
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -233,12 +240,11 @@ export default function ProductForm({
             <input
               ref={fileRef}
               type="file"
+              multiple
               accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+              aria-label="Images du produit"
               className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void uploadImage(file);
-              }}
+              onChange={(e) => void uploadImages(e.target.files)}
             />
             <Button
               type="button"
@@ -248,9 +254,9 @@ export default function ProductForm({
               onClick={() => fileRef.current?.click()}
               className="w-full"
             >
-              Importer depuis mon ordinateur
+              Importer des images
             </Button>
-            <p className="mt-1.5 mb-3 text-[11px] text-slate-400">JPG, PNG, WEBP, AVIF ou GIF — 5 Mo maximum.</p>
+            <p className="mt-1.5 mb-3 text-[11px] text-slate-400">Sélectionnez une ou plusieurs images. JPG, PNG, WEBP, AVIF ou GIF — 5 Mo maximum par image.</p>
             <div className="flex gap-2">
               <Input
                 value={imageUrl}
