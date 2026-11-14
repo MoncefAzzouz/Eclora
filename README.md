@@ -47,7 +47,9 @@ user `eclora`, password `eclora`.
 
 Product variants are shown as **Référence** in the admin and storefront. Each
 reference has its own name, stock, and optional image gallery uploaded through
-the existing R2 upload endpoint. Choosing a reference switches the product gallery
+the existing R2 upload endpoint. Product pages initially show the general gallery
+with a **Choisir une option** reference dropdown; a reference must be selected
+before adding to the cart. Choosing a reference switches the product gallery
 and preserves its first image and name in the cart and order. References without
 images use the general product gallery. Existing color values remain compatible
 internally but are no longer displayed or required in the editor.

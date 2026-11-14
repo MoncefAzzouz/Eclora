@@ -15,7 +15,6 @@ import { Product } from '@/data/products';
 import { STOCK_TONE, stockLabel } from '@/components/ProductCard';
 import ProductCarousel from '@/components/ProductCarousel';
 import ProductReviews from '@/components/ProductReviews';
-import StoreImage from '@/components/StoreImage';
 
 interface ProductDetailPageProps {
   product: Product;
@@ -37,14 +36,16 @@ export default function ProductDetailPage({
 
   const shades = product.shades ?? [];
   const hasShades = shades.length > 0;
-  const [selectedReferenceId, setSelectedReferenceId] = useState((shades.find((s) => s.stock === undefined || s.stock > 0) ?? shades[0])?.id);
-  const selectedReference = shades.find((s) => s.id === selectedReferenceId) ?? shades[0];
+  const [selectedReferenceId, setSelectedReferenceId] = useState('');
+  const selectedReference = shades.find((s) => s.id === selectedReferenceId);
+  const needsReference = hasShades && !selectedReference;
   const generalGallery = product.images?.length ? product.images : [product.image];
   const galleryImages = selectedReference?.images?.length ? selectedReference.images : generalGallery;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const selectedStock = hasShades ? selectedReference?.stock ?? product.stock : product.stock;
   const stock = stockLabel(selectedStock);
   const soldOut = stock.tone === 'out';
+  const purchaseDisabled = soldOut || needsReference;
 
   // Accordion open states
   const [expandedSection, setExpandedSection] = useState<string | null>('description');
@@ -62,7 +63,7 @@ export default function ProductDetailPage({
   }, []);
 
   const handleAddToCartClick = () => {
-    if (soldOut) return;
+    if (purchaseDisabled) return;
     onAddToCart(hasShades ? { ...product, image: galleryImages[0] ?? product.image, images: galleryImages, stock: selectedStock } : product, selectedReference?.name);
     setAddedSuccess(true);
     setTimeout(() => setAddedSuccess(false), 2000);
@@ -201,36 +202,45 @@ export default function ProductDetailPage({
               </p>
 
               {hasShades && (
-                <fieldset className="mt-8">
-                  <legend className="mb-3 text-xs font-extrabold text-black">Référence : {selectedReference?.name}</legend>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {shades.map((reference) => (
-                      <button type="button" key={reference.id} onClick={() => selectReference(reference.id)}
-                        aria-pressed={selectedReference?.id === reference.id}
-                        className={`flex min-w-0 items-center gap-3 rounded-xl border-2 p-2.5 text-left transition-colors ${selectedReference?.id === reference.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-400'}`}>
-                        {reference.images?.[0] && <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white"><StoreImage src={reference.images[0]} alt="" fill sizes="48px" className="object-contain" /></span>}
-                        <span className="min-w-0 flex-1 break-words text-xs font-bold">{reference.name}{reference.stock === 0 && <span className="mt-1 block text-[10px] font-medium text-red-600">Rupture de stock</span>}</span>
-                        {selectedReference?.id === reference.id && <Check aria-hidden="true" className="h-4 w-4 shrink-0" />}
-                      </button>
-                    ))}
+                <div className="mt-8 grid grid-cols-1 items-center gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-6">
+                  <label htmlFor="product-reference" className="text-sm font-extrabold uppercase text-black">Référence</label>
+                  <div className="relative min-w-0">
+                    <select
+                      id="product-reference"
+                      value={selectedReferenceId}
+                      onChange={(event) => selectReference(event.target.value)}
+                      className="min-h-14 w-full appearance-none rounded-none border border-gray-300 bg-white py-3 pl-4 pr-14 text-base text-gray-700 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                    >
+                      <option value="">Choisir une option</option>
+                      {shades.map((reference) => (
+                        <option key={reference.id} value={reference.id}>
+                          {reference.name}{reference.stock === 0 ? ' — Rupture de stock' : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-center border-l border-gray-300 text-gray-500">
+                      <ChevronDown className="h-5 w-5" />
+                    </span>
                   </div>
-                </fieldset>
+                </div>
               )}
 
               {/* Add to Cart & Wishlist Buttons */}
               <div className="mt-8 flex items-center gap-3">
                 <button
                   onClick={handleAddToCartClick}
-                  disabled={soldOut}
+                  disabled={purchaseDisabled}
                   className={`flex-1 py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all ${
-                    soldOut
+                    purchaseDisabled
                       ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                       : addedSuccess
                       ? 'bg-emerald-600 text-white'
                       : 'bg-black text-white hover:bg-neutral-800'
                   }`}
                 >
-                  {soldOut ? (
+                  {needsReference ? (
+                    <span>Choisir une référence</span>
+                  ) : soldOut ? (
                     <span>Rupture de stock</span>
                   ) : addedSuccess ? (
                     <>
@@ -417,22 +427,22 @@ export default function ProductDetailPage({
             {/* Shade dropdown selector in sticky bar */}
             {hasShades && (
             <div className="hidden md:flex items-center gap-2 border border-gray-300 rounded-xl px-3 py-2 bg-white">
-              <span className="text-xs font-bold text-black">Référence : {selectedReference?.name}</span>
+              <span className="text-xs font-bold text-black">Référence : {selectedReference?.name ?? 'Choisir une option'}</span>
             </div>
             )}
 
             <button
               onClick={handleAddToCartClick}
-              disabled={soldOut}
+              disabled={purchaseDisabled}
               className={`px-6 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${
-                soldOut
+                purchaseDisabled
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   : addedSuccess
                   ? 'bg-emerald-600 text-white'
                   : 'bg-black text-white hover:bg-neutral-800'
               }`}
             >
-              {soldOut ? 'Rupture de stock' : addedSuccess ? 'Ajouté !' : 'Ajouter au panier'}
+              {needsReference ? 'Choisir une référence' : soldOut ? 'Rupture de stock' : addedSuccess ? 'Ajouté !' : 'Ajouter au panier'}
             </button>
           </div>
         </div>
