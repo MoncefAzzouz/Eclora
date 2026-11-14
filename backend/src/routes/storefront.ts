@@ -221,6 +221,43 @@ shopRouter.get(
   })
 );
 
+/** Small, independent recommendations: prefer the same subcategory, then category. */
+shopRouter.get(
+  '/products/:idOrSlug/related',
+  handler(async (req, res) => {
+    const key = param(req, 'idOrSlug');
+    const source = await prisma.product.findFirst({
+      where: { ...activeProduct, OR: [{ id: key }, { slug: key }] },
+      select: { id: true, categoryId: true, subcategoryId: true },
+    });
+    if (!source) throw notFound('Produit introuvable');
+    const where: Prisma.ProductWhereInput = { ...activeProduct, categoryId: source.categoryId, id: { not: source.id } };
+    const preferred = source.subcategoryId ? await prisma.product.findMany({
+      where: { ...where, subcategoryId: source.subcategoryId },
+      include: listInclude,
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 12,
+    }) : [];
+    const rest = preferred.length < 12 ? await prisma.product.findMany({
+      where: { ...where, id: { notIn: [source.id, ...preferred.map((item) => item.id)] } },
+      include: listInclude,
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 12 - preferred.length,
+    }) : [];
+    res.json([...preferred, ...rest].map((item) => {
+      const card = listItem(item);
+      return {
+        ...card,
+        images: card.images.slice(0, 1),
+        shades: card.shades.map(({ id, name, hex, stock }) => ({ id, name, hex, stock })),
+        description: undefined,
+        usageTips: undefined,
+        ingredients: undefined,
+      };
+    }));
+  })
+);
+
 shopRouter.get(
   '/products/:idOrSlug',
   handler(async (req, res) => {

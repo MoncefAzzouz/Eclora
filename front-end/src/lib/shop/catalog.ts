@@ -7,6 +7,8 @@ import { shopApi, type ApiBrand, type ApiCategory } from './api';
 
 let categoriesPromise: Promise<ApiCategory[]> | null = null;
 let brandsPromise: Promise<ApiBrand[]> | null = null;
+let categoriesLoadedAt = 0;
+let brandsLoadedAt = 0;
 
 interface InitialCatalog {
   categories?: ApiCategory[];
@@ -30,10 +32,14 @@ function cached<T>(get: () => Promise<T> | null, set: (p: Promise<T> | null) => 
   return p;
 }
 
-export const loadCategories = () =>
-  cached(() => categoriesPromise, (p) => (categoriesPromise = p), () => shopApi.categories());
-export const loadAllBrands = () =>
-  cached(() => brandsPromise, (p) => (brandsPromise = p), () => shopApi.brands(true));
+export const loadCategories = () => {
+  if (Date.now() - categoriesLoadedAt > 60_000) categoriesPromise = null;
+  return cached(() => categoriesPromise, (p) => { categoriesPromise = p; categoriesLoadedAt = Date.now(); }, () => shopApi.categories());
+};
+export const loadAllBrands = () => {
+  if (Date.now() - brandsLoadedAt > 60_000) brandsPromise = null;
+  return cached(() => brandsPromise, (p) => { brandsPromise = p; brandsLoadedAt = Date.now(); }, () => shopApi.brands(true));
+};
 
 function usePromise<T>(load: () => Promise<T>, fallback: T, initial?: T): T {
   const [value, setValue] = useState<T>(fallback);

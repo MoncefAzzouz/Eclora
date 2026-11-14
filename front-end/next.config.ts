@@ -13,6 +13,9 @@ import type { NextConfig } from "next";
 const API_ORIGIN = (process.env.API_INTERNAL_URL ?? "http://127.0.0.1:4000").replace(/\/api\/?$/, "");
 
 const nextConfig: NextConfig = {
+  // Intent-prefetched product pages contain live prices/stock. Keep their
+  // browser route cache short; a normal request always reads the current API.
+  experimental: { staleTimes: { dynamic: 0, static: 30 } },
   images: {
     qualities: [75, 90],
     // Banner and product images may also be URLs pasted from elsewhere.

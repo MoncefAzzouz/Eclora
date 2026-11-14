@@ -160,6 +160,23 @@ Storefront image components resize local/R2 images through Next.js, which caches
 WebP variants and serves the appropriate width for the screen. The original R2
 files are retained. Other pasted external image URLs remain supported directly.
 
+Product pages also read the local API on the Next.js server, with a five-second
+timeout and no persistent product cache. The initial HTML includes the title,
+price, availability, and responsive main image, which loads eagerly at high
+priority. General thumbnails remain unchanged when a reference is selected;
+only the main image changes. Gallery and sticky-bar images use the same resize
+cache as storefront cards instead of downloading full-size upload originals.
+
+Recommendations use `/api/shop/products/:idOrSlug/related` independently when
+their section approaches the viewport. This returns up to 12 active products,
+preferring the same subcategory and then the same category, without descriptions
+or reference photos. A failed recommendation request does not hide the product.
+Product links prefetch the complete route on hover, keyboard focus, or touch,
+with a 30-second browser route cache. Categories and brands are shared for up to
+60 seconds between mounts. Concurrent settings requests share one in-flight
+read; subsequent visits request current settings. Checkout still recalculates
+prices and validates stock on the server.
+
 ### Existing media deployment scripts
 
 Product and banner images are files in `backend/uploads/`; the titles and the rows that

@@ -222,9 +222,12 @@ export interface HomePayload {
   freeShippingThreshold: number;
 }
 
+// Share simultaneous settings reads without retaining stale admin content.
+let settingsRequest: Promise<ShopSettings> | undefined;
+
 export const shopApi = {
   home: () => request<HomePayload>('/shop/home'),
-  settings: () => request<ShopSettings>('/shop/settings'),
+  settings: () => settingsRequest ??= request<ShopSettings>('/shop/settings').finally(() => { settingsRequest = undefined; }),
   contact: (body: { name: string; email: string; phone: string; message: string; website: string }) =>
     request<{ ok: boolean }>('/shop/contact', { method: 'POST', body: JSON.stringify(body) }),
   categories: () => request<ApiCategory[]>('/shop/categories'),
@@ -238,7 +241,8 @@ export const shopApi = {
     );
     return request<{ total: number; products: ApiProduct[] }>(`/shop/products${query.toString() ? `?${query}` : ''}`);
   },
-  product: (idOrSlug: string) => request<ApiProduct>(`/shop/products/${idOrSlug}`),
+  product: (idOrSlug: string) => request<ApiProduct>(`/shop/products/${encodeURIComponent(idOrSlug)}`),
+  relatedProducts: (id: string, signal?: AbortSignal) => request<ApiProduct[]>(`/shop/products/${encodeURIComponent(id)}/related`, { signal }),
   shipping: () => request<ShippingRate[]>('/shop/shipping'),
   deliveryWilayas: () => request<(ShippingRate & { hasStopdesk: boolean })[]>('/shop/delivery/wilayas'),
   deliveryWilaya: (code: number) => request<WilayaDelivery>(`/shop/delivery/wilayas/${code}`),

@@ -32,6 +32,12 @@ export default function ProductCard({ product, isWishlisted, onToggleWishlist, o
   const router = useRouter();
   const [added, setAdded] = useState(false);
   const href = `/product/${product.slug ?? product.id}`;
+  const [prefetch, setPrefetch] = useState(false);
+  const prepareProduct = () => {
+    // Prepare only a product the customer intends to open, not the whole grid.
+    // Explicit `true` also fetches the data for dynamic product routes.
+    setPrefetch(true);
+  };
   const stock = stockLabel(product.stock);
   const soldOut = stock.tone === 'out';
   const badge = product.badge ?? (product.isNew ? 'Nouveauté' : product.isBestSeller ? 'Best-seller' : null);
@@ -61,7 +67,7 @@ export default function ProductCard({ product, isWishlisted, onToggleWishlist, o
           </button>
         </div>
 
-        <Link href={href} className="relative mb-2 flex h-[170px] w-full items-center justify-center overflow-hidden bg-white sm:h-[230px]">
+        <Link href={href} prefetch={prefetch} onPointerEnter={prepareProduct} onFocus={prepareProduct} onTouchStart={prepareProduct} className="relative mb-2 flex h-[170px] w-full items-center justify-center overflow-hidden bg-white sm:h-[230px]">
           <StoreImage
             src={product.image}
             alt={product.title}
@@ -81,7 +87,7 @@ export default function ProductCard({ product, isWishlisted, onToggleWishlist, o
             product.brand
           )}
         </div>
-        <Link href={href} className="line-clamp-2 min-h-[36px] text-[13px] font-medium leading-snug text-neutral-900 hover:underline sm:min-h-[40px] sm:text-sm">
+        <Link href={href} prefetch={prefetch} onPointerEnter={prepareProduct} onFocus={prepareProduct} onTouchStart={prepareProduct} className="line-clamp-2 min-h-[36px] text-[13px] font-medium leading-snug text-neutral-900 hover:underline sm:min-h-[40px] sm:text-sm">
           {product.title}
         </Link>
         {product.volume && <div className="mt-0.5 text-[11px] text-gray-500 sm:text-xs">{product.volume}</div>}

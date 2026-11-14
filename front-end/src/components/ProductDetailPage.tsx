@@ -13,13 +13,12 @@ import {
 } from 'lucide-react';
 import { Product } from '@/data/products';
 import { STOCK_TONE, stockLabel } from '@/components/ProductCard';
-import ProductCarousel from '@/components/ProductCarousel';
 import ProductReviews from '@/components/ProductReviews';
+import StoreImage from '@/components/StoreImage';
 
 interface ProductDetailPageProps {
   product: Product;
-  /** Related products shown in the two carousels. */
-  related?: Product[];
+  recommendations?: React.ReactNode;
   wishlist: string[];
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product, shadeName?: string) => void;
@@ -27,7 +26,7 @@ interface ProductDetailPageProps {
 
 export default function ProductDetailPage({
   product,
-  related = [],
+  recommendations,
   wishlist,
   onToggleWishlist,
   onAddToCart,
@@ -122,26 +121,28 @@ export default function ProductDetailPage({
                       : 'border-gray-200 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                  <StoreImage src={img} alt={`${product.title} — image ${idx + 1}`} width={64} height={64} sizes="64px" loading="lazy" className="w-full h-full object-cover" />
                 </button>
               ))}
 
             </div>
 
             {/* Main Stage Image */}
-            <div className="flex-1 bg-gray-50 rounded-2xl p-6 relative flex items-center justify-center min-h-[420px] border border-gray-100">
+            <div className="min-w-0 flex-1 bg-gray-50 rounded-2xl relative h-[420px] min-h-[420px] sm:h-[528px] sm:min-h-[528px] border border-gray-100">
               {product.badge && (
                 <span className="absolute top-4 left-4 bg-black text-white text-xs font-bold px-3 py-1 rounded-md z-10">
                   {product.badge}
                 </span>
               )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <StoreImage
                 src={mainImage}
                 alt={`${product.title}${!previewImage && selectedReference?.images?.length ? ` — Référence ${selectedReference.name}` : ''}`}
                 data-testid="product-main-image"
-                className="max-h-[480px] w-auto object-contain transition-all duration-300"
+                fill
+                sizes="(min-width: 1440px) 640px, (min-width: 1024px) 45vw, (min-width: 640px) calc(100vw - 176px), calc(100vw - 80px)"
+                loading="eager"
+                fetchPriority="high"
+                className="object-contain p-6 transition-all duration-300"
               />
             </div>
           </div>
@@ -390,13 +391,7 @@ export default function ProductDetailPage({
         </section>
 
         {/* Carousel Section: Complétez votre routine */}
-        <ProductCarousel
-          title="Vous aimerez aussi"
-          products={related}
-          wishlist={wishlist}
-          onToggleWishlist={onToggleWishlist}
-          onOpenQuickView={() => {}}
-        />
+        {recommendations}
 
         <ProductReviews product={product} />
 
@@ -411,12 +406,14 @@ export default function ProductDetailPage({
       >
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            {showStickyBar && <StoreImage
               src={mainImage}
               alt={product.title}
+              width={40}
+              height={40}
+              sizes="40px"
               className="w-10 h-10 object-cover rounded-lg border border-gray-200 hidden sm:block"
-            />
+            />}
             <div className="min-w-0">
               <div className="text-[11px] font-black uppercase text-black truncate">{product.brand}</div>
               <div className="text-xs text-gray-800 truncate font-medium">{product.title}</div>
