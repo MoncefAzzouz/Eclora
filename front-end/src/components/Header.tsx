@@ -16,6 +16,8 @@ interface HeaderProps {
   onOpenQuickView?: (product: Product) => void;
 }
 
+const NAV_LINK_TEXT = 'font-avantgarde text-[14px] font-medium uppercase tracking-[0.04em] whitespace-nowrap';
+
 /** Live search: debounced, and only the latest answer is kept. */
 function useProductSearch(query: string) {
   const [results, setResults] = useState<{ q: string; total: number; products: ApiProduct[] } | null>(null);
@@ -175,12 +177,12 @@ export default function Header({ cartCount, onOpenCart }: HeaderProps) {
               <Search className="h-5 w-5 stroke-[1.75]" />
             </button>
 
-            <Link href="/a-propos" className="hidden font-medium transition-colors hover:text-gray-600 md:block">À propos</Link>
-            <Link href="/contact" className="hidden font-medium transition-colors hover:text-gray-600 md:block">Contact</Link>
+            <Link href="/a-propos" className={`hidden transition-colors hover:text-gray-600 md:block ${NAV_LINK_TEXT}`}>À propos</Link>
+            <Link href="/contact" className={`hidden transition-colors hover:text-gray-600 md:block ${NAV_LINK_TEXT}`}>Contact</Link>
 
             <Link href="/compte" className="flex items-center gap-2 transition-colors hover:text-gray-600" aria-label="Mon compte">
               <User className="h-5 w-5 stroke-[1.75]" />
-              <span className="hidden font-medium leading-tight sm:inline">{firstName ? `Bonjour, ${firstName}` : 'Se connecter'}</span>
+              <span className={`hidden sm:inline ${NAV_LINK_TEXT}`}>{firstName ? `Bonjour, ${firstName}` : 'Se connecter'}</span>
             </Link>
 
 
