@@ -233,6 +233,7 @@ export interface ShippingRate {
 // ─── Settings & team ────────────────────────────────────────────────────────
 
 export interface StoreSettings {
+  pages?: import('@/lib/site-pages').PageContent;
   storeName: string;
   contactEmail: string;
   contactPhone: string;

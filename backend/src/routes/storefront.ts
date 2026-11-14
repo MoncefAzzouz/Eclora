@@ -35,6 +35,7 @@ shopRouter.get(
       payments: full.payments,
       socials: full.socials,
       maintenanceMode: full.maintenanceMode,
+      pages: full.pages,
     });
   })
 );

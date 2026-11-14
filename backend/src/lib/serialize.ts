@@ -232,6 +232,7 @@ export function settings(s: StoreSettings) {
     payments: { COD: s.payCod, BARIDIMOB: s.payBaridimob, CIB: s.payCib },
     socials: { instagram: s.instagram, facebook: s.facebook, tiktok: s.tiktok },
     maintenanceMode: s.maintenanceMode,
+    pages: s.pages,
     yalidine: {
       fromWilaya: s.yalidineFromWilaya,
       parcel: { length: s.parcelLength, width: s.parcelWidth, height: s.parcelHeight, weight: s.parcelWeight },

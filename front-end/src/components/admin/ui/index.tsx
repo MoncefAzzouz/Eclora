@@ -370,6 +370,7 @@ export function Tabs<K extends string>({
       {tabs.map((t) => (
         <button
           key={t.id}
+          type="button"
           onClick={() => onChange(t.id)}
           className={`px-3 py-2.5 text-xs font-bold whitespace-nowrap border-b-2 -mb-px transition-colors flex items-center gap-1.5 ${
             value === t.id ? 'border-black text-black' : 'border-transparent text-slate-500 hover:text-black'

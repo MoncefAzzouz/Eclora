@@ -126,6 +126,7 @@ export interface ApiBrand {
 }
 
 export interface ShopSettings {
+  pages?: import('@/lib/site-pages').PageContent;
   storeName: string;
   contactEmail: string;
   contactPhone: string;

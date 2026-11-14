@@ -60,6 +60,7 @@ export default function Footer() {
             <h3 className="mb-4 text-sm font-black uppercase tracking-wider">Mon ECLORA</h3>
             <ul className="space-y-2.5 text-[13px]">
               <li><Link href="/compte" className={LINK}>Mon compte</Link></li>
+              <li><Link href="/a-propos" className={LINK}>À propos d’Eclora</Link></li>
               <li><Link href="/suivi" className={LINK}>Suivre ma commande</Link></li>
               <li><Link href="/panier" className={LINK}>Mon panier</Link></li>
             </ul>
@@ -71,7 +72,7 @@ export default function Footer() {
               <li><Link href="/aide#livraison" className={LINK}>Livraison</Link></li>
               <li><Link href="/aide#paiement" className={LINK}>Paiement</Link></li>
               <li><Link href="/aide#retours" className={LINK}>Retours</Link></li>
-              <li><Link href="/aide#contact" className={LINK}>Nous contacter</Link></li>
+              <li><Link href="/contact" className={LINK}>Nous contacter</Link></li>
             </ul>
           </div>
 

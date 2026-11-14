@@ -321,6 +321,7 @@ model StoreSettings {
   facebook              String   @default("")
   tiktok                String   @default("")
   maintenanceMode       Boolean  @default(false)
+  pages                 Json     @default("{}")
   /// Yalidine: the wilaya parcels leave from, and the default parcel size the
   /// parcel API requires (cm / kg).
   yalidineFromWilaya    Int      @default(19)

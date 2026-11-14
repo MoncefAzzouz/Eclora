@@ -41,7 +41,6 @@ export default function HomePage({ initialData }: { initialData: HomePayload | n
     <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-pink-100 selection:text-pink-900">
       <AnnouncementBar text={data?.announcement} />
       <Header
-        wishlistCount={wishlist.length}
         cartCount={cart.count}
         onOpenCart={() => cart.setOpen(true)}
         onOpenQuickView={setQuickViewProduct}

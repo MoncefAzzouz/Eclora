@@ -43,6 +43,26 @@ already uses 5432. Connection string: `postgresql://eclora:eclora@localhost:5433
 You can also connect the pgAdmin 4 desktop app: host `localhost`, port `5433`, database `eclora`,
 user `eclora`, password `eclora`.
 
+## Editable About and Contact pages
+
+The public `/a-propos` and `/contact` pages load their content on every request.
+Edit their French text, values, photos and opening hours in **Paramètres → Pages
+du site**. Photos use the existing R2 uploader; contact details also update the
+footer. Page saves use `/api/admin/settings/pages` and preserve payment and
+delivery settings. The pages include scroll reveals with reduced-motion support
+and remain readable without JavaScript. The header links to both pages; order
+tracking remains available from the footer and help page.
+
+Apply `backend/prisma/migrations/20261114220000_editable_pages/migration.sql`
+with `prisma db execute --file ... --schema prisma/schema.prisma` on an existing
+database, then regenerate Prisma and rebuild both services. This adds only the
+JSON page-content column and preserves the current settings and catalogue.
+
+Default editorial imagery: [serum](https://images.unsplash.com/photo-1608571423902-eed4a5ad8108)
+and [skincare ritual](https://images.unsplash.com/photo-1570172619644-dfd03ed5d881)
+from Unsplash, stored locally and resized by Next Image. Replace them from the
+page editor with your own photography at any time.
+
 ## Ordering without an account
 
 Product variants are shown as **Référence** in the admin and storefront. Each

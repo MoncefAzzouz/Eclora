@@ -24,7 +24,6 @@ export default function ShopShell({ children, announcement }: { children: React.
     <div className="min-h-screen bg-white text-black flex flex-col">
       <AnnouncementBar text={announcement} />
       <Header
-        wishlistCount={wishlist.length}
         cartCount={cart.count}
         onOpenCart={() => cart.setOpen(true)}
         onOpenQuickView={setQuickViewProduct}

@@ -6,6 +6,7 @@ import { prisma } from '../lib/prisma.js';
 import { badRequest, forbidden, handler } from '../lib/http.js';
 import * as s from '../lib/serialize.js';
 import { MANAGERS, requireRole } from '../middleware/auth.js';
+import { pageSettingsSchema } from '../lib/page-content.js';
 
 // ─── Settings ───────────────────────────────────────────────────────────────
 
@@ -48,6 +49,18 @@ settingsRouter.get(
     res.json(s.settings(await getSettings()));
   })
 );
+
+// Save public page content separately so payment, delivery and team settings
+// cannot be overwritten by an older page editor tab.
+settingsRouter.put('/pages', requireRole(...MANAGERS), handler(async (req, res) => {
+  const input = pageSettingsSchema.parse(req.body);
+  const updated = await prisma.storeSettings.upsert({
+    where: { id: 1 },
+    create: { id: 1, ...input },
+    update: input,
+  });
+  res.json(s.settings(updated));
+}));
 
 settingsRouter.put(
   '/',

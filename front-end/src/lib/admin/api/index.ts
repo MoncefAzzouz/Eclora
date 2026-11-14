@@ -288,6 +288,8 @@ const yalidine = {
 const settings = {
   get: () => request<StoreSettings>('/admin/settings'),
   save: (value: StoreSettings) => request<StoreSettings>('/admin/settings', { method: 'PUT', body: value }),
+  savePages: (value: { pages: import('@/lib/site-pages').SitePages; contactEmail: string; contactPhone: string; address: string }) =>
+    request<StoreSettings>('/admin/settings/pages', { method: 'PUT', body: value }),
 };
 
 const team = {

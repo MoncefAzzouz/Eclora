@@ -3,14 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, ChevronRight, Heart, Menu, Package, Search, ShoppingBag, User, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 import type { Product } from '@/data/products';
 import { formatDA, shopApi, type ApiProduct } from '@/lib/shop/api';
 import { useCategories } from '@/lib/shop/catalog';
 import { useCustomer } from '@/lib/shop/account';
 
 interface HeaderProps {
-  wishlistCount: number;
   cartCount: number;
   onOpenCart: () => void;
   /** Kept for the pages that still pass it; search results now open the product page. */
@@ -86,7 +85,7 @@ function SearchResults({ query, onPick }: { query: string; onPick: () => void })
   );
 }
 
-export default function Header({ wishlistCount, cartCount, onOpenCart }: HeaderProps) {
+export default function Header({ cartCount, onOpenCart }: HeaderProps) {
   const router = useRouter();
   const categories = useCategories();
   const { customer } = useCustomer();
@@ -176,24 +175,14 @@ export default function Header({ wishlistCount, cartCount, onOpenCart }: HeaderP
               <Search className="h-5 w-5 stroke-[1.75]" />
             </button>
 
-            <Link href="/suivi" className="hidden items-center gap-2 transition-colors hover:text-gray-600 md:flex">
-              <Package className="h-5 w-5 stroke-[1.75]" />
-              <span className="font-medium leading-tight">Suivre ma commande</span>
-            </Link>
+            <Link href="/a-propos" className="hidden font-medium transition-colors hover:text-gray-600 md:block">À propos</Link>
+            <Link href="/contact" className="hidden font-medium transition-colors hover:text-gray-600 md:block">Contact</Link>
 
             <Link href="/compte" className="flex items-center gap-2 transition-colors hover:text-gray-600" aria-label="Mon compte">
               <User className="h-5 w-5 stroke-[1.75]" />
               <span className="hidden font-medium leading-tight sm:inline">{firstName ? `Bonjour, ${firstName}` : 'Se connecter'}</span>
             </Link>
 
-            <span className="relative p-1" aria-label={`Favoris (${wishlistCount})`}>
-              <Heart className="h-5 w-5 stroke-[1.75]" />
-              {wishlistCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#d80075] text-[10px] font-bold text-white">
-                  {wishlistCount}
-                </span>
-              )}
-            </span>
 
             <button type="button" onClick={onOpenCart} className="relative flex cursor-pointer items-center gap-1.5 p-1 transition-colors hover:text-gray-600" aria-label={`Mon panier (${cartCount})`}>
               <div className="relative">
@@ -296,10 +285,8 @@ export default function Header({ wishlistCount, cartCount, onOpenCart }: HeaderP
                 <User className="h-4 w-4 text-black" />
                 {customer ? `Mon compte (${firstName})` : 'Se connecter / Créer un compte'}
               </Link>
-              <Link href="/suivi" onClick={() => setIsMobileNavOpen(false)} className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-black" />
-                Suivre ma commande
-              </Link>
+              <Link href="/a-propos" onClick={() => setIsMobileNavOpen(false)} className="block">À propos</Link>
+              <Link href="/contact" onClick={() => setIsMobileNavOpen(false)} className="block">Contact</Link>
             </div>
           </div>
         </div>

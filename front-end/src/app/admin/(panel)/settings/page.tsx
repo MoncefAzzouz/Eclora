@@ -10,8 +10,9 @@ import { ADMIN_ROLE, PAYMENT_METHOD } from '@/lib/admin/constants';
 import type { AdminRole, AdminUser, PaymentMethod, StoreSettings } from '@/types/admin';
 import { Badge, Button, Card, ConfirmDialog, ErrorState, Field, IconButton, Input, LoadingState, Modal, PageHeader, Select, Tabs, Toggle } from '@/components/admin/ui';
 import { useToast } from '@/components/admin/ui/Toast';
+import PageSettings from '@/components/admin/settings/PageSettings';
 
-type Tab = 'store' | 'payments' | 'team';
+type Tab = 'store' | 'pages' | 'payments' | 'team';
 
 export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('store');
@@ -21,13 +22,14 @@ export default function SettingsPage() {
       <Tabs
         tabs={[
           { id: 'store', label: 'Boutique' },
+          { id: 'pages', label: 'Pages du site' },
           { id: 'payments', label: 'Paiement & livraison' },
           { id: 'team', label: 'Équipe' },
         ]}
         value={tab}
         onChange={setTab}
       />
-      {tab === 'team' ? <TeamTab /> : <StoreTab section={tab} />}
+      {tab === 'team' ? <TeamTab /> : tab === 'pages' ? <PageSettings /> : <StoreTab section={tab} />}
     </div>
   );
 }
